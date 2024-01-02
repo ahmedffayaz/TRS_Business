@@ -1,0 +1,60 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class Client extends Model
+{
+    use HasFactory, SoftDeletes;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'company_id',
+        'name',
+        'street_address',
+        'city',
+        'postal_code',
+        'country_id',
+        'rate_per_hour',
+        'rate_unit',
+        'note'
+    ];
+
+    public function scopeGetList($query, $search, $columnName, $sortDirection)
+    {
+        if (!empty($search)) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('street_address', 'LIKE', '%' . $search . '%')
+                    ->orWhere('city', 'LIKE', '%' . $search . '%')
+                    ->orWhereHas('country', function ($query) use ($search) {
+                        $query->where('name', 'LIKE', '%' . $search . '%');
+                    })
+                    ->orWhere('postal_code', 'LIKE', '%' . $search . '%')
+                    ->orWhere('rate_per_hour', 'LIKE', '%' . $search . '%')
+                    ->orWhere('rate_unit', 'LIKE', '%' . $search . '%')
+                    ->orWhere('note', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy($columnName, $sortDirection);
+    }
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    public function country(): BelongsTo
+    {
+        return $this->belongsTo(Country::class);
+    }
+}

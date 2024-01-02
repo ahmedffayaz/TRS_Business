@@ -1,0 +1,17 @@
+/* Theme CSS */
+@import url('../assets/css/bootstrap.min.css');
+@import url('../assets/css/bootstrap-extended.min.css');
+@import url('../assets/css/colors.min.css');
+@import url('../assets/css/components.min.css');
+@import url('../assets/css/dark-layout.min.css');
+@import url('../assets/css/vertical-menu.min.css');
+
+/* Node Module Dependencies */
+@import url('toastr/build/toastr.css');
+@import url('select2/dist/css/select2.min.css');
+@import url('sweetalert2/dist/sweetalert2.min.css');
+
+/* Custom CSS */
+@import url('../assets/css/form-validation.min.css');
+@import url('../assets/css/authentication.min.css');
+@import url('../assets/css/sweet-alerts.min.css');
