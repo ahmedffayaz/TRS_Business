@@ -42,7 +42,7 @@ class ProjectFactory extends Factory
             'type' => $isFixed ? 'fixed' : 'hourly',
             'nature' => $faker->randomElement([
                 'fixed',
-                'weekly',
+                'hourly',
                 'monthly',
             ]),
         ];
