@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Country extends Model
 {
-	/**
-	 * The attributes that are mass assignable.
-	 *
-	 * @var array
-	 */
-	protected $fillable = ['name'];
+
+    protected $fillable = [
+        'name',
+        'official_name',
+        'continent_name',
+        'alpha_2_code',
+        'alpha_3_code',
+        'numeric_code',
+        'country_code',
+        'official_language'
+    ];
 }

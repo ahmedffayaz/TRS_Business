@@ -29,6 +29,11 @@ class Task extends Model
 		'completed_at'
 	];
 
+	protected $casts = [
+        'completed_at' => 'datetime',
+        'billed_at' => 'datetime',
+    ];
+	
 	/**
 	 * @return BelongsTo
 	 */

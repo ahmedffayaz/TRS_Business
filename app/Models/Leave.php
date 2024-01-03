@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\Leave\LeaveIsWorking;
+use App\Enums\Leave\LeaveStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -18,6 +20,11 @@ class Leave extends Model
         'processing_reason'
     ];
 
+    protected $casts = [
+        'is_working' => LeaveIsWorking::class,
+        'status' => LeaveStatus::class
+    ];
+    
     /**
      * @return BelongsTo
      */

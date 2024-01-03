@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+use App\Enums\Project\ProjectIsAutoArchived;
+use App\Enums\Project\ProjectNature;
+use App\Enums\Project\ProjectType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -38,9 +41,30 @@ class Project extends Model
         'last_updated_at'
     ];
 
-    /**
-     * @return BelongsToMany
-     */
+    protected $casts = [
+        'type' => ProjectType::class,
+        'is_auto_archived' => ProjectIsAutoArchived::class,
+        'nature' => ProjectNature::class,
+        'last_updated_at' => 'datetime',
+    ];
+    
+    public function scopeGetList($query, $search, $columnName, $sortDirection) {
+        if (!empty($search)) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('status', 'LIKE', '%' . $search . '%')
+                    ->orWhere('description', 'LIKE', '%' . $search . '%')
+                    ->orWhere('budget', 'LIKE', '%' . $search . '%')
+                    ->orWhere('rate_per_hour', 'LIKE', '%' . $search . '%')
+                    ->orWhere('rate_unit', 'LIKE', '%' . $search . '%')
+                    ->orWhere('type', 'LIKE', '%' . $search . '%')
+                    ->orWhere('reports_schedule', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy($columnName, $sortDirection);
+    }
+
     public function members(): BelongsToMany
     {
         return $this->BelongsToMany(User::class, 'project_members');
