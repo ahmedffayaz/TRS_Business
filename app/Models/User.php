@@ -2,65 +2,133 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use Notifiable, HasRoles, SoftDeletes;
+    protected $guard_name = 'web';
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $fillable = [
+        'company_id',
         'first_name',
-        'middle_name',
         'last_name',
         'email',
-        'email_verified_at',
-        'alternative_email',
         'password',
+        'account_type',
         'designation',
         'phone',
-        'alternative_number',
         'address',
+        'device_token',
+        'avatar',
+        'alternative_number',
         'salary',
         'currency',
-        'company_id',
-        'avatar',
-        'is_active'
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
+     * The attributes that should be hidden for arrays.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token', 'pivot',
     ];
 
     /**
-     * The attributes that should be cast.
+     * The attributes that should be cast to native types.
      *
-     * @var array<string, string>
+     * @var array
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'password' => 'hashed',
     ];
+
+    /**
+     * Encrypt password
+     *
+     * @param $value
+     * @return string
+     */
+    public function setPasswordAttribute($value)
+    {
+        return $this->attributes['password'] = bcrypt($value);
+    }
+
+    public function getNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
+
+    public function getNameWithDesignationAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name . ' -- ' . slugToName(implode(', ', $this->getRoleNames()->toArray()));
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * @return BelongsToMany
+     */
+    public function projects(): BelongsToMany
+    {
+        return $this->belongsToMany(Project::class, 'project_members', 'user_id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function commentsTo(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'to', 'id');
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(Task::class);
+    }
+
+    /**
+     * @return HasMany
+     */
+    public function salaries(): HasMany
+    {
+        return $this->hasMany(Salary::class);
+    }
+
+    public function userContracts(): HasMany
+    {
+        return $this->hasMany(UserContract::class);
+    }
+
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
+    }
 
     public function getFullName(): string
     {
-        return "{$this->first_name} {$this->middle_name} {$this->last_name}";
+        return "{$this->first_name} {$this->last_name}";
     }
 
     public function scopeGetList($query, $search, $columnName, $sortDirection)
@@ -68,7 +136,6 @@ class User extends Authenticatable
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('first_name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('middle_name', 'LIKE', '%' . $search . '%')
                     ->orWhere('last_name', 'LIKE', '%' . $search . '%')
                     ->orWhere('email', 'LIKE', '%' . $search . '%')
                     ->orWhere('alternative_email', 'LIKE', '%' . $search . '%')
@@ -94,10 +161,5 @@ class User extends Authenticatable
         if ($keyword === 'inactive' || $keyword === 'Inactive' || $keyword === 'INACTIVE') {
             return $query->orWhere('is_active', 0);
         }
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
     }
 }

@@ -6,38 +6,41 @@ use App\Enums\Company\CompanyType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Company extends Model
 {
-    use HasFactory, SoftDeletes;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+	    'logo',
         'name',
-        'logo',
-        'street_address',
+        'address',
         'city',
-        'country_id',
         'postal_code',
-        'parent_id',
+        'country',
+        'rate_per_hour',
+        'rate_per_hour_unit',
         'type',
+        'parent_id',
         'invoice_prefix',
         'invoice_serial'
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
+	/**
+	 * Return company name with type for listing
+	 *
+	 * @return string
+	 */
+	public function getNameWithTypeAttribute() {
+		return $this->name . ' - ' . $this->type;
+	}
+	protected $casts = [
         'type' => CompanyType::class,
     ];
 
@@ -77,4 +80,25 @@ class Company extends Model
     {
         return $this->belongsTo(Country::class);
     }
+	
+	public function users(): HasMany
+	{
+		return $this->hasMany(User::class);
+	}
+
+	public function projects(): HasMany
+	{
+		return $this->hasMany(Project::class);
+	}
+	public function invoices()
+	{
+		return $this->hasManyThrough('App\Invoice', 'App\Project');
+	}
+
+	/**
+	 * @return BelongsTo
+	 */
+	public function company(): BelongsTo {
+		return $this->belongsTo(Company::class, 'parent_id', 'id');
+	}
 }

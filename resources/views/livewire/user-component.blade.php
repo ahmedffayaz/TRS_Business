@@ -136,15 +136,6 @@
                 </div>
 
                 <div class="mb-1">
-                    <x-input-label for="middle_name" value="Middle Name" /> <span class="small">&#40;optional&#41;</span>
-                    <x-input type="text" name="middle_name" id="middle_name" :class="$errors->has('form.middle_name') ? 'error' : ''" placeholder="Enter middle name" wire:model="form.middle_name"
-                        autocomplete="additional-name" />
-                    @error('form.middle_name')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-
-                <div class="mb-1">
                     <x-input-label for="last_name" class="required" value="Last Name" />
                     <x-input type="text" name="last_name" id="last_name" :class="$errors->has('form.last_name') ? 'error' : ''" placeholder="Enter last name" wire:model="form.last_name"
                         autocomplete="family-name" />

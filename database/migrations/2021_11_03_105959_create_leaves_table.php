@@ -6,37 +6,43 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-return new class extends Migration
+class CreateLeavesTable extends Migration
 {
     /**
      * Run the migrations.
+     *
+     * @return void
      */
-    public function up(): void
+    public function up()
     {
         Schema::create('leaves', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->text('reason')->nullable();
-            $table->string('start_date')->nullable();
-            $table->string('end_date')->nullable();
+            $table->date('start_date');
+            $table->date('end_date');
             $table->boolean('is_working')->default(LeaveIsWorking::WORKING->value);
             $table->string('status')->default(LeaveStatus::PENDING->value);
-            $table->unsignedBigInteger('processed_by');
+            $table->unsignedBigInteger('processed_by')->nullable();
             $table->text('processing_reason')->nullable();
             $table->timestamps();
-        });
 
-        Schema::table('leaves', function (Blueprint $table) {
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('processed_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')
+                ->onDelete('restrict')
+                ->onUpdate('restrict');
+            $table->foreign('processed_by')->references('id')->on('users')
+                ->onDelete('restrict')
+                ->onUpdate('restrict');
         });
     }
 
     /**
      * Reverse the migrations.
+     *
+     * @return void
      */
-    public function down(): void
+    public function down()
     {
         Schema::dropIfExists('leaves');
     }
-};
+}

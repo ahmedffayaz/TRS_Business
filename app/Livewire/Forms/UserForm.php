@@ -14,7 +14,6 @@ class UserForm extends Form
 
     public ?string $avatar;
     public string $first_name = '';
-    public ?string $middle_name;
     public string $last_name = '';
     public ?string $email;
     public ?string $alternative_email;
@@ -34,7 +33,6 @@ class UserForm extends Form
         return [
             'avatar' => ['nullable'],
             'first_name' => ['required', 'string', 'max:191'],
-            'middle_name' => ['nullable', 'string', 'max:191'],
             'last_name' => ['required', 'string', 'max:191'],
             'email' => ['required', 'string', 'email:strict', 'unique:users,email,' . $this->id, 'max:191'],
             'alternative_email' => ['nullable', 'string', 'email:strict,dns', 'unique:users,alternative_email,' . $this->id, 'max:191'],
@@ -56,7 +54,6 @@ class UserForm extends Form
         return [
             'avatar' => 'avatar',
             'first_name' => 'first name',
-            'middle_name' => 'middle name',
             'last_name' => 'last name',
             'email' => 'email',
             'alternative_email' => 'alternative email',
@@ -76,7 +73,6 @@ class UserForm extends Form
     public function set(User $user): void
     {
         $this->first_name = $user?->first_name;
-        $this->middle_name = $user?->middle_name;
         $this->last_name = $user?->last_name;
         $this->email = $user?->email;
         $this->alternative_email = $user?->alternative_email;
