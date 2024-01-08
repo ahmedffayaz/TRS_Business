@@ -3,6 +3,7 @@
     Dashboard
 @endsection
 @section('content')
+{[dd('sss')]}
     <div class="content-header row">
     </div>
     <div class="content-body">
