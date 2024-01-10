@@ -24,8 +24,10 @@ class LoginComponent extends Component
     {
         $validated = $this->form->validate();
         if (Auth::attempt($validated, $this->remember)) {
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Login successfully.']);
             return redirect()->to('/dashboard');
         } else {
+            $this->dispatch('alert', ['type' => 'error',  'message' => 'Invalid credentials.']);
             session()->flash('error', 'Invalid credentials');
         }
     }
@@ -34,6 +36,7 @@ class LoginComponent extends Component
     {
         Auth::logout();
         session()->flash('status', 'Logout successful');
+        $this->dispatch('alert', ['type' => 'success',  'message' => 'Logout successfully']);
         return redirect()->to('/');
     }
 }

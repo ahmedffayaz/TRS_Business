@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use App\Notifications\InstantNotification;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Get system name
@@ -14,6 +15,12 @@ function cms_name()
 {
     $cms_name = Setting::where('name', 'cms_name')->first();
     return isset($cms_name) ? $cms_name->value : config('app.name');
+}
+
+function getAuthRoles(){
+    $user = Auth::user();
+    $rolesString = implode(', ', $user->roles->pluck('name')->toArray());
+    return $rolesString;
 }
 
 function favicon()

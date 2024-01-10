@@ -4,7 +4,8 @@
         <div class="alert alert-success p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
             {{ session('status') }}
         </div>
-    @elseif (session()->has('error'))
+    @endif
+    @if (session()->has('error'))
         <div class="alert alert-error alert-danger p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
             {{ session('error') }}
         </div>
