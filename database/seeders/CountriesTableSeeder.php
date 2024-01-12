@@ -13,6 +13,8 @@ class CountriesTableSeeder extends Seeder
      */
     public function run()
     {
+        Country::query()->delete();
+
         $now = Carbon::now();
 
 	    $countries = array(
@@ -257,6 +259,13 @@ class CountriesTableSeeder extends Seeder
             ["name" => "Zimbabwe", "created_at" => $now],
         );
 
-        Country::insert($countries);
+        foreach ($countries as $country) {
+			Country::updateOrCreate(
+				[
+					'name' => $country['name']
+				],
+				$country
+			);
+		}
     }
 }

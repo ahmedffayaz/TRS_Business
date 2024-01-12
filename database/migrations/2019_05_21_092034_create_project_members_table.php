@@ -18,7 +18,7 @@ class CreateProjectMembersTable extends Migration
 			$table->bigIncrements('id');
 			$table->unsignedBigInteger('user_id');
 			$table->unsignedBigInteger('project_id');
-			$table->timestamp('assigned_at');
+			$table->timestamp('assigned_at')->nullable();
 			$table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
 			$table->foreign('project_id')->references('id')->on('projects')->onDelete('restrict');
 			$table->timestamps();
