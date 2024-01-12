@@ -20,6 +20,24 @@ document.addEventListener('livewire:initialized', () => {
         $('#modal-offcanvas').removeClass('show');
     });
 
+    
+    Livewire.on('open-main-modal', (data) => {
+        $('#main-modal').show();
+        $("body").addClass('modal-open');
+        $("body").append('<div class="modal-backdrop fade show"></div>');
+        $('#main-modal').addClass('show');
+    });
+
+    /**
+    * hide offcanvas modal
+    */
+    Livewire.on('close-main-modal', (data) => {
+        $('#main-modal').hide();
+        $("body").removeClass('modal-open');
+        $(".modal-backdrop").remove()
+        $('#main-modal').removeClass('show');
+    });
+
     /**
     * generic toastr alert when dispacth event
     * from livewire component
