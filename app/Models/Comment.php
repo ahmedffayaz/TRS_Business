@@ -2,40 +2,50 @@
 
 namespace App\Models;
 
-use App\Enums\Comment\CommentType;
 use Illuminate\Database\Eloquent\Model;
-use App\Enums\Comment\CommentIsBillable;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 
 class Comment extends Model
 {
-    use HasFactory;
+	/**
+	 * The attributes that are mass assignable.
+	 *
+	 * @var array
+	 */
+	protected $fillable = [
+		'description', 'time', 'not_billable_time', 'type', 'task_id', 'to', 'from', 'invoiced_at', 'dated'
+	];
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'task_id',
-        'description',
-        'time',
-        'type',
-        'to',
-        'from',
-        'dated',
-        'invoiced_at',
-        'is_billable'
-    ];
+	/**
+	 * @return BelongsTo
+	 */
+	public function from_user(): BelongsTo
+	{
+		return $this->belongsTo(User::class, 'from', 'id');
+	}
 
-     /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'type' => CommentType::class,
-        'invoiced_at' => 'datetime',
-        'is_billable' => CommentIsBillable::class,
-    ];
+	/**
+	 * @return BelongsTo
+	 */
+	public function to_user(): BelongsTo
+	{
+		return $this->belongsTo(User::class, 'to', 'id');
+	}
+
+	/**
+	 * @return BelongsTo
+	 */
+	public function task(): BelongsTo
+	{
+		return $this->belongsTo(Task::class);
+	}
+
+	/**
+	 * @return MorphOne
+	 */
+	public function attachment(): MorphOne
+	{
+		return $this->morphOne(Attachment::class, 'attachment');
+	}
 }

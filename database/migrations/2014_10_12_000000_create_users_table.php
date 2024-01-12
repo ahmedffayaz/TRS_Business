@@ -4,41 +4,50 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateUsersTable extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::create('users', function (Blueprint $table) {
-            $table->id();
-            $table->string('avatar', 1000)->nullable();
-            $table->string('first_name');
-            $table->string('middle_name')->nullable();
-            $table->string('last_name');
-            $table->string('email')->unique();
-            $table->timestamp('email_verified_at')->nullable();
-            $table->string('alternative_email')->unique()->nullable();
-            $table->string('designation')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('alternative_number')->nullable();
-            $table->string('address', 500)->nullable();
-            $table->decimal('salary')->nullable();
-            $table->string('currency')->nullable();
+	/**
+	 * Run the migrations.
+	 *
+	 * @return void
+	 */
+	public function up()
+	{
+		Schema::create('users', function (Blueprint $table) {
+			$table->engine = "InnoDB";
+			$table->bigIncrements('id');
+			$table->string('first_name');
+			$table->string('last_name');
+			$table->string('email')->unique();
+			$table->string('alternative_email')->nullable();
+			$table->timestamp('email_verified_at')->nullable();
+			$table->string('password');
+			$table->enum('account_type', ['active', 'de-active'])->nullable();
+			$table->string('designation')->default('Software Engineer');
+			$table->rememberToken();
+			$table->string('phone')->nullable();
+			$table->string('alternative_number')->nullable();
+			$table->text('address')->nullable();
+			$table->decimal('salary')->nullable();
+			$table->unsignedBigInteger('company_id');
             $table->boolean('is_active')->default(false);
-            $table->string('password');
-            $table->rememberToken();
-            $table->softDeletes();
-            $table->timestamps();
-        });
-    }
+			$table->foreign('company_id')->references('id')->on('companies')
+				->onDelete('restrict');
+			$table->string('avatar')->nullable();
+			$table->string('device_token')->nullable();
+			$table->string('currency')->nullable();
+			$table->softDeletes();
+			$table->timestamps();
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::dropIfExists('users');
-    }
-};
+	/**
+	 * Reverse the migrations.
+	 *
+	 * @return void
+	 */
+	public function down()
+	{
+		Schema::dropIfExists('users');
+	}
+}
