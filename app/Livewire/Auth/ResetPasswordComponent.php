@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use Exception;
 use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 use Illuminate\Http\Request;
@@ -35,22 +36,26 @@ class ResetPasswordComponent extends Component
     public function submit()
     {
         $this->validate();
-        $status = Password::reset(
-            ['email' => $this->email, 'password' => $this->password, 'password_confirmation' => $this->password_confirmation, 'token' => $this->token],
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => $password,
-                    'remember_token' => Str::random(60),
-                ])->save();
-            }
-        );
+        try {
+            $status = Password::reset(
+                ['email' => $this->email, 'password' => $this->password, 'password_confirmation' => $this->password_confirmation, 'token' => $this->token],
+                function ($user, $password) {
+                    $user->forceFill([
+                        'password' => $password,
+                        'remember_token' => Str::random(60),
+                    ])->save();
+                }
+            );
 
-        if ($status == Password::PASSWORD_RESET) {
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Password has been reset successfully.']);
-            session()->flash('status', 'Password has been reset successfully.');
-        } else {
-            $this->dispatch('alert', ['type' => 'error',  'message' => trans($status)]);
-            session()->flash('error', trans($status));
+            if ($status == Password::PASSWORD_RESET) {
+                $this->dispatch('alert', ['type' => 'success',  'message' => 'Password has been reset successfully.']);
+                session()->flash('status', 'Password has been reset successfully.');
+            } else {
+                $this->dispatch('alert', ['type' => 'error',  'message' => trans($status)]);
+                session()->flash('error', trans($status));
+            }
+        } catch (Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong. Please try again later.']);
         }
     }
 }

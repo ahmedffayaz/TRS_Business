@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use Exception;
 use Illuminate\Support\Facades\Password;
 use Livewire\Attributes\Layout;
 
@@ -23,15 +24,19 @@ class ForgotPasswordComponent extends Component
     public function submit()
     {
         $this->validate();
-        $broker = Password::broker();
-        $response = $broker->sendResetLink(['email' => $this->email]);
+        try {
+            $broker = Password::broker();
+            $response = $broker->sendResetLink(['email' => $this->email]);
 
-        if ($response === Password::RESET_LINK_SENT) {
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'A password reset link has been sent to your email address.']);
-            session()->flash('status', 'A password reset link has been sent to your email address.');
-        } else {
+            if ($response === Password::RESET_LINK_SENT) {
+                $this->dispatch('alert', ['type' => 'success',  'message' => 'A password reset link has been sent to your email address.']);
+                session()->flash('status', 'A password reset link has been sent to your email address.');
+            } else {
+                $this->dispatch('alert', ['type' => 'error',  'message' => 'Unable to send password reset link. Please try again later.']);
+                session()->flash('error', 'Unable to send password reset link. Please try again later.');
+            }
+        } catch (Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Unable to send password reset link. Please try again later.']);
-            session()->flash('error', 'Unable to send password reset link. Please try again later.');
         }
     }
 }

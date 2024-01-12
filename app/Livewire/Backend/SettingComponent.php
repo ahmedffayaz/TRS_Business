@@ -12,6 +12,8 @@ class SettingComponent extends Component
 {
     public $logo;
     public $favicon;
+    public $cms_name;
+    public $date_format;
     public SettingForm $form;
 
 
@@ -42,9 +44,8 @@ class SettingComponent extends Component
 
     public function submit()
     {
+        $this->form->validate();
         try {
-            $this->form->validate();
-
             $request = $this->form->all();
             $setting = [];
 

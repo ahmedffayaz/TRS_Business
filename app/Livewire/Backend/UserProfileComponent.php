@@ -48,8 +48,8 @@ class UserProfileComponent extends Component
 
     public function submit(\Illuminate\Contracts\Auth\Authenticatable $user)
     {
+        $validatedData = $this->validate();
         try {
-            $validatedData = $this->validate();
             $this->rules['email'] = 'required|email|' . Rule::unique('users', 'email')->ignore($user->id);
             $user->update($validatedData);
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Profile updated successfully.']);
