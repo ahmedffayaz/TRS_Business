@@ -46,8 +46,10 @@ class ResetPasswordComponent extends Component
         );
 
         if ($status == Password::PASSWORD_RESET) {
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Password has been reset successfully.']);
             session()->flash('status', 'Password has been reset successfully.');
         } else {
+            $this->dispatch('alert', ['type' => 'error',  'message' => trans($status)]);
             session()->flash('error', trans($status));
         }
     }

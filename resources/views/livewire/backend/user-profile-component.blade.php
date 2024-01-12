@@ -6,52 +6,59 @@
                     <h4 class="card-title">Profile Details</h4>
                 </div>
                 <div class="card-body  py-2 my-25">
+                    @livewire('partials.file-upload-component')
                     <form class="form form-horizontal" wire:submit.prevent="submit">
                         @csrf
-                        <div class="d-flex">
-                            <a href="#" class="me-25">
-                                <img src="{{ asset('assets/images/avatar.png') }}" id="account-upload-img" class="uploadedAvatar rounded me-50" alt="profile image"
-                                    height="100" width="100">
-                            </a>
-                            <!-- upload and reset button -->
-                            <div class="d-flex align-items-end mt-75 ms-1">
-                                <div>
-                                    <label for="account-upload" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Upload</label>
-                                    <input type="file" id="account-upload" hidden="" accept="image/*">
-                                    <button type="button" id="account-reset" class="btn btn-sm btn-outline-secondary mb-75 waves-effect">Reset</button>
-                                    <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
-                                </div>
-                            </div>
-                            <!--/ upload and reset button -->
-                        </div>
                         <div class="row mt-2 pt-50">
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountFirstName">First Name</label>
-                                <input type="text" class="form-control" placeholder="John">
+                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" wire:model="first_name" placeholder="John" >
+                                @error('first_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountLastName">Last Name</label>
-                                <input type="text" class="form-control" placeholder="Doe">
+                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" wire:model="last_name" placeholder="Doe">
+                                @error('last_name')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountEmail">Email</label>
-                                <input type="email" class="form-control" placeholder="Email">
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" wire:model="email" placeholder="Email">
+                                @error('email')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountPhoneNumber">Phone Number</label>
-                                <input type="text" class="form-control account-number-mask" placeholder="Phone Number">
+                                <input type="text" class="form-control account-number-mask @error('phone') is-invalid @enderror" wire:model="phone" placeholder="Phone Number">
+                                @error('phone')
+                                    <small class="text-danger">{{ $phone }}</small>
+                                @enderror
                             </div>
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountPhoneNumber">Alternative Phone Number</label>
-                                <input type="text" class="form-control account-number-mask" placeholder="Alternative Phone Number">
+                                <input type="text" class="form-control account-number-mask @error('alternative_number') is-invalid @enderror" wire:model="alternative_number"  placeholder="Alternative Phone Number">
+                                @error('alternative_number')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
                             <div class="col-12 col-sm-6 mb-1">
                                 <label class="form-label" for="accountAddress">Address</label>
-                                <textarea row="3" type="text" class="form-control" placeholder="Your Address"></textarea>
+                                <textarea row="3" type="text" class="form-control @error('address') is-invalid @enderror" wire:model="address" placeholder="Your Address"></textarea>
+                                @error('address')
+                                    <small class="text-danger">{{ $message }}</small>
+                                @enderror
                             </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary mt-1 me-1 waves-effect waves-float waves-light">Save changes</button>
-                                <button type="reset" class="btn btn-outline-secondary mt-1 waves-effect">Discard</button>
+                            <div class="col-12 text-end">
+                                <button class="btn btn-primary me-1 waves-effect waves-float waves-light" tabindex="4" wire:loading.attr="disabled">
+                                    <span wire:loading.remove>{{ __('Save changes') }}</span>
+                                    <span wire:loading>
+                                        <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
+                                    </span>
+                                </button>
                             </div>
                         </div>
                     </form>

@@ -45,13 +45,16 @@ use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\UserContractsComponent;
 use App\Livewire\Backend\UserProfileComponent;
 
-Route::get('/', LoginComponent::class);
-Route::get('/login', LoginComponent::class)->name('login');
-Route::get('/register', RegisterComponent::class)->name('register');
-Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
-Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
-Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
+Route::middleware(['guest'])->group(function () {
+    Route::get('/', LoginComponent::class);
+    Route::get('/login', LoginComponent::class)->name('login');
+    Route::get('/register', RegisterComponent::class)->name('register');
+    Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
+    Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
+    Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
+});
 Route::get('/dashboard', DashboardComponent::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
 Route::middleware('auth')->group(function () {
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
@@ -66,7 +69,6 @@ Route::middleware('auth')->group(function () {
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
-        Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
         Route::get('/user-contracts', UserContractsComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');
     });

@@ -36,5 +36,10 @@
             <small>{{ __('Forgot Password?') }}</small>
         </a>
     </div>
-    <button class="btn btn-primary w-100 mt-2" tabindex="4">{{ __('Sign in') }}</button>
+    <button class="btn btn-primary w-100 mt-2" tabindex="4" wire:loading.attr="disabled">
+        <span wire:loading.remove>{{ __('Sign in') }}</span>
+        <span wire:loading>
+            <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
+        </span>
+    </button>
 </form>

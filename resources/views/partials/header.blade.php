@@ -22,7 +22,7 @@
                     <li class="scrollable-container media-list"><a class="d-flex" href="#">
                             <div class="list-item d-flex align-items-start">
                                 <div class="me-1">
-                                    <div class="avatar"><img src="../../../app-assets/images/portrait/small/avatar-s-15.jpg" alt="avatar" width="32" height="32">
+                                    <div class="avatar"><img src="{{ url('/assets/images/avatar.png') }}" alt="avatar" width="32" height="32">
                                     </div>
                                 </div>
                                 <div class="list-item-body flex-grow-1">
@@ -34,7 +34,7 @@
                         <a class="d-flex" href="#">
                             <div class="list-item d-flex align-items-start">
                                 <div class="me-1">
-                                    <div class="avatar"><img src="../../../app-assets/images/portrait/small/avatar-s-3.jpg" alt="avatar" width="32" height="32">
+                                    <div class="avatar"><img src="{{ url('/assets/images/avatar.png') }}" alt="avatar" width="32" height="32">
                                     </div>
                                 </div>
                                 <div class="list-item-body flex-grow-1">
@@ -94,7 +94,7 @@
                             class="round" src="{{ url($avatar) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                 </a>
                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user" style="width : 15rem;">
-                    <a class="dropdown-item" href="{{ route('dashboard.user-profile') }}"><i class="me-50" data-feather="user"></i> Profile</a>
+                    <a class="dropdown-item" href="{{ route('user-profile') }}"><i class="me-50" data-feather="user"></i> Profile</a>
                     <a class="dropdown-item" href="{{ route('dashboard.update-password') }}"><i class="me-50" data-feather="key"></i> Change Password</a>
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item" href="{{ route('dashboard.system-setting') }}"><i class="me-50" data-feather="settings"></i> Settings</a>

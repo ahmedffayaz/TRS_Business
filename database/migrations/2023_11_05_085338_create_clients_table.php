@@ -27,9 +27,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        Schema::table('clients', function (Blueprint $table) {
-            $table->foreign('country_id')->references('id')->on('countries');
-        });
     }
 
     /**

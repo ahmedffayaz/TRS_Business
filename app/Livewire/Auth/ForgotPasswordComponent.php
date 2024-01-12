@@ -27,8 +27,10 @@ class ForgotPasswordComponent extends Component
         $response = $broker->sendResetLink(['email' => $this->email]);
 
         if ($response === Password::RESET_LINK_SENT) {
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'A password reset link has been sent to your email address.']);
             session()->flash('status', 'A password reset link has been sent to your email address.');
         } else {
+            $this->dispatch('alert', ['type' => 'error',  'message' => 'Unable to send password reset link. Please try again later.']);
             session()->flash('error', 'Unable to send password reset link. Please try again later.');
         }
     }

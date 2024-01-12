@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class KnowledgeBaseComponent extends Component
 {
@@ -37,22 +38,21 @@ class KnowledgeBaseComponent extends Component
     public function mount()
     {
         $this->roles = Role::all();
-        $this->knowledgeBaseData = $this->getRecord();
     }
 
-    public function getRecord()
+    public function getRecord(): LengthAwarePaginator
     {
-        if (!$this->auth_user->hasRole('admin')) {
+        if (!auth()->user()->hasRole('admin')) {
             abort(403);
         }
 
-        $data = $this->auth_user->hasRole('admin')
-            ? KnowledgeBase::get()
+        $data = auth()->user()->hasRole('admin')
+            ? KnowledgeBase::with('roles')
             : KnowledgeBase::where(function ($query) {
                 $query->whereHas('roles', function ($q) {
                     $q->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
                 });
-            })->orWhereDoesntHave('roles')->get();
+            })->orWhereDoesntHave('roles');
 
         return $data->getList($this->search, $this->columnName, $this->sortDirection)
             ->paginate($this->limitPerPage);
@@ -60,7 +60,8 @@ class KnowledgeBaseComponent extends Component
 
     public function render()
     {
-        return view('livewire.backend.knowledge-base-component');
+        $knowledgeBaseRecord = $this->getRecord();
+        return view('livewire.backend.knowledge-base-component', compact('knowledgeBaseRecord'));
     }
 
     public function openModal()

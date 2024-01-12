@@ -5,19 +5,29 @@ use App\Livewire\Forms\SettingForm;
 use App\Models\Setting;
 use Livewire\Attributes\Title;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
 class SettingComponent extends Component
 {
-    public $date_format;
-    public $cms_name;
+    public $logo;
+    public $favicon;
     public SettingForm $form;
 
 
     public function mount()
     {
-        $this->date_format = Setting::where('name', 'date_format')->first();
-        $this->cms_name = Setting::where('name', 'cms_name')->first();
+        $favicon = Setting::where('name', 'favicon')->pluck('value')->first();
+        $faviconImage = $favicon ? Storage::url($favicon) : '/assets/images/avatar.png';
+
+        
+        $logo = Setting::where('name', 'logo')->pluck('value')->first();
+        $logoImage = $logo ? Storage::url($logo) : '/assets/images/avatar.png';
+
+        $this->favicon = $faviconImage;
+        $this->logo = $logoImage;
+        $this->form->date_format = Setting::where('name', 'date_format')->pluck('value')->first();
+        $this->form->cms_name = Setting::where('name', 'cms_name')->pluck('value')->first();
     }
 
     #[Title('Settings')]
@@ -30,7 +40,7 @@ class SettingComponent extends Component
     }
 
 
-    public function store()
+    public function submit()
     {
         try {
             $this->form->validate();
@@ -39,7 +49,7 @@ class SettingComponent extends Component
             $setting = [];
 
             foreach ($request as $name => $value) {
-                if ($name != 'favicon') {
+                if ($name != 'faviconFile' && $name != 'logoFile') {
                     $setting[$name] = Setting::updateOrCreate(
                         ['name' => $name],
                         ['name' => $name, 'value' => $value]
@@ -47,33 +57,35 @@ class SettingComponent extends Component
                 }
             }
 
-            if (array_key_exists('favicon', $request) && $request['favicon']) {
-                $old_favicon = Setting::where('name', 'favicon')->firstOr(function () {
-                    return Setting::create(['name' => 'favicon', 'value' => 'favicon.png']);
-                });
-
-                if ($old_favicon->value) {
-                    deleteFile($old_favicon->value);
+            if (array_key_exists('faviconFile', $request) && $request['faviconFile']) {
+                $old_favicon = Setting::where('name', 'favicon')->pluck('value')->first();
+                if (isset($old_favicon)) {
+                    deleteFile($old_favicon);
                 }
 
-                $path = saveResizeImage($request['favicon'], '/images', 32, 'png', 32);
+                $path = saveResizeImage($request['faviconFile'], '/images', 32, 'png', 32);
                 $setting['favicon'] = Setting::updateOrCreate(
                     ['name' => 'favicon'],
                     ['value' => $path]
                 );
             }
 
-            if (array_key_exists('logo', $request) && $request['logo']) {
-                $logo = saveResizeImage($request['logo'], '/images', 64, 'png', 64);
+            if (array_key_exists('logoFile', $request) && $request['logoFile']) {
+                $old_logo = Setting::where('name', 'logo')->pluck('value')->first();
+                if (isset($old_logo)) {
+                    deleteFile($old_logo);
+                }
+
+                $logo = saveResizeImage($request['logoFile'], '/images', 64, 'png', 64);
                 $setting['logo'] = Setting::updateOrCreate(
                     ['name' => 'logo'],
                     ['value' => $logo]
                 );
             }
 
-            session()->flash('success', 'Settings created successfully!');
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Settings created successfully!']);
         } catch (Exception $exception) {
-            session()->flash('error', 'Something went wrong. Please try again later.');
+            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong. Please try again later.' . $exception->getMessage()]);
         }
     }
 }

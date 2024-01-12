@@ -4,7 +4,8 @@
             <div class="alert alert-success p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
                 {{ session('status') }}
             </div>
-        @elseif (session()->has('error'))
+        @endif
+        @if (session()->has('error'))
             <div class="alert alert-error alert-danger p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
                 {{ session('error') }}
             </div>
@@ -16,7 +17,12 @@
                 <small class="text-danger">{{ $message }}</small>
             @enderror
         </div>
-        <button class="btn btn-primary w-100 mt-2" tabindex="4">Send Reset Link</button>
+        <button class="btn btn-primary w-100 mt-2" tabindex="4" wire:loading.attr="disabled">
+            <span wire:loading.remove>{{ __('Send Reset Link') }}</span>
+            <span wire:loading>
+                <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
+            </span>
+        </button>
         <p class="text-center mt-2">
             <a href="{{ route('login') }}" wire:ignore>
                 <i data-feather="chevron-left"></i>

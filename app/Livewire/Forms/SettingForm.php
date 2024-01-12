@@ -6,15 +6,17 @@ use Livewire\Form;
 class SettingForm extends Form
 {
     public ?string $cms_name;
-    public ?string $favicon;
-    public ?string $logo;
+    public ?string $date_format;
+    public ?string $faviconFile;
+    public ?string $logoFile;
 
     public function rules(): array
     {
         return [
             'cms_name' => 'required',
-            'favicon' => 'file|mimes:png',
-            'logo' => 'file|mimes:jpeg,png,jpg',
+            'date_format' => 'required',
+            'faviconFile' => 'nullable|file|mimes:png',
+            'logoFile' => 'nullable|file|mimes:jpeg,png,jpg',
         ];
     }
 }
