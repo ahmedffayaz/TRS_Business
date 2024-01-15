@@ -7,7 +7,9 @@ trait WithMainModal
     // open offcanvas modal
     public function openMainModal()
     {
+        $this->dispatch('select-container');
         $this->dispatch('open-main-modal');
+
     }
 
     // close offcanvas modal
@@ -17,4 +19,6 @@ trait WithMainModal
         $this->form->reset();
         $this->resetValidation();
     }
+
+
 }

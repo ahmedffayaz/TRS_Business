@@ -1,75 +1,87 @@
-import $ from 'jquery'
-import toastr from 'toastr';
+import $ from "jquery";
+import toastr from "toastr";
+import select2 from "select2";
+select2();
 
-
-
-document.addEventListener('livewire:initialized', () => {
+document.addEventListener("livewire:initialized", () => {
     /**
-    * show offcanvas modal
-    */
-    Livewire.on('open-offcanvas', (data) => {
-        $('#modal-offcanvas').show();
-        $('#modal-offcanvas').addClass('show');
+     * show offcanvas modal
+     */
+    Livewire.on("select-container", (data) => {
+        $("#role-select").each(function () {
+            var $this = $(this);
+            $this.select2({
+                // the following code is used to disable x-scrollbar when click in select input and
+                // take 100% width in responsive also
+                placeholder: "Select Value",
+                dropdownAutoWidth: true,
+                width: "100%",
+                dropdownParent: $this.parent(),
+            });
+        });
+    });
+
+    Livewire.on("open-offcanvas", (data) => {
+        $("#modal-offcanvas").show();
+        $("#modal-offcanvas").addClass("show");
     });
 
     /**
-    * hide offcanvas modal
-    */
-    Livewire.on('close-offcanvas', (data) => {
-        $('#modal-offcanvas').hide();
-        $('#modal-offcanvas').removeClass('show');
+     * hide offcanvas modal
+     */
+    Livewire.on("close-offcanvas", (data) => {
+        $("#modal-offcanvas").hide();
+        $("#modal-offcanvas").removeClass("show");
     });
 
-    
-    Livewire.on('open-main-modal', (data) => {
-        $('#main-modal').show();
-        $("body").addClass('modal-open');
+    Livewire.on("open-main-modal", (data) => {
+        $("#main-modal").show();
+        $("body").addClass("modal-open");
         $("body").append('<div class="modal-backdrop fade show"></div>');
-        $('#main-modal').addClass('show');
+        $("#main-modal").addClass("show");
     });
 
     /**
-    * hide offcanvas modal
-    */
-    Livewire.on('close-main-modal', (data) => {
-        $('#main-modal').hide();
-        $("body").removeClass('modal-open');
-        $(".modal-backdrop").remove()
-        $('#main-modal').removeClass('show');
+     * hide offcanvas modal
+     */
+    Livewire.on("close-main-modal", (data) => {
+        $("#main-modal").hide();
+        $("body").removeClass("modal-open");
+        $(".modal-backdrop").remove();
+        $("#main-modal").removeClass("show");
     });
 
     /**
-    * generic toastr alert when dispacth event
-    * from livewire component
-    */
-    Livewire.on('alert', (data) => {
+     * generic toastr alert when dispacth event
+     * from livewire component
+     */
+    Livewire.on("alert", (data) => {
         toastr.options = {
-            "closeButton": true,
-            "preventDuplicates": true,
-            "progressBar": true
-        }
+            closeButton: true,
+            preventDuplicates: true,
+            progressBar: true,
+        };
         toastr[data[0].type](data[0].message);
     });
 
     /**
-    * generic swal sweet alert when dispacth event
-    * from livewire component
-    */
-    Livewire.on('swal-alert', function ([data]) {
+     * generic swal sweet alert when dispacth event
+     * from livewire component
+     */
+    Livewire.on("swal-alert", function ([data]) {
         Swal.fire({
-            title: data?.title ?? 'Are you sure?',
+            title: data?.title ?? "Are you sure?",
             text: data?.description,
-            icon: data?.iconType ?? 'warning',
+            icon: data?.iconType ?? "warning",
             showCancelButton: true,
-            confirmButtonText: 'Yes',
-            cancelButtonText: 'Cancel',
+            confirmButtonText: "Yes",
+            cancelButtonText: "Cancel",
         }).then((result) => {
             if (result.isConfirmed) {
-                if (data?.type === 'delete') {
-                    Livewire.dispatch('delete', { id: data?.id });
+                if (data?.type === "delete") {
+                    Livewire.dispatch("delete", { id: data?.id });
                 }
             }
         });
     });
 });
-

@@ -9,7 +9,6 @@ use App\Models\UserContract;
 use App\Traits\WithMainModal;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -50,7 +49,7 @@ class UserContractsComponent extends Component
                 'uuid' => getUuid(),
                 'title' => $this->form->title,
                 'description' => $this->form->description,
-                'version'=> '1',
+                'version' => '1',
             ]);
             $contract->roles()->sync($this->form->roles);
             DB::commit();
@@ -116,7 +115,7 @@ class UserContractsComponent extends Component
 
     public function getVersion($contract_id)
     {
-       $contract = Contract::findOrFail($contract_id);
+        $contract = Contract::findOrFail($contract_id);
         return $contract->version += 0.1;
     }
 
