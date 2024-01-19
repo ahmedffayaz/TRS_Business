@@ -5,7 +5,7 @@ namespace App\Livewire\Forms;
 use App\Models\TermsCondition;
 use Livewire\Form;
 
-class ContractForm extends Form
+class TermsConditionForm extends Form
 {
     public bool $isUpdate = false;
     public $id;
@@ -26,12 +26,12 @@ class ContractForm extends Form
         ];
     }
 
-    public function set(TermsCondition $contract): void
+    public function set(TermsCondition $termsCondition): void
     {
-        $this->title = $contract?->title;
-        $this->version = $contract?->version;
-        $this->description = $contract?->description;
+        $this->title = $termsCondition?->title;
+        $this->version = $termsCondition?->version;
+        $this->description = $termsCondition?->description;
 
-        $this->roles = $contract->roles->pluck('id')->toArray();
+        $this->roles = $termsCondition->roles->pluck('id')->toArray();
     }
 }

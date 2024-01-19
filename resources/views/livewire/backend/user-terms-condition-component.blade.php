@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <div class="col-md-8 col-sm-6 text-end">
-                    <a href="javascript:void(0);" class="btn btn-primary" tabindex="0" aria-controls="table-hover" type="button" wire:click="openMainModal">Add Contract</a>
+                    <a href="javascript:void(0);" class="btn btn-primary" tabindex="0" aria-controls="table-hover" type="button" wire:click="openMainModal">Add Terms & Conditions</a>
                 </div>
             </div>
             @if (session('error'))
@@ -36,18 +36,18 @@
                             <th>Actions</th>
                         </tr>
                     <tbody>
-                        @isset($contracts)
-                            @foreach ($contracts as $contract)
+                        @isset($termsConditions)
+                            @foreach ($termsConditions as $termsCondition)
                                 <tr>
-                                    <td>{{ $contract->id }}</td>
+                                    <td>{{ $termsCondition->id }}</td>
                                     <td>
-                                        {{ $contract->version }}
+                                        {{ $termsCondition->version }}
                                     </td>
                                     <td>
-                                        {{ $contract->title }}
+                                        {{ $termsCondition->title }}
                                     </td>
                                     <td>
-                                        {{ $contract->created_at }}
+                                        {{ $termsCondition->created_at }}
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -55,11 +55,11 @@
                                                 <span wire:ignore><i data-feather="more-vertical"></i></span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $contract?->id }}')">
+                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $termsCondition?->id }}')">
                                                     <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                     <span>Edit</span>
                                                 </a>
-                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $contract?->id }}')">
+                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $termsCondition?->id }}')">
                                                     <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
                                                     <span>Delete</span>
                                                 </a>
@@ -72,13 +72,13 @@
                     </tbody>
                     </thead>
                 </table>
-                {{ $contracts->links('components.pagination') }}
+                {{ $termsConditions->links('components.pagination') }}
             </div>
         </div>
     </div>
     <x-main-modal wireIgnoreSelf="wire:ignore.self">
         <div class="text-center mb-2">
-            <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Contract </h1>
+            <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Terms & Conditions </h1>
         </div>
         <form class="row" wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
             <div class="col-6 mt-75">
@@ -99,7 +99,7 @@
             </div>
             <div class="col-md-6  mt-75" wire:ignore.>
                 <label class="col-form-label" for="Date Format">Role</label>
-                <select name="roles[]" class="select2 form-select @error('form.roles') is-invalid @enderror" id="role-select" multiple
+                <select name="roles[]" class="select2 multi-select form-select @error('form.roles') is-invalid @enderror" id="role-select" multiple
                 wire:model="form.roles">
                     <option value="" selected disabled>--Select Role--</option>
                     @foreach ($roles as $key => $role)
@@ -138,7 +138,7 @@
 
             initTicketTypesDrop();
 
-            Livewire.on('select-container', (data) => {
+            Livewire.on('roles-select', (data) => {
                 var $select = $('#role-select');
                 $select.val(data.formRole).trigger('change');
             });

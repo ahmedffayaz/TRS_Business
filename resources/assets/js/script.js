@@ -8,7 +8,7 @@ document.addEventListener("livewire:initialized", () => {
      * show offcanvas modal
      */
     Livewire.on("select-container", (data) => {
-        $("#role-select").each(function () {
+        $(".multi-select").each(function () {
             var $this = $(this);
             $this.select2('destroy');
             // var formRole = data.roles;

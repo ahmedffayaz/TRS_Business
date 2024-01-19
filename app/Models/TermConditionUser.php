@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserTermCondition extends Model
+class TermConditionUser extends Model
 {
     protected $fillable =
     [
