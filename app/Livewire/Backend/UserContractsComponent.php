@@ -3,9 +3,9 @@
 namespace App\Livewire\Backend;
 
 use App\Livewire\Forms\ContractForm;
-use App\Models\Contract;
+use App\Models\TermsCondition;
 use App\Models\Role;
-use App\Models\UserContract;
+use App\Models\UserTermCondition;
 use App\Traits\WithMainModal;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -29,7 +29,7 @@ class UserContractsComponent extends Component
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         // getList($this->search, $this->columnName, $this->sortDirection)
-        return Contract::paginate($this->limitPerPage);
+        return TermsCondition::paginate($this->limitPerPage);
     }
 
     #[Title('User Contracts')]
@@ -39,19 +39,26 @@ class UserContractsComponent extends Component
         $roles = Role::pluck('title', 'id')->all();
         return view('livewire.backend.user-contracts-component', compact('contracts', 'roles'));
     }
+    
+    public function hydrate()
+    {
+        $this->dispatch('select-container', ['formRole' => $this->form->roles]);
+    }
 
     public function store()
     {
+       
         $this->form->validate();
         try {
             DB::beginTransaction();
-            $contract = Contract::create([
+            $contract = TermsCondition::create([
                 'uuid' => getUuid(),
                 'title' => $this->form->title,
                 'description' => $this->form->description,
                 'version' => '1',
             ]);
-            $contract->roles()->sync($this->form->roles);
+            $rolesArray = json_decode($this->form->roles, true);
+            $contract->roles()->sync($rolesArray);
             DB::commit();
             $this->closeMainModal();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Contract Created Successfully!']);
@@ -65,7 +72,7 @@ class UserContractsComponent extends Component
         $this->form->isUpdate = true;
         $this->form->id = $id;
         try {
-            $contract = Contract::findOrFail($id);
+            $contract = TermsCondition::findOrFail($id);
             $this->form->set($contract);
             $this->openMainModal();
         } catch (\Exception $exception) {
@@ -76,7 +83,7 @@ class UserContractsComponent extends Component
     public function update($id)
     {
         $this->form->validate();
-        $contract = Contract::with('roles')->findOrFail($id);
+        $contract = TermsCondition::with('roles')->findOrFail($id);
 
         $this->form->validate([
             'title' => [
@@ -115,7 +122,7 @@ class UserContractsComponent extends Component
 
     public function getVersion($contract_id)
     {
-        $contract = Contract::findOrFail($contract_id);
+        $contract = TermsCondition::findOrFail($contract_id);
         return $contract->version += 0.1;
     }
 
@@ -134,7 +141,7 @@ class UserContractsComponent extends Component
     public function destroy($id)
     {
         try {
-            $contract = UserContract::findOrFail($id);
+            $contract = UserTermCondition::findOrFail($id);
             $contract->delete();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Contract Deleted Successfully!']);
         } catch (\Exception $exception) {

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateUserContractsTable extends Migration
+class CreateUserTermConditionTable  extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateUserContractsTable extends Migration
      */
     public function up()
     {
-        Schema::create('user_contracts', function (Blueprint $table) {
+        Schema::create('user_term_condition', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
-            $table->unsignedBigInteger('contract_id');
-            $table->foreign('contract_id')->references('id')->on('contracts');
+            $table->unsignedBigInteger('terms_condition_id');
+            $table->foreign('terms_condition_id')->references('id')->on('terms_conditions');
             $table->string('uuid');
             $table->string('signature_url');
             $table->string('pdf_url');
@@ -33,6 +33,6 @@ class CreateUserContractsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('user_contracts');
+        Schema::dropIfExists('user_term_condition');
     }
 }

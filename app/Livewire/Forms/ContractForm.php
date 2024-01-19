@@ -2,7 +2,7 @@
 
 namespace App\Livewire\Forms;
 
-use App\Models\Contract;
+use App\Models\TermsCondition;
 use Livewire\Form;
 
 class ContractForm extends Form
@@ -13,7 +13,8 @@ class ContractForm extends Form
     public ?string $title;
     public ?string $version;
     public ?string $description;
-    public ?array $roles;
+    public ?string $roles = '0';
+
 
     public function rules(): array
     {
@@ -21,13 +22,16 @@ class ContractForm extends Form
             'title' => ['required', 'string'],
             'version' => ['required', 'string'],
             'description' => ['required', 'string'],
+            'roles' => ['required'],
         ];
     }
 
-    public function set(Contract $contract): void
+    public function set(TermsCondition $contract): void
     {
         $this->title = $contract?->title;
         $this->version = $contract?->version;
         $this->description = $contract?->description;
+
+        $this->roles = $contract->roles->pluck('id');
     }
 }

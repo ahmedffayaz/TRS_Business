@@ -99,8 +99,8 @@
             </div>
             <div class="col-md-6  mt-75" wire:ignore.>
                 <label class="col-form-label" for="Date Format">Role</label>
-                <select name="roles[]" class="select2 form-select   @error('form.roles') is-invalid @enderror" id="role-select" multiple
-                    wire:model="form.roles">
+                <select name="roles[]" class="select2 form-select @error('form.roles') is-invalid @enderror" id="role-select" multiple
+                wire:model="form.roles">
                     <option value="" selected disabled>--Select Role--</option>
                     @foreach ($roles as $key => $role)
                         <option value="{{ $key }}">{{ $role }}</option>
@@ -129,3 +129,19 @@
         </form>
     </x-main-modal>
 </div>
+@script
+    <script>
+        $(document).ready(function() {
+            window.initTicketTypesDrop = () => {
+                alert('dd');
+                $('#role-select').select2();
+            }
+            initTicketTypesDrop();
+            $('#role-select').on('select2:select', function(e) {
+                // localStorage.setItem('companySelect',$(this).val());
+                @this.set('form.roles',JSON.stringify($(this).val()));
+                alert($(this).val());
+            });
+        });
+    </script>
+@endscript

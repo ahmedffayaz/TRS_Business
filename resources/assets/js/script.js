@@ -10,14 +10,20 @@ document.addEventListener("livewire:initialized", () => {
     Livewire.on("select-container", (data) => {
         $("#role-select").each(function () {
             var $this = $(this);
+            // var formRole = data.roles;
             $this.select2({
-                // the following code is used to disable x-scrollbar when click in select input and
-                // take 100% width in responsive also
                 placeholder: "Select Value",
                 dropdownAutoWidth: true,
                 width: "100%",
                 dropdownParent: $this.parent(),
             });
+            var selectValue = data[0].formRole;
+            if(typeof selectValue == 'string'){
+                selectValue = JSON.parse(selectValue);
+            }
+            // var selectValue = selectValue;
+            $this.val(selectValue).trigger('change');
+            
         });
     });
 
