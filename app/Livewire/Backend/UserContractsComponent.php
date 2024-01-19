@@ -40,14 +40,13 @@ class UserContractsComponent extends Component
         return view('livewire.backend.user-contracts-component', compact('contracts', 'roles'));
     }
     
-    public function hydrate()
-    {
-        $this->dispatch('select-container', ['formRole' => $this->form->roles]);
-    }
+    // public function hydrate()
+    // {
+    //     $this->dispatch('select-container', ['formRole' => $this->form->roles]);
+    // }
 
     public function store()
     {
-       
         $this->form->validate();
         try {
             DB::beginTransaction();
@@ -57,8 +56,7 @@ class UserContractsComponent extends Component
                 'description' => $this->form->description,
                 'version' => '1',
             ]);
-            $rolesArray = json_decode($this->form->roles, true);
-            $contract->roles()->sync($rolesArray);
+            $contract->roles()->sync($this->form->roles);
             DB::commit();
             $this->closeMainModal();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Contract Created Successfully!']);

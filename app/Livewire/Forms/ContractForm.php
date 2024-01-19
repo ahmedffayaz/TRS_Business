@@ -13,7 +13,7 @@ class ContractForm extends Form
     public ?string $title;
     public ?string $version;
     public ?string $description;
-    public ?string $roles = '0';
+    public ?array $roles = [];
 
 
     public function rules(): array
@@ -22,7 +22,7 @@ class ContractForm extends Form
             'title' => ['required', 'string'],
             'version' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'roles' => ['required'],
+            'roles' => ['required','array'],
         ];
     }
 
@@ -32,6 +32,6 @@ class ContractForm extends Form
         $this->version = $contract?->version;
         $this->description = $contract?->description;
 
-        $this->roles = $contract->roles->pluck('id');
+        $this->roles = $contract->roles->pluck('id')->toArray();
     }
 }

@@ -10,6 +10,7 @@ document.addEventListener("livewire:initialized", () => {
     Livewire.on("select-container", (data) => {
         $("#role-select").each(function () {
             var $this = $(this);
+            $this.select2('destroy');
             // var formRole = data.roles;
             $this.select2({
                 placeholder: "Select Value",
@@ -17,12 +18,6 @@ document.addEventListener("livewire:initialized", () => {
                 width: "100%",
                 dropdownParent: $this.parent(),
             });
-            var selectValue = data[0].formRole;
-            if(typeof selectValue == 'string'){
-                selectValue = JSON.parse(selectValue);
-            }
-            // var selectValue = selectValue;
-            $this.val(selectValue).trigger('change');
             
         });
     });

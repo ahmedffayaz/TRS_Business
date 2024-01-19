@@ -133,14 +133,18 @@
     <script>
         $(document).ready(function() {
             window.initTicketTypesDrop = () => {
-                alert('dd');
                 $('#role-select').select2();
             }
+
             initTicketTypesDrop();
-            $('#role-select').on('select2:select', function(e) {
-                // localStorage.setItem('companySelect',$(this).val());
-                @this.set('form.roles',JSON.stringify($(this).val()));
-                alert($(this).val());
+
+            Livewire.on('select-container', (data) => {
+                var $select = $('#role-select');
+                $select.val(data.formRole).trigger('change');
+            });
+
+            $('#role-select').on('change', function(e) {
+                @this.set('form.roles', $(this).val());
             });
         });
     </script>
