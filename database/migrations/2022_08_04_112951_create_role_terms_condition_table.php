@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateContractsTable extends Migration
+class CreateRoleTermsConditionTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,10 @@ class CreateContractsTable extends Migration
      */
     public function up()
     {
-        Schema::create('contracts', function (Blueprint $table) {
-            $table->bigIncrements('id');
-            $table->string('uuid');
-            $table->string('title');
-            $table->longText('description');
-            $table->float('version');
+        Schema::create('role_terms_condition', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('terms_condition_id');
+            $table->unsignedBigInteger('role_id');
             $table->timestamps();
         });
     }
@@ -30,6 +28,6 @@ class CreateContractsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('contracts');
+        Schema::dropIfExists('role_terms_condition');
     }
 }

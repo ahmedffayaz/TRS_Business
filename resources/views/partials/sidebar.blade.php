@@ -59,6 +59,12 @@
                     <span class="menu-title text-truncate" data-i18n="Invoices">Invoices</span>
                 </a>
             </li>
+            <li class="{{ request()->routeIs('dashboard.user-contracts') ? 'active' : '' }} nav-item">
+                <a class="d-flex align-items-center" href="{{ route('dashboard.user-contracts') }}">
+                    <i data-feather="file"></i>
+                    <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
+                </a>
+            </li>
             <li class="{{ request()->routeIs('dashboard.knowledge-base') ? 'active' : '' }} nav-item">
                 <a class="d-flex align-items-center" href="{{ route('dashboard.knowledge-base') }}">
                     <i data-feather="file"></i>

@@ -2,19 +2,19 @@
 
 namespace App\Livewire\Backend;
 
-use App\Livewire\Forms\PermissionForm;
+use App\Livewire\Forms\TermsConditionForm;
+use App\Models\TermsCondition;
+use App\Models\Role;
+use App\Models\TermConditionUser;
 use App\Traits\WithMainModal;
 use Livewire\Attributes\On;
 use Livewire\Component;
-use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Title;
-use Spatie\Permission\Models\Permission;
 
-class PermissionComponent extends Component
+class UserTermsConditionComponent extends Component
 {
     use WithPagination;
     use WithMainModal;
@@ -23,49 +23,43 @@ class PermissionComponent extends Component
     public string $columnName = 'created_at';
     public string $sortDirection = 'desc';
     public int $limitPerPage = 10;
-    public PermissionForm $form;
+    public TermsConditionForm $form;
 
-    private function getPermissions(): LengthAwarePaginator
+    private function getTermsConditions(): LengthAwarePaginator
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         // getList($this->search, $this->columnName, $this->sortDirection)
-        return Permission::paginate($this->limitPerPage);
+        return TermsCondition::paginate($this->limitPerPage);
     }
 
-    #[Title('User Permissions')]
+    #[Title('User Terms & Conditions')]
     public function render()
     {
-        $permissions = $this->getPermissions();
-        return view('livewire.backend.permission-component', compact('permissions'));
+        $termsConditions = $this->getTermsConditions();
+        $roles = Role::pluck('title', 'id')->all();
+        return view('livewire.backend.user-terms-condition-component', compact('termsConditions', 'roles'));
     }
+    
+    // public function hydrate()
+    // {
+    //     $this->dispatch('select-container', ['formRole' => $this->form->roles]);
+    // }
 
     public function store()
     {
         $this->form->validate();
-        $this->form->validate([
-            'title' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $existingCount = DB::table('permissions')
-                        ->where('title', $value)
-                        ->count();
-
-                    if ($existingCount > 0) {
-                        $fail("The $attribute has already been taken.");
-                    }
-                }
-            ]
-        ]);
         try {
             DB::beginTransaction();
-            Permission::create([
-                'group' => $this->form->group,
+            $contract = TermsCondition::create([
+                'uuid' => getUuid(),
                 'title' => $this->form->title,
-                'name' => Str::slug($this->form->title, '-')
+                'description' => $this->form->description,
+                'version' => '1',
             ]);
+            $contract->roles()->sync($this->form->roles);
             DB::commit();
             $this->closeMainModal();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Permission Created Successfully!']);
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Contract Created Successfully!']);
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
@@ -76,8 +70,8 @@ class PermissionComponent extends Component
         $this->form->isUpdate = true;
         $this->form->id = $id;
         try {
-            $permission = Permission::findOrFail($id);
-            $this->form->set($permission);
+            $contract = TermsCondition::findOrFail($id);
+            $this->form->set($contract);
             $this->openMainModal();
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
@@ -87,15 +81,15 @@ class PermissionComponent extends Component
     public function update($id)
     {
         $this->form->validate();
-        $permission = Permission::findOrFail($id);
+        $termsCondition = TermsCondition::with('roles')->findOrFail($id);
 
         $this->form->validate([
             'title' => [
                 'required',
-                function ($attribute, $value, $fail) use ($permission) {
+                function ($attribute, $value, $fail) use ($termsCondition) {
                     $existingCount = DB::table('permissions')
                         ->where('title', $value)
-                        ->where('id', '!=', $permission->id)
+                        ->where('id', '!=', $termsCondition->id)
                         ->count();
 
                     if ($existingCount > 0) {
@@ -107,19 +101,28 @@ class PermissionComponent extends Component
         try {
 
             DB::beginTransaction();
-            $permission->group = $this->form->group;
-            $permission->title = $this->form->title;
-            $permission->name = Str::slug($this->form->title, '-');
-            $permission->save();
+            $version = $this->getVersion($id);
+            $termsCondition->update([
+                'title' => $this->form->title,
+                'description' => $this->form->description,
+                'version' => $version,
+            ]);
+            $termsCondition->roles()->sync($this->form->roles);
             DB::commit();
 
             $this->closeMainModal();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Permission Updated Successfully!']);
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Contract Updated Successfully!']);
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
     }
 
+
+    public function getVersion($termsCondition_id)
+    {
+        $termsCondition = TermsCondition::findOrFail($termsCondition_id);
+        return $termsCondition->version += 0.1;
+    }
 
     public function deleteConfirmation($id)
     {
@@ -136,9 +139,9 @@ class PermissionComponent extends Component
     public function destroy($id)
     {
         try {
-            $permission = Permission::findOrFail($id);
-            $permission->delete();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Permission Deleted Successfully!']);
+            $userTermsCondition = TermConditionUser::findOrFail($id);
+            $userTermsCondition->delete();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'User Terms&Condition Deleted Successfully!']);
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }

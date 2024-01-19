@@ -104,7 +104,7 @@ class UsersController extends Controller
                     }
                     if ($this->auth_user->hasPermissionTo('view_contracts')) {
                         $actions .= '<li class="m-nav__item"><a class="m-nav__link" href="' . route('user-contracts', $user->id) . '">
-								<span class="m-nav__link-text">User Contracts</span>
+								<span class="m-nav__link-text">User Terms & Conditions</span>
 							</a></li>';
                     }
                     if ($this->auth_user->hasPermissionTo('view_users')) {

@@ -42,7 +42,7 @@ use App\Livewire\Backend\PermissionComponent;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Backend\SettingComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
-use App\Livewire\Backend\UserContractsComponent;
+use App\Livewire\Backend\UserTermsConditionComponent;
 use App\Livewire\Backend\UserProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
@@ -69,7 +69,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
-        Route::get('/user-contracts', UserContractsComponent::class)->name('user-contracts');
+        Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');
     });
 });

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class UserContract extends Model
+class TermConditionUser extends Model
 {
     protected $fillable =
     [
@@ -17,7 +17,7 @@ class UserContract extends Model
 
     public function contract()
     {
-        return $this->belongsTo(Contract::class);
+        return $this->belongsTo(TermsCondition::class);
     }
 }
     
