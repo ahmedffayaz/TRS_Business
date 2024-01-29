@@ -7,6 +7,7 @@ use App\Http\Controllers\CompaniesController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\LeavesController;
+use App\Http\Controllers\NewKnowledgeBaseController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\ProfileController;
@@ -67,7 +68,8 @@ Route::middleware('auth')->group(function () {
         Route::get('projects', ProjectComponent::class)->name('projects');
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
-        Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
+        // Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
+        Route::resource('knowledge-bases', NewKnowledgeBaseController::class);
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');

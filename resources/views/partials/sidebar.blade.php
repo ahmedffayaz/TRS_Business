@@ -65,8 +65,8 @@
                     <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
                 </a>
             </li>
-            <li class="{{ request()->routeIs('dashboard.knowledge-base') ? 'active' : '' }} nav-item">
-                <a class="d-flex align-items-center" href="{{ route('dashboard.knowledge-base') }}">
+            <li class="{{ request()->routeIs('dashboard.knowledge-bases.index') ? 'active' : '' }} nav-item">
+                <a class="d-flex align-items-center" href="{{ route('dashboard.knowledge-bases.index') }}">
                     <i data-feather="file"></i>
                     <span class="menu-title text-truncate" data-i18n="Knowledge Base">Knowledge Base</span>
                 </a>
