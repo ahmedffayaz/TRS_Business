@@ -1,27 +1,27 @@
 <?php
 
-use App\Http\Controllers\AttachmentsController;
-use App\Http\Controllers\AttendanceController;
-use App\Http\Controllers\CommentsController;
-use App\Http\Controllers\CompaniesController;
-use App\Http\Controllers\ContractController;
-use App\Http\Controllers\InvoicesController;
-use App\Http\Controllers\LeavesController;
-use App\Http\Controllers\NewKnowledgeBaseController;
-use App\Http\Controllers\NotificationController;
+use App\Livewire\Auth\LoginComponent;
+use Illuminate\Support\Facades\Route;
+use App\Livewire\Backend\RoleComponent;
+use App\Livewire\Backend\UserComponent;
+use App\Livewire\Auth\RegisterComponent;
 use App\Http\Controllers\PagesController;
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ProjectsController;
-use App\Http\Controllers\ReportsController;
-
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\UsersController;
 use App\Livewire\Backend\ClientComponent;
+use App\Http\Controllers\LeavesController;
 use App\Livewire\Backend\CompanyComponent;
-use App\Livewire\Backend\DashboardComponent;
 use App\Livewire\Backend\ProjectComponent;
-use App\Livewire\Backend\UserComponent;
-use Illuminate\Support\Facades\Route;
+use App\Livewire\Backend\SettingComponent;
+
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReportsController;
+use App\Http\Controllers\CommentsController;
+use App\Http\Controllers\ContractController;
+use App\Http\Controllers\InvoicesController;
+use App\Http\Controllers\ProjectsController;
+use App\Livewire\Backend\DashboardComponent;
+use App\Http\Controllers\CompaniesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,17 +34,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-use App\Livewire\Auth\LoginComponent;
-use App\Livewire\Auth\RegisterComponent;
-use App\Livewire\Auth\ForgotPasswordComponent;
 use App\Livewire\Auth\ResetPasswordComponent;
-use App\Livewire\Backend\KnowledgeBaseComponent;
 use App\Livewire\Backend\PermissionComponent;
-use App\Livewire\Backend\RoleComponent;
-use App\Livewire\Backend\SettingComponent;
+use App\Http\Controllers\AttendanceController;
+use App\Livewire\Auth\ForgotPasswordComponent;
+use App\Livewire\Backend\UserProfileComponent;
+use App\Http\Controllers\AttachmentsController;
+use App\Http\Controllers\NotificationController;
+use App\Livewire\Backend\KnowledgeBaseComponent;
+use App\Http\Controllers\KnowledgeBaseController;
 use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\UserTermsConditionComponent;
-use App\Livewire\Backend\UserProfileComponent;
+use App\Http\Controllers\KnowledgeBaseTopicController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -69,7 +70,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         // Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
-        Route::resource('knowledge-bases', NewKnowledgeBaseController::class);
+        Route::get('knowledge-base-record', [KnowledgeBaseController::class, 'fetchRecord'])->name('knowledge-base.fetch-record');
+        Route::resource('knowledge-bases', KnowledgeBaseController::class);
+        Route::get('knowledge-base-topics-record/{id}', [KnowledgeBaseTopicController::class, 'fetchRecord'])->name('knowledge-base-topic.fetch-record');
+        Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class);
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');
