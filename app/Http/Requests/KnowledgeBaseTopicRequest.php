@@ -20,8 +20,8 @@ class KnowledgeBaseTopicRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {dd($this->route());
-        $id = $this->route()->parameters() ? $this->route()->parameters()['knowledge_base'] : null;
+    {
+        $id = $this->route()->parameters() ? $this->route()->parameters()['knowledge_base_topic'] : null;
         switch ($this->method()) {
             case 'POST':
                 return [

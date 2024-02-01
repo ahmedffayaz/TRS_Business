@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
-use App\Models\KnowledgeBase;
+use App\Models\KnowledgeBaseQa;
 use Illuminate\Http\JsonResponse;
 use App\Models\KnowledgeBaseTopic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
-use App\Http\Requests\KnowledgeBaseTopicRequest;
+use App\Http\Requests\KnowledgeBaseQuestionRequest;
 
-class KnowledgeBaseTopicController extends Controller
+class KnowledgeBaseQuestionController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -28,11 +28,11 @@ class KnowledgeBaseTopicController extends Controller
     public function create(Request $request)
     {
         try {
-            $knowledgeBaseId = KnowledgeBase::findOrFail($request->id)->id;
+            $knowledgeBaseTopicId = KnowledgeBaseTopic::findOrFail($request->input('knowledge_base_topic_id'))->id;
 
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
-                'data' => view('backend.knowledge-base.topics.edit', compact('knowledgeBaseId'))->render()
+                'data' => view('backend.knowledge-base.questions.edit', compact('knowledgeBaseTopicId'))->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             return response()->json([
@@ -45,35 +45,34 @@ class KnowledgeBaseTopicController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(KnowledgeBaseTopicRequest $request)
+    public function store(KnowledgeBaseQuestionRequest $request)
     {
         try {
             DB::beginTransaction();
-            KnowledgeBaseTopic::create([
-                'knowledge_base_id' => $request->knowledge_base_id,
-                'name' => $request->name,
-                'slug' => Str::slug($request->name)
+            $question = KnowledgeBaseQa::create([
+                'knowledge_base_topic_id' => $request->input('knowledge_base_topic_id'),
+                'question' => $request->input('question'),
+                'slug' => Str::slug($request->input('question')),
+                'answer' => $request->input('description'),
+                'keywords' => $request->input('keywords')
             ]);
 
             DB::commit();
 
             if ($request->ajax()) {
-                $url = route('dashboard.knowledge-base-topic.fetch-record', $request->knowledge_base_id);
+                $url = route('dashboard.knowledge-base-topic.fetch-record', $question->topic->knowledgeBase);
                 return response()->json([
                     'status' => JsonResponse::HTTP_OK,
-                    'success' => 'Knowledge base topic created successfully.',
+                    'success' => 'Knowledge base question created successfully.',
                     'url' => $url
                 ], JsonResponse::HTTP_OK);
             }
-
-            Session::flash('success', 'Knowledge base topic created successfully.');
-            return redirect()->route('dashboard.knowledge-base-topics.index');
         } catch (Exception $exception) {
             DB::rollBack();
             if ($request->ajax()) {
                 return response()->json([
                     'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
-                    'error' => 'Something went wrong.' . $exception->getMessage()
+                    'error' => 'Something went wrong.'
                 ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
             Session::flash('error', 'Something went wrong.');
@@ -86,7 +85,8 @@ class KnowledgeBaseTopicController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $question = KnowledgeBaseQa::findOrFail($id);
+        return view('backend.knowledge-base.questions.show', compact('question'));
     }
 
     /**
@@ -95,14 +95,14 @@ class KnowledgeBaseTopicController extends Controller
     public function edit(Request $request, string $id)
     {
         try {
-            $topic = KnowledgeBaseTopic::whereKnowledgeBaseId($request->knowledge_base_id)
-            ->whereHas('knowledgeBase')->with('knowledgeBase')->findOrFail($id);
+            $question = KnowledgeBaseQa::whereKnowledgeBaseTopicId($request->knowledge_base_topic_id)
+            ->whereHas('topic')->with('topic')->findOrFail($id);
 
-            $knowledgeBaseId = $topic->knowledgeBase->id;
+            $knowledgeBaseTopicId = $question->topic->id;
 
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
-                'data' => view('backend.knowledge-base.topics.edit', compact('topic', 'knowledgeBaseId'))->render()
+                'data' => view('backend.knowledge-base.questions.edit', compact('question', 'knowledgeBaseTopicId'))->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             return response()->json([
@@ -115,34 +115,34 @@ class KnowledgeBaseTopicController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(KnowledgeBaseTopicRequest $request, string $id)
+    public function update(Request $request, string $id)
     {
         try {
             DB::beginTransaction();
-            $topic = KnowledgeBaseTopic::whereKnowledgeBaseId($request->knowledge_base_id)->findOrFail($id);
-            $topic->update([
-                'name' => $request->input('name'),
-                'slug' => Str::slug($request->input('name'))
+            $question = KnowledgeBaseQa::where('knowledge_base_topic_id', $request->input('knowledge_base_topic_id'))->findOrFail($id);
+            $question->update([
+                'question' => $request->input('question'),
+                'slug' => Str::slug($request->input('question')),
+                'answer' => $request->input('description'),
+                'keywords' => $request->input('keywords')
             ]);
+
             DB::commit();
 
             if ($request->ajax()) {
-                $url = route('dashboard.knowledge-base-topic.fetch-record', $request->knowledge_base_id);
+                $url = route('dashboard.knowledge-base-topic.fetch-record', $question->topic->knowledgeBase);
                 return response()->json([
                     'status' => JsonResponse::HTTP_OK,
-                    'success' => 'Knowledge base topic updated successfully.',
+                    'success' => 'Knowledge base question updated successfully.',
                     'url' => $url
                 ], JsonResponse::HTTP_OK);
             }
-
-            Session::flash('success', 'Knowledge base topic updated successfully.');
-            return redirect()->route('dashboard.knowledge-base-topics.index');
         } catch (Exception $exception) {
             DB::rollBack();
             if ($request->ajax()) {
                 return response()->json([
                     'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
-                    'error' => 'Something went wrong.' . $exception->getMessage()
+                    'error' => 'Something went wrong.'
                 ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
             }
             Session::flash('error', 'Something went wrong.');
@@ -153,27 +153,22 @@ class KnowledgeBaseTopicController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(string $id)
     {
         try {
             DB::beginTransaction();
-            $topic = KnowledgeBaseTopic::whereKnowledgeBaseId($request->input('knowledge_base_id'))->findOrFail($id);
-
-            // Delete topics and Questions
-            $topic->qas->each(function ($query) {
-                $query->delete();
-            });
+            $question = KnowledgeBaseQa::findOrFail($id);
 
             // Delete knowledge base
-            $topic->delete();
+            $question->delete();
             DB::commit();
 
             // redirect url
-            $url = route('dashboard.knowledge-base-topic.fetch-record', $topic->knowledgeBase->id);
+            $url = route('dashboard.knowledge-base-topic.fetch-record', $question->topic->knowledgeBase->id);
 
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
-                'success' => 'Knowledge base topic deleted successfully.',
+                'success' => 'Knowledge base question deleted successfully.',
                 'url' => $url
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
@@ -181,31 +176,6 @@ class KnowledgeBaseTopicController extends Controller
             return response()->json([
                 'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 'error' => 'Something went wrong.'
-            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function fetchRecord($id)
-    {
-        try {
-            $data = auth()->user()->hasRole('admin') ? KnowledgeBaseTopic::where('knowledge_base_id', $id)
-            ->whereHas('knowledgeBase') : KnowledgeBaseTopic::where('knowledge_base_id', $id)
-            ->whereHas('knowledgeBase', function ($query) {
-                $query->whereHas('roles', function ($query) {
-                    $query->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
-                });
-            });
-
-            $topics = $data->with('qas')->latest()->paginate(21);
-
-            return response()->json([
-                'status' => JsonResponse::HTTP_OK,
-                'data' =>  view('backend.knowledge-base.topics.index-data', compact('topics'))->render()
-            ], JsonResponse::HTTP_OK);
-        } catch (Exception $exception) {
-            return response()->json([
-                'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
-                'error' => 'Something went wrong. ' . $exception->getMessage()
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

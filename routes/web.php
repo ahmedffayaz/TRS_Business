@@ -46,6 +46,7 @@ use App\Http\Controllers\KnowledgeBaseController;
 use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\UserTermsConditionComponent;
 use App\Http\Controllers\KnowledgeBaseTopicController;
+use App\Http\Controllers\KnowledgeBaseQuestionController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -69,11 +70,11 @@ Route::middleware('auth')->group(function () {
         Route::get('projects', ProjectComponent::class)->name('projects');
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
-        // Route::get('/knowledge-base', KnowledgeBaseComponent::class)->name('knowledge-base');
         Route::get('knowledge-base-record', [KnowledgeBaseController::class, 'fetchRecord'])->name('knowledge-base.fetch-record');
         Route::resource('knowledge-bases', KnowledgeBaseController::class);
         Route::get('knowledge-base-topics-record/{id}', [KnowledgeBaseTopicController::class, 'fetchRecord'])->name('knowledge-base-topic.fetch-record');
         Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class);
+        Route::resource('knowledge-base-question', KnowledgeBaseQuestionController::class);
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');

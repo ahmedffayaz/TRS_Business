@@ -6,6 +6,7 @@
     integrity="sha512-RtZU3AyMVArmHLiW0suEZ9McadTdegwbgtiQl5Qqo9kunkVg1ofwueXD8/8wv3Af8jkME3DDe3yLfR8HSJfT2g=="
     crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js" type="text/javascript"></script>
 <script src="{{ asset('assets/common.js') }}"></script>
 @stack('scripts')
 <script>

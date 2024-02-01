@@ -1,3 +1,4 @@
+let quill;
 // Define a function named fetchRecord that takes a URL as input
 function fetchRecord(url) {
     // Get the value of an element with the id 'page' and store it in the 'page' variable
@@ -23,6 +24,35 @@ function fetchRecord(url) {
         error: function (response) {
             console.log(response);
         }
+    });
+}
+
+function quillEditor()
+{
+    var toolbarOptions = [
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+        [
+            'bold', 'italic',
+            'underline',
+            'strike',
+            { 'color': [] },
+            { 'background': [] },
+            'blockquote',
+            'code-block',
+            { 'header': 1 },
+            { 'header': 2 },
+            { 'list': 'ordered'},
+            { 'list': 'bullet' },
+            { 'align': [] }
+        ],
+    ];
+
+    quill = new Quill('.editor', {
+        modules: {
+            toolbar: toolbarOptions
+        },
+        theme: 'snow'
     });
 }
 
@@ -52,12 +82,11 @@ $('body').on('click', '[data-act=ajax-modal]', function () {
 
     const content = $("#ajax_model_content");
     const spinner = $("#ajax_model_spinner");
+    // Check if the _self element has the 'data-quill' attribute
+    var quillAttr = _self.attr('data-quill');
 
     content.hide();
     spinner.show();
-
-    $("#ajax_model").modal({ backdrop: "static" });
-    $("#ajax_model_title").html(_self.attr('data-title'));
 
     var metaData = {};
     $(this).each(function () {
@@ -67,7 +96,7 @@ $('body').on('click', '[data-act=ajax-modal]', function () {
                 metaData[dataName] = this.value;
             }
         });
-    }); console.log(metaData);
+    });
 
     $.ajax({
         url : _self.attr('data-action-url'),
@@ -85,6 +114,13 @@ $('body').on('click', '[data-act=ajax-modal]', function () {
 
                 // Initialize select2 plugin for any elements with the 'select2' class within the modal body
                 $('.select2').select2();
+
+
+                // If data-quill attribute is present, set quillAttr to true
+                if (quillAttr) {
+                    quillEditor();
+                }
+
             } else {
                 var toastrData = {type: 'error', message: 'Something went wrong.'};
                 showToastr(toastrData);
@@ -136,6 +172,13 @@ function sendAjaxForm(form) {
 
     // Disable the submit button and show spinner
     disableSubmitButton(btn);
+
+    // Check if Quill instance is defined before populating description field
+    if (typeof quill !== 'undefined') {
+        // Populate hidden form field with Quill editor content
+        let desc = document.querySelector('input[name=description]');
+        desc.value = quill.root.innerHTML;
+    }
 
     const formData = new FormData(_self[0]);
 
@@ -208,10 +251,21 @@ $(document).on('click', '.delete', function () {
     let redirect = $(this).data('redirect');
     let callback = $(this).data('callback');
     let triggered = $(this).data('triggered');
-    deleteConfirmation(url, tableId, reload, redirect, callback, triggered);
+
+    var metaData = {};
+    $(this).each(function () {
+        $.each(this.attributes, function () {
+            if (this.specified && this.name.match("^data-post-")) {
+                var dataName = this.name.replace("data-post-", "");
+                metaData[dataName] = this.value;
+            }
+        });
+    });
+
+    deleteConfirmation(url, tableId, reload, redirect, callback, triggered, metaData);
 });
 
-function deleteConfirmation(url, tableId, reload = false, redirect = false, callback = false, triggered=false) {
+function deleteConfirmation(url, tableId, reload = false, redirect = false, callback = false, triggered=false, metaData = {}) {
     Swal.fire({
         title: 'Are you sure?',
         text: 'You want to delete this record',
@@ -233,24 +287,19 @@ function deleteConfirmation(url, tableId, reload = false, redirect = false, call
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 },
+                data: metaData,
                 success: function (response) {
                     Swal.close();
-                    if (response.status === 200) {
-                        if (reload)
-                            location.reload();
-                        else if (redirect)
-                            window.location.href = redirect;
-                        else if (callback && typeof window[callback] === 'function')
-                            window[callback]();
+                    if (reload)
+                        location.reload();
+                    else if (redirect)
+                        window.location.href = redirect;
+                    else if (callback && typeof window[callback] === 'function')
+                        window[callback]();
 
-                        var toastrData = {type: 'success', message: response.success};
-                        showToastr(toastrData);
-                        if (response.url != '') fetchRecord(response.url);
-
-                    } else {
-                        var toastrData = {type: 'error', message: response.responseJSON.error};
-                        showToastr(toastrData);
-                    }
+                    var toastrData = {type: 'success', message: response.success};
+                    showToastr(toastrData);
+                    if (response.url != '') fetchRecord(response.url);
                 },
                 error: function (response) {
                     Swal.fire({

@@ -10,6 +10,7 @@
 <link rel="stylesheet" href="{{ asset('assets/vendors/css/forms/select/select2.min.css') }}" />
 <link rel="stylesheet" href="{{ asset('assets/vendors/css/plugins/ext-component-sweet-alerts.css') }}" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" />
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
 @stack('styles')
 
