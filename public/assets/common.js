@@ -216,8 +216,8 @@ function sendAjaxForm(form) {
                 var toastrData = {type: 'error', message: response.responseJSON.error};
                 showToastr(toastrData);
             } else {
-                let errors = response.responseJSON.errors;
-                let error;
+                var errors = response.responseJSON.errors;
+                var error;
 
                 for (const key in errors) {
                     error = `${errors[key]}`
@@ -233,6 +233,45 @@ function sendAjaxForm(form) {
         }
     });
 }
+
+$('body').on('submit', '[data-form-search=ajax-form]', function (event) {
+    event.preventDefault();
+
+    _self = $(this);
+    formData = new FormData(_self[0]);
+    $.ajax({
+        url : _self.attr('action'),
+        type : _self.attr('method'),
+        data : formData,
+        processData: false, // Prevent jQuery from processing data
+        contentType: false, // Prevent jQuery from setting content type
+        success: function (response) {
+            // Update the content of an element with the id 'data' with the data received in the response
+            $('#data').html(response.data);
+
+            // Check if the 'feather' library is available and replace SVG icons with updated ones
+            if (feather) {
+                feather.replace({width: 14, height: 14});
+            }
+        },
+        error: function (response) {
+            if (response.responseJSON.error) {
+                var toastrData = {type: 'error', message: response.responseJSON.error};
+                showToastr(toastrData);
+            } else {
+                var errors = response.responseJSON.errors;
+                var error;
+
+                for (const key in errors) {
+                    error = `${errors[key]}`
+                }
+
+                var toastrData = {type: 'error', message: error};
+                showToastr(toastrData);
+            }
+        }
+    });
+});
 
 // Function to add spinner and disable the button
 function disableSubmitButton(button) {

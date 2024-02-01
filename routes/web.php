@@ -71,8 +71,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         Route::get('knowledge-base-record', [KnowledgeBaseController::class, 'fetchRecord'])->name('knowledge-base.fetch-record');
+        Route::post('knowledge-base-search', [KnowledgeBaseController::class, 'search'])->name('knowledge-base.search');
         Route::resource('knowledge-bases', KnowledgeBaseController::class);
         Route::get('knowledge-base-topics-record/{id}', [KnowledgeBaseTopicController::class, 'fetchRecord'])->name('knowledge-base-topic.fetch-record');
+        Route::post('knowledge-base-topic-search', [KnowledgeBaseTopicController::class, 'search'])->name('knowledge-base-topic.search');
         Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class);
         Route::resource('knowledge-base-question', KnowledgeBaseQuestionController::class);
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');

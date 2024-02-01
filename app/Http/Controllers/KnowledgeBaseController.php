@@ -6,13 +6,14 @@ use Exception;
 use App\Models\Role;
 use App\Models\Company;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\JsonResponse;
+use App\Models\KnowledgeBaseTopic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Session;
 use App\Http\Requests\KnowledgeBaseRequest;
-use App\Models\KnowledgeBaseTopic;
 
 class KnowledgeBaseController extends Controller
 {
@@ -245,6 +246,39 @@ class KnowledgeBaseController extends Controller
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
                 'data' =>  view('backend.knowledge-base.index-data', compact('knowledgeBases', 'roles', 'companies'))->render()
+            ], JsonResponse::HTTP_OK);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => 'Something went wrong.'
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'search' => 'required|string'
+        ]);
+
+        try {
+            // Get the search query from the request
+            $search = $request->input('search');
+
+            // Perform the search query on both KnowledgeBase and KnowledgeBaseTopic and KnowledgeBaseQa models
+            $knowledgeBases = KnowledgeBase::where('name', 'like', '%' . $search . '%')
+                ->orWhereHas('topics', function ($query) use ($search) {
+                    $query->where('name', 'like', '%' . $search . '%');
+                })
+                ->orWhereHas('topics.qas', function ($query) use ($search) {
+                    $query->where('question', 'like', '%' . $search . '%')
+                    ->orWhere('answer', 'like', '%' . $search . '%')
+                    ->orWhere('keywords', 'like', '%' . $search . '%');
+                })->with('topics')->latest()->paginate(21);
+
+            return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'data' =>  view('backend.knowledge-base.index-data', compact('knowledgeBases'))->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             return response()->json([

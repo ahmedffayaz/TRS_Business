@@ -31,12 +31,13 @@
                         </h4>
                         <p class="mb-2">Last updated on {{ Carbon\Carbon::parse($question->updated_at)->format('d F, Y') }}</p>
                         {!! $question->answer !!}
-                        <br>
-                        @php $keywords = explode(',', $question->keywords) @endphp
-                        <div class="mt-2">@foreach ($keywords as $keyword)
-                            {{ $keyword }}
-                        @endforeach</div>
-                    </div>
+                        <p></p>
+                        @php $keywords = explode(', ', $question->keywords) @endphp
+                        @foreach ($keywords as $keyword)
+                            <div class="badge rounded-pill {{ getRandomColor() }}">
+                                <a href="#">{{ $keyword }}</a>
+                            </div>
+                        @endforeach
                 </div>
             </div>
         </div>

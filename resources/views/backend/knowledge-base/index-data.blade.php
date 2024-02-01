@@ -1,7 +1,7 @@
 <div class="row kb-search-content-info match-height">
     @forelse ($knowledgeBases as $knowledgeBase)
         <!-- knowledge base card -->
-        <div class="col-md-4 col-sm-6 col-12 kb-search-content">
+        <div class="col-md-4 col-sm-6 kb-search-content">
             <div class="card">
                 <a href="{{ route('dashboard.knowledge-bases.show', $knowledgeBase->id) }}">
                     <img src="{{ !file_exists(public_path('storage/images/knowledge-base/' . $knowledgeBase->image)) || is_null($knowledgeBase->image) ? asset('assets/illustrations/questions.svg') : asset('storage/images/knowledge-base/' . $knowledgeBase->image) }}"
@@ -30,7 +30,7 @@
         </div>
     @empty
         <!-- no result -->
-        <div class="col-12 text-center no-result no-items">
+        <div class="col-md-12 text-center kb-search-content">
             <h4 class="mt-4">Search result not found!!</h4>
         </div>
     @endforelse

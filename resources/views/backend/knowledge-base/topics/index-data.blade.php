@@ -78,9 +78,9 @@
         </div>
     @empty
         <!-- no result -->
-        <div class="col-12 text-center no-result no-items">
+        <div class="col-md-12 text-center kb-search-content">
             <h4 class="mt-4">Search result not found!!</h4>
         </div>
     @endforelse
-    {{-- {{ $topics->links('components.pagination') }} --}}
+    {{ $topics->links('components.blade-pagination') }}
 </div>

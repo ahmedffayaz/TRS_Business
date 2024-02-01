@@ -12,28 +12,19 @@
                 data-method="get" data-complete-location="true" tabindex="0" aria-controls="table-hover" />
         @endsection
     @endcan
-    <!-- Knowledge base Jumbotron -->
-    <section id="kb-category-search">
-        <div class="row">
-            <div class="col-12">
-                <div class="card knowledge-base-bg text-center" style="background-image: url('../../../app-assets/images/banner/banner.png')">
-                    <div class="card-body">
-                        <h2 class="text-primary">Dedicated Source Used on Website</h2>
-                        <p class="card-text mb-2">
-                            <span>Popular searches: </span><span class="fw-bolder">Sales automation, Email marketing</span>
-                        </p>
-                        <form class="kb-search-input">
-                            <div class="input-group input-group-merge">
-                                <span class="input-group-text"><i data-feather="search"></i></span>
-                                <input type="text" class="form-control" id="searchbar" placeholder="Ask a question..." />
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    {{-- Search knowledge base component --}}
+    <x-search>
+        <form class="kb-search-input" action="{{ route('dashboard.knowledge-base-topic.search') }}"
+            method="POST" data-form-search=ajax-form autocomplete="off">
+            @csrf
+            <x-input type="hidden" name="knowledge_base_id" value="{{ $id }}" />
+            <div class="input-group input-group-merge">
+                <span class="input-group-text"><i data-feather="search"></i></span>
+                <input type="text" class="form-control" id="searchbar" name="search" autocomplete="off"
+                    placeholder="Search knowledge base..." />
             </div>
-        </div>
-    </section>
-    <!--/ Knowledge base Jumbotron -->
+        </form>
+    </x-search>
 
     <!-- Knowledge base category Content  -->
     <section id="knowledge-base-category">

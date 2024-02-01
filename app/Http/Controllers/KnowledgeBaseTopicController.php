@@ -209,4 +209,37 @@ class KnowledgeBaseTopicController extends Controller
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'search' => 'required|string',
+            'knowledge_base_id' => 'required|integer'
+        ]);
+
+        try {
+            // Get the search query from the request
+            $search = $request->input('search');
+            $knowledgeBaseId = $request->input('knowledge_base_id');
+
+            // Perform the search query on both KnowledgeBaseTopic and KnowledgeBaseQa models
+            $topics = KnowledgeBaseTopic::where('name', 'like', '%' . $search . '%')
+                ->orWhereHas('qas', function ($query) use ($search) {
+                    $query->where('question', 'like', '%' . $search . '%')
+                    ->orWhere('answer', 'like', '%' . $search . '%')
+                    ->orWhere('keywords', 'like', '%' . $search . '%');
+                })->where('knowledge_base_id', $request->input('knowledge_base_id'))
+                ->with('qas')->latest()->paginate(21);
+
+            return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'data' =>  view('backend.knowledge-base.topics.index-data', compact('topics'))->render()
+            ], JsonResponse::HTTP_OK);
+        } catch (Exception $exception) {
+            return response()->json([
+                'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => 'Something went wrong.'
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
