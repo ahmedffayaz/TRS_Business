@@ -13,11 +13,13 @@
                         </h6>
 
                         <div class="list-group list-group-circle mt-1">
-                            <a href="#" class="list-group-item text-body">How Secure Is My Password?</a>
-                            <a href="#" class="list-group-item text-body">Can I Change My Username?</a>
-                            <a href="#" class="list-group-item text-body">Where Can I Upload My Avatar?</a>
-                            <a href="#" class="list-group-item text-body">How Do I Change My Timezone?</a>
-                            <a href="#" class="list-group-item text-body">How Do I Change My Password?</a>
+                            @forelse ($relatedQuestions as $relatedQuestion)
+                                <x-anchor-tag
+                                    href="{{ route('dashboard.knowledge-base-question.show', $relatedQuestion->id) }}"
+                                    class="list-group-item text-body" :value="$relatedQuestion->question" />
+                            @empty
+                                <p>No question found</p>
+                            @endforelse
                         </div>
                     </div>
                 </div>
@@ -35,12 +37,25 @@
                         @php $keywords = explode(', ', $question->keywords) @endphp
                         @foreach ($keywords as $keyword)
                             <div class="badge rounded-pill {{ getRandomColor() }}">
-                                <a href="#">{{ $keyword }}</a>
+                                <x-anchor-tag href="javascript:void(0);" onclick="submitKeyword('{{ $keyword }}')" :value="$keyword" />
                             </div>
                         @endforeach
+                        <form id="search-keyword" action="{{ route('dashboard.knowledge-base.search-keyword') }}" method="post" class="d-none">
+                            @csrf
+                            <x-input type="hidden" name="keyword" id="keyword-input" />
+                        </form>
                 </div>
             </div>
         </div>
     </section>
     <!-- Knowledge base question Content ends -->
 @endsection
+
+@push('scripts')
+    <script>
+        function submitKeyword(keyword) {
+            document.getElementById('keyword-input').value = keyword;
+            document.getElementById('search-keyword').submit();
+        }
+    </script>
+@endpush

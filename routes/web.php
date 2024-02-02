@@ -77,6 +77,8 @@ Route::middleware('auth')->group(function () {
         Route::post('knowledge-base-topic-search', [KnowledgeBaseTopicController::class, 'search'])->name('knowledge-base-topic.search');
         Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class);
         Route::resource('knowledge-base-question', KnowledgeBaseQuestionController::class);
+        Route::post('knowledge-base-search-keyword', [KnowledgeBaseQuestionController::class, 'searchKeyword'])->name('knowledge-base.search-keyword');
+        Route::get('knowledge-base-search-keyword-record/{keyword}', [KnowledgeBaseQuestionController::class, 'fetchSearchKeywordRecord'])->name('knowledge-base.fetch-search-keyword');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');

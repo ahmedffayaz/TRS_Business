@@ -11,6 +11,9 @@ use App\Models\KnowledgeBaseTopic;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use App\Http\Requests\KnowledgeBaseQuestionRequest;
+use App\Models\KnowledgeBase;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class KnowledgeBaseQuestionController extends Controller
 {
@@ -86,7 +89,34 @@ class KnowledgeBaseQuestionController extends Controller
     public function show(string $id)
     {
         $question = KnowledgeBaseQa::findOrFail($id);
-        return view('backend.knowledge-base.questions.show', compact('question'));
+        $keywords = explode(', ', $question->keywords);
+
+        $relatedQuestions = collect(); // Initialize an empty collection to store related questions
+
+        foreach ($keywords as $keyword) {
+            // Trim each keyword to remove any extra spaces
+            $keyword = trim($keyword);
+
+            // Perform a query for each keyword and merge the results into the $relatedQuestions collection
+            $relQuestions = auth()->user()->hasRole('admin')
+                ? KnowledgeBaseQa::where('keywords', 'like', '%' . $keyword . '%')
+                : KnowledgeBaseQa::whereHas('topic.knowledgeBase.roles', function ($query) {
+                    $query->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
+                })->where('keywords', 'like', '%' . $keyword . '%');
+
+            $questions = $relQuestions->get();
+
+            // Exclude the current question from the related questions
+            $questions = $questions->reject(function ($relatedQuestion) use ($question) {
+                return $relatedQuestion->id === $question->id;
+            });
+
+            $relatedQuestions = $relatedQuestions->merge($questions);
+        }
+
+        // Remove duplicate questions from the collection
+        $relatedQuestions = $relatedQuestions->unique('id');
+        return view('backend.knowledge-base.questions.show', compact('question', 'relatedQuestions'));
     }
 
     /**
@@ -107,7 +137,7 @@ class KnowledgeBaseQuestionController extends Controller
         } catch (Exception $exception) {
             return response()->json([
                 'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
-                'error' => 'Something went wrong. ' . $exception->getMessage()
+                'error' => 'Something went wrong.'
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -119,7 +149,8 @@ class KnowledgeBaseQuestionController extends Controller
     {
         try {
             DB::beginTransaction();
-            $question = KnowledgeBaseQa::where('knowledge_base_topic_id', $request->input('knowledge_base_topic_id'))->findOrFail($id);
+            $question = KnowledgeBaseQa::where('knowledge_base_topic_id', $request->input('knowledge_base_topic_id'))
+                ->findOrFail($id);
             $question->update([
                 'question' => $request->input('question'),
                 'slug' => Str::slug($request->input('question')),
@@ -173,6 +204,61 @@ class KnowledgeBaseQuestionController extends Controller
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             DB::rollBack();
+            return response()->json([
+                'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => 'Something went wrong.'
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function searchKeyword(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'keyword' => 'required|string'
+        ]);
+
+        if ($validator->failed()) {
+            return redirect()->back()->with('error', $validator->errors()->first());
+        }
+
+        $keyword = $request->input('keyword');
+
+        return view('backend.knowledge-base.search-keywords.index', compact('keyword'));
+
+        try {
+            //code...
+        } catch (Exception $exception) {
+            Log::error($exception->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong.');
+        }
+    }
+
+    public function fetchSearchKeywordRecord($keyword)
+    {
+        try {
+            $data = auth()->user()->hasRole('admin')
+                ? KnowledgeBaseTopic::whereHas('qas', function ($query) use ($keyword) {
+                    $query->where('keywords', 'like', '%' . $keyword . '%');
+                })->with(['qas' => function ($query) use ($keyword) {
+                    $query->where('keywords', 'like', '%' . $keyword . '%');
+                }])
+                : KnowledgeBaseTopic::whereHas('qas', function ($query) use ($keyword) {
+                    $query->whereHas('topic.knowledgeBase.roles', function ($query) {
+                        $query->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
+                    })->where('keywords', 'like', '%' . $keyword . '%');
+                })->with(['qas' => function ($query) use ($keyword) {
+                    $query->whereHas('topic.knowledgeBase.roles', function ($query) {
+                        $query->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
+                    })->where('keywords', 'like', '%' . $keyword . '%');
+                }]);
+
+            $topics = $data->latest()->paginate(21);
+
+            return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'data' =>  view('backend.knowledge-base.search-keywords.index-data', compact('topics'))->render()
+            ], JsonResponse::HTTP_OK);
+        } catch (Exception $exception) {
             return response()->json([
                 'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
                 'error' => 'Something went wrong.'
