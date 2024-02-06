@@ -6,7 +6,7 @@
         <!-- knowledge base card -->
         <div class="col-md-4 col-sm-6 kb-search-content">
             <div class="card">
-                <a href="{{ route('dashboard.knowledge-bases.show', $knowledgeBase->slug) }}">
+                <a href="{{ route('dashboard.knowledge-base-topics.index', $knowledgeBase->slug) }}">
                     <img src="{{ !file_exists(public_path('storage/images/knowledge-base/' . $knowledgeBase->image)) || is_null($knowledgeBase->image) ? asset('assets/illustrations/questions.svg') : asset('storage/images/knowledge-base/' . $knowledgeBase->image) }}"
                         class="card-img-top" alt="knowledge-base-image" />
                     <div class="card-body text-center">

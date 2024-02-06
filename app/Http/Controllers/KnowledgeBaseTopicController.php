@@ -17,9 +17,13 @@ class KnowledgeBaseTopicController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index($slug)
     {
-        //
+        $topics = KnowledgeBaseTopic::whereHas('knowledgeBase', function ($query) use ($slug) {
+            $query->whereSlug($slug);
+        })->with('knowledgeBase')->get();
+        $id = $topics->first()->knowledgeBase->id;
+        return view('backend.knowledge-base.topics.index', compact('id'));
     }
 
     /**
