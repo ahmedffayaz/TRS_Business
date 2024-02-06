@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('keyword_knowledge_base', function (Blueprint $table) {
+        Schema::create('knowledge_base_topics', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('keyword_id');
-            $table->unsignedBigInteger('knowledge_base_id');
-            $table->timestamps();
-        });
 
-        Schema::table('keyword_knowledge_base', function (Blueprint $table) {
-            $table->foreign('keyword_id')->references('id')->on('keywords')->onDelete('cascade');
+            $table->unsignedBigInteger('knowledge_base_id');
             $table->foreign('knowledge_base_id')->references('id')->on('knowledge_bases')->onDelete('cascade');
+
+            $table->string('name')->unique();
+            $table->string('slug')->unique();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('keyword_knowledge_base');
+        Schema::dropIfExists('knowledge_base_topics');
     }
 };
