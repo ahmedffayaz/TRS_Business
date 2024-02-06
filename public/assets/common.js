@@ -216,15 +216,10 @@ function sendAjaxForm(form) {
                 var toastrData = {type: 'error', message: response.responseJSON.error};
                 showToastr(toastrData);
             } else {
-                var errors = response.responseJSON.errors;
-                var error;
-
-                for (const key in errors) {
-                    error = `${errors[key]}`
-                }
-
-                var toastrData = {type: 'error', message: error};
-                showToastr(toastrData);
+                // Display errors for dynamic fields, if any
+                $.each(response.responseJSON.errors, function(fieldName, fieldErrors) {
+                    displayFieldErrors(fieldName, fieldErrors);
+                });
             }
         },
         complete: function () {
@@ -232,6 +227,44 @@ function sendAjaxForm(form) {
             enableSubmitButton(btn, originalText);
         }
     });
+
+    // Clear error message and remove text-danger class on form submission
+    _self.on('submit', function() {
+        // Clear error messages and remove text-danger class for all relevant fields
+        $(this).find('.error-message').text('').removeClass('text-danger');
+    });
+}
+
+// Function to display errors for dynamic fields
+function displayFieldErrors(fieldName, fieldErrors) {
+    // Check if the field name contains square brackets
+    if (fieldName.endsWith('[]')) {
+        // Remove the brackets to match the field name in the DOM
+        fieldName = fieldName.slice(0, -2);
+    }
+
+    // Find the corresponding DOM element by name
+    var $field = $('[name="' + fieldName + '[]"]');
+
+    // If the field is not found with square brackets, try without them
+    if ($field.length === 0) {
+        $field = $('[name="' + fieldName + '"]');
+    }
+
+    // Clear previous error messages for the dynamic field
+    $field.siblings('.text-danger').remove();
+
+    // Find the existing error message span
+    var $errorMessageSpan = $field.siblings('.error-message');
+
+    // If the error message span doesn't exist, create it
+    if ($errorMessageSpan.length === 0) {
+        $errorMessageSpan = $('<small class="error-message"></small>');
+        $field.after($errorMessageSpan);
+    }
+
+    // Append error message below the corresponding dynamic field
+    $errorMessageSpan.text(fieldErrors[0]).addClass('text-danger');
 }
 
 $('body').on('submit', '[data-form-search=ajax-form]', function (event) {
