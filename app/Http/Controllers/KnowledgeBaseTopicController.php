@@ -233,7 +233,7 @@ class KnowledgeBaseTopicController extends Controller
 
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
-                'data' =>  view('backend.knowledge-base.topics.index-data', compact('topics'))->render()
+                'data' =>  view('backend.knowledge-base.topics.index-data', compact('topics', 'search', 'knowledgeBaseId'))->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             return response()->json([

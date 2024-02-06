@@ -14,7 +14,7 @@
     {{-- Search knowledge base component --}}
     <x-search>
         <form class="kb-search-input" action="{{ route('dashboard.knowledge-base.search') }}"
-            method="POST" data-form-search=ajax-form autocomplete="off">
+            method="GET" data-form-search=ajax-form autocomplete="off">
             @csrf
             <div class="input-group input-group-merge">
                 <span class="input-group-text"><i data-feather="search"></i></span>

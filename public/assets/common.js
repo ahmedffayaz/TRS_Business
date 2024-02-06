@@ -8,6 +8,29 @@ function fetchRecord(url) {
     // Check if the 'page' variable is not equal to 0
     if (page != 0) requestUrl += '?page=' + page;
 
+    var metaData = {};
+
+    // Iterate over all elements with data-post attribute
+    $('[data-post]').each(function() {
+        var element = $(this);
+        var key = element.data('post'); // Get the key from data-post attribute
+        var value = element.val(); // Get the value of the element
+
+        // If the element is not an input (e.g., hidden input), use data-post-{key} attribute
+        if (typeof value === 'undefined') {
+            value = element.data('post-' + key);
+        }
+
+        metaData[key] = value; // Store key-value pair in metaData object
+    });
+
+    // Append all key-value pairs from metaData to requestUrl
+    for (var key in metaData) {
+        if (metaData.hasOwnProperty(key)) {
+            requestUrl += '&' + key + '=' + encodeURIComponent(metaData[key]);
+        }
+    }
+
     // Make an AJAX request
     $.ajax({
         url : requestUrl,
@@ -271,13 +294,12 @@ $('body').on('submit', '[data-form-search=ajax-form]', function (event) {
     event.preventDefault();
 
     _self = $(this);
-    formData = new FormData(_self[0]);
+    formData = _self.serialize(); // Serialize the form data
+
     $.ajax({
         url : _self.attr('action'),
         type : _self.attr('method'),
         data : formData,
-        processData: false, // Prevent jQuery from processing data
-        contentType: false, // Prevent jQuery from setting content type
         success: function (response) {
             // Update the content of an element with the id 'data' with the data received in the response
             $('#data').html(response.data);

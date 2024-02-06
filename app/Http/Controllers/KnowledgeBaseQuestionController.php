@@ -86,9 +86,9 @@ class KnowledgeBaseQuestionController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        $question = KnowledgeBaseQa::findOrFail($id);
+        $question = KnowledgeBaseQa::whereSlug($slug)->firstOrFail();
         $keywords = explode(', ', $question->keywords);
 
         $relatedQuestions = collect(); // Initialize an empty collection to store related questions

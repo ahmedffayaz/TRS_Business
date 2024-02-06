@@ -101,10 +101,13 @@ class KnowledgeBaseController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $slug)
     {
-        $topics = KnowledgeBaseTopic::where('knowledge_base_id', $id)->get();
-        return view('backend.knowledge-base.topics.index', compact('topics', 'id'));
+        $topics = KnowledgeBaseTopic::whereHas('knowledgeBase', function ($query) use ($slug) {
+            $query->whereSlug($slug);
+        })->with('knowledgeBase')->get();
+        $id = $topics->first()->knowledgeBase->id;
+        return view('backend.knowledge-base.topics.index', compact('id'));
     }
 
     /**
@@ -278,7 +281,7 @@ class KnowledgeBaseController extends Controller
 
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
-                'data' =>  view('backend.knowledge-base.index-data', compact('knowledgeBases'))->render()
+                'data' =>  view('backend.knowledge-base.index-data', compact('knowledgeBases', 'search'))->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
             return response()->json([
