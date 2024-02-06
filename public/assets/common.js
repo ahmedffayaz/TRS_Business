@@ -134,6 +134,7 @@ $('body').on('click', '[data-act=ajax-modal]', function () {
 
                 // Show the modal dialog
                 $('.modal').modal('show');
+                $("body").append('<div class="modal-backdrop fade show"></div>');
 
                 // Initialize select2 plugin for any elements with the 'select2' class within the modal body
                 $('.select2').select2();
@@ -420,3 +421,8 @@ function showToastr(data)
     // Display a toastr message of the type specified in 'data.type' with the message specified in 'data.message'
     toastr[data.type](data.message);
 }
+
+// Listen for the 'hidden.bs.modal' event on the modal
+$('.modal').on('hidden.bs.modal', function (e) {
+    $(".modal-backdrop").remove();
+});
