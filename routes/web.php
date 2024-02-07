@@ -75,7 +75,7 @@ Route::middleware('auth')->group(function () {
         Route::resource('knowledge-bases', KnowledgeBaseController::class);
         Route::get('knowledge-base-topics-record/{id}', [KnowledgeBaseTopicController::class, 'fetchRecord'])->name('knowledge-base-topic.fetch-record');
         Route::get('knowledge-base-topic-search', [KnowledgeBaseTopicController::class, 'search'])->name('knowledge-base-topic.search');
-        Route::get('knowledge-base-topics/{slug}', [KnowledgeBaseTopicController::class, 'index'])->name('knowledge-base-topics.index');
+        Route::get('knowledge-base-topic/{slug}', [KnowledgeBaseTopicController::class, 'index'])->name('knowledge-base-topics.index');
         Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class)->except(['index']);
         Route::resource('knowledge-base-question', KnowledgeBaseQuestionController::class);
         Route::get('knowledge-base-search-keyword', [KnowledgeBaseQuestionController::class, 'searchKeyword'])->name('knowledge-base.search-keyword');

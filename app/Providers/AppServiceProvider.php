@@ -47,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
                 ['title' => 'Dashboard', 'url' => '/'],
                 ['title' =>  ucwords(str_replace('-', ' ', $currentModule)), 'url' => ''],
             ];
-        } else if (in_array($currentModule, ['knowledge-base-topics'])) {
+        } else if (in_array($currentModule, ['knowledge-base-topic'])) {
             $breadcrumbs = [
                 ['title' => 'Dashboard', 'url' => '/'],
                 ['title' =>  'Knowledge Bases', 'url' => route('dashboard.knowledge-bases.index')],
@@ -55,11 +55,16 @@ class AppServiceProvider extends ServiceProvider
             ];
         } else if (in_array($currentModule, ['knowledge-base-question'])) {
             $slug = getSlug($currentUrl);
-            $topicSlug = KnowledgeBaseQa::whereSlug($slug)->first()->topic->knowledgeBase->slug;
+            $topicSlug = KnowledgeBaseQa::whereSlug($slug)->first();
+            if (!empty($topicSlug->topic)) {
+                $topicSlug = $topicSlug->topic->knowledgeBase->slug;
+                $breadcrumb = ['title' =>  'Knowledge Base Topics', 'url' => route('dashboard.knowledge-base-topics.index', $topicSlug)];
+            }
+
             $breadcrumbs = [
                 ['title' => 'Dashboard', 'url' => '/'],
                 ['title' =>  'Knowledge Bases', 'url' => route('dashboard.knowledge-bases.index')],
-                ['title' =>  'Knowledge Base Topics', 'url' => route('dashboard.knowledge-base-topics.index', $topicSlug)],
+                isset($breadcrumb) ? $breadcrumb : '',
                 ['title' =>  ucwords(str_replace('-', ' ', $currentModule)), 'url' => ''],
             ];
         } else {

@@ -424,5 +424,6 @@ function showToastr(data)
 
 // Listen for the 'hidden.bs.modal' event on the modal
 $('.modal').on('hidden.bs.modal', function (e) {
+    $(".modal-body").html("");
     $(".modal-backdrop").remove();
 });
