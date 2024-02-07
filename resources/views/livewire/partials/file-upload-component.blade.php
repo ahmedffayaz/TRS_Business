@@ -11,6 +11,14 @@
                 <input type="file" wire:model="avatarFile"  wire:change="uploadAvatarFile"  id="account-upload" hidden="" accept="image/*">
                 <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
             </div>
+            {{-- <form wire:submit="uploadAvatarFile" enctype="multipart/form-data">
+                @csrf
+                <input type="file" wire:model="avatarFile">
+             
+                @error('avatarFile') <span class="error">{{ $message }}</span> @enderror
+             
+                <button type="submit">Save photo</button>
+            </form> --}}
         </div>
         <!--/ upload and reset button -->
     </div>

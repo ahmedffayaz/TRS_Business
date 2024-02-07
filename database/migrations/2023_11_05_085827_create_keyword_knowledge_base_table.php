@@ -20,7 +20,7 @@ return new class extends Migration
 
         Schema::table('keyword_knowledge_base', function (Blueprint $table) {
             $table->foreign('keyword_id')->references('id')->on('keywords')->onDelete('cascade');
-            $table->foreign('knowledge_base_id')->references('id')->on('knowledge_base')->onDelete('cascade');
+            $table->foreign('knowledge_base_id')->references('id')->on('knowledge_bases')->onDelete('cascade');
         });
     }
 

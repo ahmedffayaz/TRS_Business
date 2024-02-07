@@ -31,9 +31,9 @@ class BreadcrumbsComponent extends Component
             ];
         }
         foreach($segments as $segment){
-           $page = ['url' => asset($segment), 'label' => ucwords($segment)];
+           $page = ['url' => asset($segment), 'label' => ucwords(str_replace('-', ' ', $segment))];
            array_push($breadcrumbs, $page);
-           $this->page_title = ucwords($segment);
+           $this->page_title = ucwords(str_replace('-', ' ', $segment));
         }
         $this->breadcrumbs = $breadcrumbs;
     }

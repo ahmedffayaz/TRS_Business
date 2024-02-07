@@ -11,7 +11,10 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
+                // 'resources/css/select2.min.css',
                 'resources/js/app.js',
+                // 'resources/js/select2.full.min.js',
+                // 'resources/js/form-select2.js',
             ],
             refresh: true,
         }),

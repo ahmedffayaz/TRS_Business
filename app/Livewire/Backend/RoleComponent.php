@@ -2,146 +2,156 @@
 
 namespace App\Livewire\Backend;
 
-use App\Models\Role;
-use App\Models\User;
+use App\Livewire\Forms\RoleForm;
+use App\Traits\WithMainModal;
 use Exception;
 use Livewire\Component;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Livewire\WithPagination;
+use Spatie\Permission\Models\Role;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Livewire\Attributes\On;
+use Livewire\Attributes\Title;
 use Spatie\Permission\Models\Permission;
 
 class RoleComponent extends Component
 {
+    use WithPagination;
+    use WithMainModal;
+
+    public string $search = '';
+    public string $columnName = 'created_at';
+    public string $sortDirection = 'desc';
+    public int $limitPerPage = 10;
+    public RoleForm $form;
+
+    private function getRoles(): LengthAwarePaginator
+    {
+        $this->search ? $this->resetPage() : ''; 
+        return Role::paginate($this->limitPerPage);
+    }
+
+
+    #[Title('User Roles')]
     public function render()
     {
-        return view('livewire.backend.role-component');
+        $roles = $this->getRoles();
+        $recentRoles = Role::latest()->limit(5)->get();
+        return view('livewire.backend.role-component', compact('roles', 'recentRoles'));
     }
 
-    // public function __construct()
-    // {
-    //     parent::__construct();
-    //     $this->middleware(['permission:add_roles|edit_roles|view_roles|delete_roles|view_permissions']);
-    // }
-
-    public function roles()
+    public function store()
     {
-        $roles = Role::withCount(['users'])->get();
-    }
+        $this->form->validate();
+        $this->form->validate([
+            'title' => [
+                'required',
+                function ($attribute, $value, $fail) {
+                    $existingCount = DB::table('roles')
+                        ->where('title', $value)
+                        ->count();
 
-    public function create()
-    {
-        $permissions = Permission::all();
-        // $permissionGroups = RolesController::formatPermissions($permissions);
-        return view('roles.create', compact('permissionGroups'));
-    }
-
-    public static function formatPermissions($permissions)
-    {
-        $permissionGroups = [];
-        foreach ($permissions as $permission) {
-            $permissionGroups[$permission->group][] = $permission;
-        }
-        return $permissionGroups;
-    }
-
-    public function store(Role $role)
-    {
-        $input = $this->form->all();
+                    if ($existingCount > 0) {
+                        $fail("The $attribute has already been taken.");
+                    }
+                }
+            ]
+        ]);
         try {
             DB::beginTransaction();
-            $role = $role->create([
-                'name' => $input['name'],
-                'title' => $input['title'],
+            $role = Role::create([
+                'title' => $this->form->title,
+                'name' => Str::slug($this->form->title, '-'),
             ]);
-            $role->permissions()->sync($input['permissions']);
+            if (isset($this->form->permissions)) {
+                $permissions = Permission::whereIn('title', $this->form->permissions)->pluck('id');
+                $role->permissions()->sync($permissions);
+            }
             DB::commit();
-
-            // flash()->success('Role created successfully');
-        } catch (Exception $exception) {
-            DB::rollBack();
-            // flash()->error($exception->getMessage());
+            $this->closeMainModal();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Role Created Successfully!']);
+        } catch (\Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
-        return redirect()->route('roles.index');
     }
 
-    public function edit(int $id)
+    public function edit($id)
     {
+        $this->form->isUpdate = true;
+        $this->form->id = $id;
         try {
-            $permissions = Permission::all();
-            $permissionGroups = $this->formatPermissions($permissions);
-            $role = Role::with('permissions')->findOrFail($id);
-
-            if (strtolower($role->name) == 'admin') {
-                // flash()->error("Admin role is not editable");
-                return redirect()->route('roles.index');
-            }
-
-            if (in_array($role->id, $this->auth_user->roles->pluck('id')->toArray())) {
-                // flash()->error("This role is not editable");
-                return redirect()->route('roles.index');
-            }
-
-            $permissions = Permission::get();
-
-            return view('roles.edit', compact('role', 'permissions', 'permissionGroups'));
-
-        } catch (Exception $ex) {
-
-            // flash()->error("No role found");
-            return redirect()->route('roles.index');
-
+            $role = Role::findOrFail($id);
+            $this->form->set($role);
+            $this->openMainModal();
+        } catch (\Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
     }
 
     public function update($id)
     {
+        $this->form->validate();
+        $role = Role::findOrFail($id);
+
+        $this->form->validate([
+            'title' => [
+                'required',
+                function ($attribute, $value, $fail) use ($role) {
+                    $existingCount = DB::table('roles')
+                        ->where('title', $value)
+                        ->where('id', '!=', $role->id)
+                        ->count();
+
+                    if ($existingCount > 0) {
+                        $fail("The $attribute has already been taken.");
+                    }
+                }
+            ]
+        ]);
         try {
-            $input = $this->form->all();
 
             DB::beginTransaction();
-            $role = Role::findOrFail($id);
-            $role->update([
-                'name' => $input['name'],
-                'title' => $input['title'],
-            ]);
-            $role->permissions()->sync($input['permissions']);
+            $role->title = $this->form->title;
+            $role->name = Str::slug($this->form->title, '-');
+            $role->save();
+
+            if (isset($this->form->permissions)) {
+                $permissions = Permission::whereIn('title', $this->form->permissions)->pluck('id');
+                $role->permissions()->sync($permissions);
+            }
             DB::commit();
 
-            // flash()->success('Role updated successfully');
-        } catch (Exception $exception) {
-            DB::rollBack();
-            // flash()->error($exception->getMessage());
+            $this->closeMainModal();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Role Updated Successfully!']);
+        } catch (\Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
-        return redirect()->route('roles.index');
     }
 
-    public function destroy(int $id)
+
+    public function deleteConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' => $id,
+            'type' => 'delete',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You are about to delete the client. This action cannot be undone.',
+        ]);
+    }
+
+    #[On('delete')]
+    public function destroy($id)
     {
         try {
             $role = Role::findOrFail($id);
-            $user = User::role($role->name)->first();
-            if ($user) {
-                return response()->json([
-                    'message' => 'This role can not be deleted until some users exist with this role.',
-                ]);
-            }
-            if (!$role->is_deleteable) {
-                return response()->json([
-                    'message' => Str::contains(strtolower($role->name), 'admin') ? 'Admin role is not deletable' : 'Default System role is not deletable',
-                ]);
-            }
-            DB::beginTransaction();
             $role->delete();
-            DB::commit();
-        } catch (Exception $exception) {
-            DB::rollBack();
-            return response()->json([
-                'message' => $exception->getMessage(),
-            ]);
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Role Deleted Successfully!']);
+        } catch (\Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
-        return response()->json([
-            'message' => 'Role deleted successfully',
-        ]);
     }
 }
+
 

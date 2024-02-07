@@ -7,6 +7,7 @@ use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
 use App\Notifications\InstantNotification;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 
 /**
  * Get system name
@@ -226,6 +227,36 @@ function formatDate($date, $format = 'd M y')
  * @param string $label
  * @return string
  */
+function getRandomColor() {
+    $colors = ['bg-primary', 'bg-secondary', 'bg-success', 'bg-danger', 'bg-warning', 'bg-info', 'bg-dark'];
+    $randomBgColor = $colors[array_rand($colors)];
+    return $randomBgColor;
+}
+
+function checkRolehasPermission($rolePermissionName, $permissionName)
+{
+    return in_array($permissionName, $rolePermissionName);
+}
+
+
+function getGroupPermissions()
+{
+    $permissionGroups = Permission::pluck('group')->unique()->toArray();
+    $permissionArray = [
+        'group' => [],
+        'title' => [],
+    ];
+
+    foreach ($permissionGroups as $groupName) {
+        $permissionArray['group'][] = $groupName;
+        $permissionArray['title'][$groupName] = Permission::where('group', $groupName)
+            ->pluck('title')
+            ->toArray();
+    }
+
+    return $permissionArray;
+}
+
 function wrapWithLabel($data, $key = '', $icon = null, $label = 'info')
 {
     $html = '';
@@ -477,16 +508,16 @@ function saveResizeImage($file, $directory, $width, $type = 'jpg', $height = nul
     $manager = new ImageManager(
         new Intervention\Image\Drivers\Gd\Driver()
     );
-    
+
     $img = $manager->make($path)->resize($width, $height, function ($constraint) {
         $constraint->aspectRatio();
         $constraint->upsize();
     });
-    
+
     if ($width == $is_preview) {
         $img = $img->blur(60);
     }
-    
+
     $resource = $img->stream()->detach();
     Storage::disk('public')->put($path, $resource, 'public');
     return $path;
@@ -503,4 +534,12 @@ function deleteFile($path)
     if (!empty($path) && file_exists($public_path)) {
         unlink($public_path);
     }
+}
+
+function getSlug($url)
+{
+    $path = parse_url($url, PHP_URL_PATH);
+    preg_match('/[^\/]+$/', $path, $matches);
+    $slug = isset($matches[0]) ? $matches[0] : '/';
+    return $slug;
 }

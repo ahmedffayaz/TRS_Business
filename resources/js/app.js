@@ -7,8 +7,10 @@ import select2 from 'select2'
 select2();
 
 import Swal from 'sweetalert2'
+import '../assets/js/select2/select2.full.min.js'
 import '../assets/js/app-menu'
 import '../assets/js/app-core'
+import '../assets/js/select2/form-select2.js'
 import 'toastr'
 import '../assets/js/script'
 

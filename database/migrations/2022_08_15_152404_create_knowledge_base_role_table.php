@@ -15,7 +15,7 @@ class CreateKnowledgeBaseRoleTable extends Migration
     {
         Schema::create('knowledge_base_role', function (Blueprint $table) {
             $table->unsignedBigInteger('knowledge_base_id');
-            $table->foreign('knowledge_base_id')->references('id')->on('knowledge_base')->onDelete('cascade');
+            $table->foreign('knowledge_base_id')->references('id')->on('knowledge_bases')->onDelete('cascade');
             $table->unsignedBigInteger('role_id');
         });
     }

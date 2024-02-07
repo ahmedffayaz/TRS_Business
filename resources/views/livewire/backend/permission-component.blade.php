@@ -1,93 +1,101 @@
 <div>
     <div class="card">
-        <div class="card-datatable table-responsive">
-            <table class="datatables-permissions table">
-                <thead class="table-light">
-                    <tr>
-                        <th></th>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Assigned To</th>
-                        <th>Created Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-            </table>
-        </div>
-    </div>
-    <div class="modal fade" id="addPermissionModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-transparent">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body px-sm-5 pb-5">
-                    <div class="text-center mb-2">
-                        <h1 class="mb-1">Add New Permission</h1>
-                        <p>Permissions you may use and assign to your users.</p>
+        <div class="card-body  py-1 my-25">
+            <div class="row mb-2">
+                <div class="col-md-4 col-sm-6">
+                    <div class="input-group input-group-merge">
+                        <span class="input-group-text" wire:ignore id="basic-addon-search2"><i data-feather="search"></i></span>
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
+                            aria-describedby="basic-addon-search2" />
                     </div>
-                    <form id="addPermissionForm" class="row" onsubmit="return false">
-                        <div class="col-12">
-                            <label class="form-label" for="modalPermissionName">Permission Name</label>
-                            <input type="text" id="modalPermissionName" name="modalPermissionName" class="form-control" placeholder="Permission Name" autofocus
-                                data-msg="Please enter permission name" />
-                        </div>
-                        <div class="col-12 mt-75">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="corePermission" />
-                                <label class="form-check-label" for="corePermission"> Set as core permission </label>
-                            </div>
-                        </div>
-                        <div class="col-12 text-center">
-                            <button type="submit" class="btn btn-primary mt-2 me-1">Create Permission</button>
-                            <button type="reset" class="btn btn-outline-secondary mt-2" data-bs-dismiss="modal" aria-label="Close">
-                                Discard
-                            </button>
-                        </div>
-                    </form>
                 </div>
+                <div class="col-md-8 col-sm-6 text-end">
+                    <a href="javascript:void(0);" class="btn btn-primary" tabindex="0" aria-controls="table-hover" type="button" wire:click="openMainModal">Add Permission</a>
+                </div>
+            </div>
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible" role="alert">
+                    <h4 class="alert-heading d-flex align-items-center">
+                        <span wire:ignore><i data-feather="alert-triangle" class="me-50"></i></span>
+                        Error
+                    </h4>
+                    <div class="alert-body">
+                        {{ session('error') }}
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
+            <div class="card-datatable table-responsive">
+                <table class="datatables-permissions table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Group</th>
+                            <th>Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    <tbody>
+                        @isset($permissions)
+                            @foreach ($permissions as $permission)
+                                <tr>
+                                    <td>{{ $permission?->group }}</td>
+                                    <td>
+                                        {{ $permission?->title }}
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
+                                                <span wire:ignore><i data-feather="more-vertical"></i></span>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $permission?->id }}')">
+                                                    <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                    <span>Edit</span>
+                                                </a>
+                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $permission?->id }}')">
+                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                    <span>Delete</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endisset
+                    </tbody>
+                    </thead>
+                </table>
+                {{ $permissions->links('components.pagination') }}
             </div>
         </div>
     </div>
-    <div class="modal fade" id="editPermissionModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header bg-transparent">
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body p-3 pt-0">
-                    <div class="text-center mb-2">
-                        <h1 class="mb-1">Edit Permission</h1>
-                        <p>Edit permission as per your requirements.</p>
-                    </div>
-
-                    <div class="alert alert-warning" role="alert">
-                        <h6 class="alert-heading">Warning!</h6>
-                        <div class="alert-body">
-                            By editing the permission name, you might break the system permissions functionality. Please ensure you're
-                            absolutely certain before proceeding.
-                        </div>
-                    </div>
-
-                    <form id="editPermissionForm" class="row" onsubmit="return false">
-                        <div class="col-sm-9">
-                            <label class="form-label" for="editPermissionName">Permission Name</label>
-                            <input type="text" id="editPermissionName" name="editPermissionName" class="form-control" placeholder="Enter a permission name" tabindex="-1"
-                                data-msg="Please enter permission name" />
-                        </div>
-                        <div class="col-sm-3 ps-sm-0">
-                            <button type="submit" class="btn btn-primary mt-2">Update</button>
-                        </div>
-                        <div class="col-12 mt-75">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="editCorePermission" />
-                                <label class="form-check-label" for="editCorePermission"> Set as core permission </label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        <div class="text-center mb-2">
+            <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Permission</h1>
+            <p>Permissions you may use and assign to your users.</p>
         </div>
-    </div>
-
+        <form class="row" wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
+            <div class="col-6">
+                <label class="form-label" for="modalPermissionName"> Group</label>
+                <input type="text" class="form-control  @error('form.group') is-invalid @enderror" wire:model="form.group" placeholder="Permission Group" autofocus data-msg="Please enter permission name" />
+                @error('form.group')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            <div class="col-6">
+                <label class="form-label" for="modalPermissionName"> Name</label>
+                <input type="text" class="form-control  @error('form.title') is-invalid @enderror" wire:model="form.title" placeholder="Permission Name" autofocus data-msg="Please enter permission name" />
+                @error('form.title')
+                    <small class="text-danger">{{ $message }}</small>
+                @enderror
+            </div>
+            <div class="col-12 text-end mt-75">
+                <button class="btn btn-primary me-1 waves-effect waves-float waves-light" tabindex="4" wire:loading.attr="disabled">
+                    <span wire:loading.remove>{{ $form->isUpdate ? __('Update Changes') : __('Save Changes') }}</span>
+                    <span wire:loading>
+                        <i class="fa fa-spinner fa-spin " wire:ignore></i> {{ __('Loading...') }}
+                    </span>
+                </button>
+            </div>
+        </form>
+    </x-main-modal>
 </div>
