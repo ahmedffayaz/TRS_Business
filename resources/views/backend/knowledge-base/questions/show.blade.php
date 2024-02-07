@@ -40,8 +40,7 @@
                                 <x-anchor-tag href="javascript:void(0);" onclick="submitKeyword('{{ $keyword }}')" :value="$keyword" />
                             </div>
                         @endforeach
-                        <form id="search-keyword" action="{{ route('dashboard.knowledge-base.search-keyword') }}" method="post" class="d-none">
-                            @csrf
+                        <form id="search-keyword" action="{{ route('dashboard.knowledge-base.search-keyword') }}" method="get" class="d-none">
                             <x-input type="hidden" name="keyword" id="keyword-input" />
                         </form>
                 </div>

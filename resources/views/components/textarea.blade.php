@@ -4,4 +4,5 @@
     @isset($length)
         <small class="textarea-counter-value float-end"><span class="char-count">0</span> / {{ $length }}</small>
     @endisset
+    <small class="error-message"></small>
 </div>

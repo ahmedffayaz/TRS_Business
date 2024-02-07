@@ -13,9 +13,9 @@
         @endsection
     @endcan
     {{-- Search knowledge base component --}}
-    <x-search>
+    <x-search :title="__('Search knowledge base topic')">
         <form class="kb-search-input" action="{{ route('dashboard.knowledge-base-topic.search') }}"
-            method="POST" data-form-search=ajax-form autocomplete="off">
+            method="GET" data-form-search=ajax-form autocomplete="off">
             @csrf
             <x-input type="hidden" name="knowledge_base_id" value="{{ $id }}" />
             <div class="input-group input-group-merge">

@@ -8,6 +8,29 @@ function fetchRecord(url) {
     // Check if the 'page' variable is not equal to 0
     if (page != 0) requestUrl += '?page=' + page;
 
+    var metaData = {};
+
+    // Iterate over all elements with data-post attribute
+    $('[data-post]').each(function() {
+        var element = $(this);
+        var key = element.data('post'); // Get the key from data-post attribute
+        var value = element.val(); // Get the value of the element
+
+        // If the element is not an input (e.g., hidden input), use data-post-{key} attribute
+        if (typeof value === 'undefined') {
+            value = element.data('post-' + key);
+        }
+
+        metaData[key] = value; // Store key-value pair in metaData object
+    });
+
+    // Append all key-value pairs from metaData to requestUrl
+    for (var key in metaData) {
+        if (metaData.hasOwnProperty(key)) {
+            requestUrl += '&' + key + '=' + encodeURIComponent(metaData[key]);
+        }
+    }
+
     // Make an AJAX request
     $.ajax({
         url : requestUrl,
@@ -111,6 +134,7 @@ $('body').on('click', '[data-act=ajax-modal]', function () {
 
                 // Show the modal dialog
                 $('.modal').modal('show');
+                $("body").append('<div class="modal-backdrop fade show"></div>');
 
                 // Initialize select2 plugin for any elements with the 'select2' class within the modal body
                 $('.select2').select2();
@@ -216,15 +240,10 @@ function sendAjaxForm(form) {
                 var toastrData = {type: 'error', message: response.responseJSON.error};
                 showToastr(toastrData);
             } else {
-                var errors = response.responseJSON.errors;
-                var error;
-
-                for (const key in errors) {
-                    error = `${errors[key]}`
-                }
-
-                var toastrData = {type: 'error', message: error};
-                showToastr(toastrData);
+                // Display errors for dynamic fields, if any
+                $.each(response.responseJSON.errors, function(fieldName, fieldErrors) {
+                    displayFieldErrors(fieldName, fieldErrors);
+                });
             }
         },
         complete: function () {
@@ -232,19 +251,56 @@ function sendAjaxForm(form) {
             enableSubmitButton(btn, originalText);
         }
     });
+
+    // Clear error message and remove text-danger class on form submission
+    _self.on('submit', function() {
+        // Clear error messages and remove text-danger class for all relevant fields
+        $(this).find('.error-message').text('').removeClass('text-danger');
+    });
+}
+
+// Function to display errors for dynamic fields
+function displayFieldErrors(fieldName, fieldErrors) {
+    // Check if the field name contains square brackets
+    if (fieldName.endsWith('[]')) {
+        // Remove the brackets to match the field name in the DOM
+        fieldName = fieldName.slice(0, -2);
+    }
+
+    // Find the corresponding DOM element by name
+    var $field = $('[name="' + fieldName + '[]"]');
+
+    // If the field is not found with square brackets, try without them
+    if ($field.length === 0) {
+        $field = $('[name="' + fieldName + '"]');
+    }
+
+    // Clear previous error messages for the dynamic field
+    $field.siblings('.text-danger').remove();
+
+    // Find the existing error message span
+    var $errorMessageSpan = $field.siblings('.error-message');
+
+    // If the error message span doesn't exist, create it
+    if ($errorMessageSpan.length === 0) {
+        $errorMessageSpan = $('<small class="error-message"></small>');
+        $field.after($errorMessageSpan);
+    }
+
+    // Append error message below the corresponding dynamic field
+    $errorMessageSpan.text(fieldErrors[0]).addClass('text-danger');
 }
 
 $('body').on('submit', '[data-form-search=ajax-form]', function (event) {
     event.preventDefault();
 
     _self = $(this);
-    formData = new FormData(_self[0]);
+    formData = _self.serialize(); // Serialize the form data
+
     $.ajax({
         url : _self.attr('action'),
         type : _self.attr('method'),
         data : formData,
-        processData: false, // Prevent jQuery from processing data
-        contentType: false, // Prevent jQuery from setting content type
         success: function (response) {
             // Update the content of an element with the id 'data' with the data received in the response
             $('#data').html(response.data);
@@ -365,3 +421,9 @@ function showToastr(data)
     // Display a toastr message of the type specified in 'data.type' with the message specified in 'data.message'
     toastr[data.type](data.message);
 }
+
+// Listen for the 'hidden.bs.modal' event on the modal
+$('.modal').on('hidden.bs.modal', function (e) {
+    $(".modal-body").html("");
+    $(".modal-backdrop").remove();
+});

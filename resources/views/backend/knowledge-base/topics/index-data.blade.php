@@ -1,3 +1,7 @@
+@if (isset($search))
+    <input type="hidden" name="search" id="search" value="{{ $search }}" data-post="search" data-post_search="{{ $search }}" />
+    <input type="hidden" name="knowledge_base_id" id="knowledge_base_id" value="{{ $topics->first()->knowledgeBase->id }}" data-post="knowledge_base_id" data-post-knowledge_base_id="{{ $knowledgeBaseId }}" />
+@endif
 <div class="row kb-search-content-info match-height">
     @forelse ($topics as $topic)
         <div class="col-md-4 col-sm-6 col-12 kb-search-content">
@@ -38,7 +42,7 @@
                             <div class="row">
                                 <div class="col-md-10">
                                     @can('edit_knowledgeBase')
-                                        <a href="{{ route('dashboard.knowledge-base-question.show', $qa->id) }}">
+                                        <a href="{{ route('dashboard.knowledge-base-question.show', $qa->slug) }}">
                                             <span class="list-group-item text-body">{{ $qa->question }}</span>
                                         </a>
                                     @endcan
