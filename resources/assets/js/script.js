@@ -1,7 +1,6 @@
 import $ from "jquery";
 import toastr from "toastr";
 import select2 from "select2";
-select2();
 
 document.addEventListener("livewire:initialized", () => {
     /**
@@ -18,7 +17,7 @@ document.addEventListener("livewire:initialized", () => {
                 width: "100%",
                 dropdownParent: $this.parent(),
             });
-            
+
         });
     });
 
