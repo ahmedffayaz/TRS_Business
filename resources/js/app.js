@@ -3,8 +3,7 @@ import './bootstrap'
 import $ from 'jquery'
 import '@popperjs/core'
 
-import select2 from 'select2'
-select2();
+import select2 from 'select2';
 
 import Swal from 'sweetalert2'
 import '../assets/js/select2/select2.full.min.js'
