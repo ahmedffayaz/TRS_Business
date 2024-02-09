@@ -12,7 +12,7 @@
                         @forelse ($topic->qas as $qa)
                             <div class="row">
                                 <div class="col-md-12">
-                                    <a href="{{ route('dashboard.knowledge-base-question.show', $qa->id) }}">
+                                    <a href="{{ route('dashboard.knowledge-base-question.show', $qa->slug) }}">
                                         <span class="list-group-item text-body">{{ $qa->question }}</span>
                                     </a>
                                 </div>
