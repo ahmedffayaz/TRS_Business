@@ -19,10 +19,7 @@ class KnowledgeBaseTopicController extends Controller
      */
     public function index($slug)
     {
-        $topics = KnowledgeBaseTopic::whereHas('knowledgeBase', function ($query) use ($slug) {
-            $query->whereSlug($slug);
-        })->with('knowledgeBase')->get();
-        $id = $topics->first()->knowledgeBase->id;
+        $id = KnowledgeBase::whereSlug($slug)->firstOrFail()->id;
         return view('backend.knowledge-base.topics.index', compact('id'));
     }
 
