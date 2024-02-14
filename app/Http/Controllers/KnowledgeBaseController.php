@@ -257,7 +257,7 @@ class KnowledgeBaseController extends Controller
     public function search(Request $request)
     {
         $request->validate([
-            'search' => 'required|string'
+            'search' => 'nullable|string'
         ]);
 
         try {
