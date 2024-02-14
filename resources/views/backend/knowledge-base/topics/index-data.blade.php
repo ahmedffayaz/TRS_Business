@@ -1,6 +1,6 @@
 @if (isset($search))
     <input type="hidden" name="search" id="search" value="{{ $search }}" data-post="search" data-post_search="{{ $search }}" />
-    <input type="hidden" name="knowledge_base_id" id="knowledge_base_id" value="{{ $topics->first()->knowledgeBase->id }}" data-post="knowledge_base_id" data-post-knowledge_base_id="{{ $knowledgeBaseId }}" />
+    <input type="hidden" name="knowledge_base_id" id="knowledge_base_id" value="{{ $knowledgeBaseId }}" data-post="knowledge_base_id" data-post-knowledge_base_id="{{ $knowledgeBaseId }}" />
 @endif
 <div class="row kb-search-content-info match-height">
     @forelse ($topics as $topic)
@@ -16,7 +16,7 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-end">
                             <a class="dropdown-item" href="javascript:void(0);" data-act="ajax-modal"
-                             data-post-knowledge_base_topic_id="{{ $topic->id }}" data-method="get"
+                            data-post-knowledge_base_topic_id="{{ $topic->id }}" data-method="get"
                             data-action-url="{{ route('dashboard.knowledge-base-question.create') }}" data-quill="true"
                             data-complete-location="true">
                                 <i data-feather="edit-2" class="me-50"></i>
