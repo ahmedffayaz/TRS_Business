@@ -1,6 +1,4 @@
-import $ from "jquery";
 import toastr from "toastr";
-import select2 from "select2";
 
 document.addEventListener("livewire:initialized", () => {
     /**
