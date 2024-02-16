@@ -4,7 +4,7 @@
   ----------------------------------------------------------------------------------------
   Item Name: Vuexy  - Vuejs, HTML & Laravel Admin Dashboard Template
 ==========================================================================================*/
-import jQuery from "jquery";
+
 import i18next from 'i18next';
 import i18nextXHRBackend from 'i18next-xhr-backend';
 import PerfectScrollbar from "perfect-scrollbar";
