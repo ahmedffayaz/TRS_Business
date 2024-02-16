@@ -6,8 +6,9 @@
                 @if ($paginator->onFirstPage())
                     <li class="page-item prev-item disabled"><a class="page-link" href="#"></a></li>
                 @else
-                    <li class="page-item prev-item"><a class="page-link" href="#"
-                            wire:click="previousPage('{{ $paginator->getPageName() }}')" wire:loading.attr="disabled"></a>
+                    <li class="page-item prev-item"><a class="page-link" href="{{ $paginator->previousPageUrl() }}"
+                            wire:click="previousPage('{{ $paginator->getPageName() }}')" wire:loading.attr="disabled"
+                            wire:navigate></a>
                     </li>
                 @endif
 
@@ -31,8 +32,9 @@
                             @else
                                 <li class="page-item"
                                     wire:key="paginator-{{ $paginator->getPageName() }}-page-{{ $page }}"><a
-                                        class="page-link" href="#"
-                                        wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')">{{ $page }}</a>
+                                        class="page-link" href="?page={{ $page }}"
+                                        wire:click="gotoPage({{ $page }}, '{{ $paginator->getPageName() }}')"
+                                        wire:navigate>{{ $page }}</a>
                                 </li>
                             @endif
                         @endforeach
@@ -41,8 +43,9 @@
 
                 {{-- Next Page Link --}}
                 @if ($paginator->hasMorePages())
-                    <li class="page-item next-item"><a class="page-link" href="#"
-                            wire:click="nextPage('{{ $paginator->getPageName() }}')" wire:loading.attr="disabled"></a>
+                    <li class="page-item next-item"><a class="page-link" href="{{ $paginator->nextPageUrl() }}"
+                            wire:click="nextPage('{{ $paginator->getPageName() }}')" wire:loading.attr="disabled"
+                            wire:navigate></a>
                     </li>
                 @else
                     <li class="page-item next-item disabled"><a class="page-link" href="#"></a></li>
