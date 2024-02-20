@@ -44,23 +44,31 @@ use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\KnowledgeBaseComponent;
 use App\Http\Controllers\KnowledgeBaseController;
 use App\Livewire\Backend\UpdatePasswordComponent;
+use App\Livewire\Backend\Business\BusinessComponent;
 use App\Livewire\Backend\UserTermsConditionComponent;
 use App\Http\Controllers\KnowledgeBaseTopicController;
+use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Http\Controllers\KnowledgeBaseQuestionController;
+use App\Livewire\Backend\Business\CreateBusinessComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
     Route::get('/login', LoginComponent::class)->name('login');
     Route::get('/register', RegisterComponent::class)->name('register');
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
-    Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
-Route::get('/dashboard', DashboardComponent::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardComponent::class)->middleware(['auth', 'verified', 'user-account-type'])->name('dashboard');
 Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'user-account-type'])->group(function () {
+    Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
+    Route::get('select-business', BusinessComponent::class)->name('select-business');
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
+        Route::prefix('businesses')->name('businesses.')->group(function () {
+            Route::get('create', CreateBusinessComponent::class)->name('create');
+            Route::get('edit/{slug}', EditBusinessComponent::class)->name('edit');
+        });
         Route::get('/companies', CompanyComponent::class)->name('companies');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

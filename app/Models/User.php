@@ -2,13 +2,15 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
+use App\Enums\User\AccountType;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -21,7 +23,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'company_id',
+        'business_id',
         'first_name',
         'last_name',
         'email',
@@ -53,7 +55,15 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'account_type' => AccountType::class
     ];
+
+    public function accountType(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => !empty($this->account_type) ? AccountType::BUSINESS : AccountType::CLIENT
+        );
+    }
 
     /**
      * Encrypt password
@@ -79,9 +89,9 @@ class User extends Authenticatable
     /**
      * @return BelongsTo
      */
-    public function company(): BelongsTo
+    public function client(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Client::class);
     }
 
     /**

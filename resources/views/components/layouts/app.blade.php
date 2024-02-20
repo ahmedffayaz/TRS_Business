@@ -16,8 +16,10 @@
 </head>
 
 <body class="vertical-layout vertical-menu-modern  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="">
-    @include('partials.header')
-    @include('partials.sidebar')
+    @livewire('partials.header-component')
+    @if (auth()->check() && !request()->routeIs('select-business'))
+        @livewire('partials.sidebar-component')
+    @endif
     <div class="app-content content ">
         <div class="content-overlay"></div>
         <div class="header-navbar-shadow"></div>

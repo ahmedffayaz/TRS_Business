@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\User;
+use App\Enums\User\AccountType;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\Factory;
-
+use App\Models\User;
+use App\Models\Business;
+use App\Models\Client;
 use Faker\Factory as Faker;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 
 class UserFactory extends Factory
@@ -24,7 +26,8 @@ class UserFactory extends Factory
             'account_type' => 'active',
             'phone' => '0000000000',
             'address' => 'Islamabad',
-            'company_id' => $faker->unique()->numberBetween(2, 11)
+            'account_type' => AccountType::CLIENT->value,
+            'client_id' => $this->faker->randomElement(Client::pluck('id'))
         ];
     }
 }

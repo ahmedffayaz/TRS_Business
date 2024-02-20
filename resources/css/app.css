@@ -16,3 +16,5 @@
 @import url('../assets/css/form-validation.min.css');
 @import url('../assets/css/authentication.min.css');
 @import url('../assets/css/sweet-alerts.min.css');
+
+@import url('custom.css');

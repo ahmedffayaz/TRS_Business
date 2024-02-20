@@ -9,13 +9,13 @@ class DatabaseSeeder extends Seeder
 	{
 		$this->call([
             SettingTableSeeder::class,
-            CountriesTableSeeder::class,
+			CountrySeeder::class,
             CompaniesTableSeeder::class,
             PermissionsTableSeeder::class,
             RolesTableSeeder::class,
-            UsersTableSeeder::class,
-			CountrySeeder::class,
+            BusinessSeeder::class,
             ClientSeeder::class,
+            UsersTableSeeder::class,
 			CurrencySeeder::class,
 			ProjectsTableSeeder::class,
 			TasksTableSeeder::class,
