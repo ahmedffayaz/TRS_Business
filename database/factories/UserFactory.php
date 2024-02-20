@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\User\AccountType;
+use App\Enums\User\UserStatus;
 use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Business;
@@ -23,7 +24,7 @@ class UserFactory extends Factory
             'last_name' => $faker->lastName(),
             'email' => $faker->unique()->email,
             'password' => '123456',
-            'account_type' => 'active',
+            'is_active' => UserStatus::ACTIVE->value,
             'phone' => '0000000000',
             'address' => 'Islamabad',
             'account_type' => AccountType::CLIENT->value,

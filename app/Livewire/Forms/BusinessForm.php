@@ -28,7 +28,7 @@ class BusinessForm extends Form
     {
         if ($this->isUpdate) {
             return [
-                'name' => 'required|min:3|unique:companies,name,' . $this->id . ',id',
+                'name' => 'required|min:3|unique:businesses,name,' . $this->id . ',id',
                 'roles' => 'required',
                 'logo' => 'nullable|mimes:jpg,png,jpeg,bmp',
                 'address' => 'required|string|max:200',
@@ -41,7 +41,7 @@ class BusinessForm extends Form
         }
         else {
             return [
-                'name' => 'required|min:3|unique:companies',
+                'name' => 'required|min:3|unique:businesses',
                 'roles' => 'required',
                 'logo' => 'nullable|mimes:jpg,png,jpeg,bmp',
                 'address' => 'required|string|max:200',

@@ -4,12 +4,9 @@ namespace Database\Seeders;
 
 use App\Enums\User\AccountType;
 use App\Models\User;
-use App\Models\Business;
 use Illuminate\Support\Str;
 use App\Enums\User\UserStatus;
-use App\Models\Client;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 use Database\Factories\UserFactory;
 
 class UsersTableSeeder extends Seeder
@@ -30,7 +27,7 @@ class UsersTableSeeder extends Seeder
             'phone' => '+17026723124',
             'password' => 'admin',
 			'address' => 'Islamabad',
-            'is_active' => UserStatus::ACTIVE,
+            'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
             'account_type' => AccountType::BUSINESS->value,
             'client_id' => null
@@ -45,7 +42,7 @@ class UsersTableSeeder extends Seeder
             'phone' => '+17026723124',
             'password' => 'admin',
 			'address' => 'Islamabad',
-            'is_active' => UserStatus::ACTIVE,
+            'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
             'account_type' => AccountType::BUSINESS->value,
             'client_id' => null

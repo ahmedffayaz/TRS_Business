@@ -18,9 +18,10 @@ class Client extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'company_id',
+        'business_id',
         'name',
-        'street_address',
+        'slug',
+        'address',
         'city',
         'postal_code',
         'country_id',
@@ -34,7 +35,7 @@ class Client extends Model
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('street_address', 'LIKE', '%' . $search . '%')
+                    ->orWhere('address', 'LIKE', '%' . $search . '%')
                     ->orWhere('city', 'LIKE', '%' . $search . '%')
                     ->orWhereHas('country', function ($query) use ($search) {
                         $query->where('name', 'LIKE', '%' . $search . '%');

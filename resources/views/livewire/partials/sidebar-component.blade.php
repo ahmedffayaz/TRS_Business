@@ -27,18 +27,18 @@
                         <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
                     </x-anchor-tag>
                 </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
+                        <i data-feather="user-check"></i>
+                        <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
+                    </x-anchor-tag>
+                </x-nav>
                 <x-nav class="{{ request()->routeIs('dashboard.employees') ? 'active' : '' }} nav-item">
                     <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.employees') }}">
                         <i data-feather="users"></i>
                         <span class="menu-title text-truncate" data-i18n="Companies">Employees</span>
                     </x-anchor-tag>
                 </x-nav>
-                {{-- <li class="{{ request()->routeIs('dashboard.companies') ? 'active' : '' }} nav-item">
-                    <a class="d-flex align-items-center" href="{{ route('dashboard.companies') }}">
-                        <i data-feather="package"></i>
-                        <span class="menu-title text-truncate" data-i18n="Companies">Companies</span>
-                    </a>
-                </li> --}}
                 <li class="{{ request()->routeIs('dashboard.projects') ? 'active' : '' }} nav-item">
                     <a class="d-flex align-items-center" href="{{ route('dashboard.projects') }}">
                         <i data-feather="file-text"></i>
@@ -109,12 +109,6 @@
                             <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
                                 <i data-feather="settings"></i>
                                 <span class="menu-title text-truncate" data-i18n="Settings">Edit Business</span>
-                            </x-anchor-tag>
-                        </x-nav>
-                        <x-nav class="{{ request()->routeIs('dashboard.clients') ? 'active' : '' }} nav-item">
-                            <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients') }}">
-                                <i data-feather="user-check"></i>
-                                <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
                             </x-anchor-tag>
                         </x-nav>
                     </ul>
