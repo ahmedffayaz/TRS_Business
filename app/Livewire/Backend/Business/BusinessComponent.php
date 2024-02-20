@@ -2,14 +2,19 @@
 
 namespace App\Livewire\Backend\Business;
 
-use App\Models\Business;
-use Livewire\Attributes\Title;
 use Livewire\Component;
+use App\Models\Business;
+use Livewire\WithPagination;
+use Livewire\Attributes\Title;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 #[Title('Select Business')]
 class BusinessComponent extends Component
 {
-    public $user;
+    use WithPagination;
+
+    public $user, $limitPerPage = 15;
+
     public function mount()
     {
         $this->user = auth()->user();
@@ -21,7 +26,7 @@ class BusinessComponent extends Component
         return view('livewire.backend.business.business-component', compact('businesses'));
     }
 
-    private function getBusinesses()
+    private function getBusinesses(): LengthAwarePaginator
     {
         $query = Business::select('id', 'name', 'slug', 'logo', 'created_at');
         $data = $this->user->hasRole('super-admin')
@@ -29,7 +34,7 @@ class BusinessComponent extends Component
             : $query->whereHas('roles', function($query) {
                     $query->whereIn('name', auth()->user()->roles->pluck('name')->toArray());
                 });
-        return $data->get();
+        return $data->paginate($this->limitPerPage);
     }
 
     public function selectBusiness($name)

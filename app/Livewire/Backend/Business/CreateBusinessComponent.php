@@ -3,16 +3,17 @@
 namespace App\Livewire\Backend\Business;
 
 use Exception;
+use App\Models\Role;
 use App\Models\Country;
 use Livewire\Component;
 use App\Models\Business;
 use Illuminate\Support\Str;
 use Livewire\WithFileUploads;
+use Livewire\Attributes\Title;
+use App\Libraries\ImageManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Livewire\Forms\BusinessForm;
-use App\Models\Role;
-use Livewire\Attributes\Title;
 
 #[Title('Create Business')]
 class CreateBusinessComponent extends Component
@@ -36,6 +37,12 @@ class CreateBusinessComponent extends Component
 
         try {
             DB::beginTransaction();
+
+            if (!empty($validated['logo'])) {
+                $imageManager = new ImageManager();
+                $validated['logo'] = $imageManager->setFile($validated['logo'])->resize(64)->setDirectory("images/business")->save();
+            }
+
             $business = Business::create([
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']),
@@ -52,6 +59,8 @@ class CreateBusinessComponent extends Component
 
             DB::commit();
 
+            // Reset form fields
+            $this->form->reset();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Business created successfully!']);
             session()->flash('error', 'Business created successfully.');
             return redirect()->route('dashboard');

@@ -3,20 +3,24 @@
 namespace App\Livewire\Backend\Business;
 
 use Exception;
+use App\Models\Role;
 use App\Models\Country;
 use Livewire\Component;
 use App\Models\Business;
 use Illuminate\Support\Str;
 use Livewire\Attributes\Title;
+use App\Libraries\ImageManager;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Livewire\Forms\BusinessForm;
-use App\Models\Role;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\WithFileUploads;
 
 #[Title('Edit Business')]
 class EditBusinessComponent extends Component
 {
+    use WithFileUploads;
+
     public BusinessForm $form;
     public $isUpdate, $countries, $slug, $user, $roles;
 
@@ -49,10 +53,16 @@ class EditBusinessComponent extends Component
         try {
             DB::beginTransaction();
             $business = Business::findOrFail($id);
+
+            if (!empty($validated['logo'])) {
+                $imageManager = new ImageManager();
+                $validated['logo'] = $imageManager->setFile($validated['logo'])->resize(64)->setDirectory("images/business")->save();
+            }
+
             $business->update([
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']),
-                'logo' => $validated['logo'],
+                'logo' => !empty($validated['logo']) ? $validated['logo'] : $business->logo,
                 'address' => $validated['address'],
                 'city' => $validated['city'],
                 'country_id' => $validated['country_id'],
@@ -62,6 +72,11 @@ class EditBusinessComponent extends Component
             ]);
             $business->roles()->sync($validated['roles']);
             DB::commit();
+
+            // Reset form logo field
+            if (!empty($this->form->logo))
+                $this->form->logo = '';
+
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Business updated successfully!']);
         } catch (Exception $exception) {
             DB::rollBack();
