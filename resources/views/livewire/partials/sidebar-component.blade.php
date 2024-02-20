@@ -96,13 +96,13 @@
                 <li class=" nav-item">
                     <a class="d-flex align-items-center" href="{{ route('dashboard.system-setting') }}">
                         <i data-feather="settings"></i>
-                        <span class="menu-title text-truncate" data-i18n="Settings">System Settings</span>
+                        <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
                     </a>
                 </li>
                 <x-nav class="nav-itme">
                     <x-anchor-tag class="d-flex align-items-center" href="#">
-                        <i data-feather="settings"></i>
-                        <span class="menu-title text-truncate" data-i18n="Settings">Business Settings</span>
+                        <i data-feather='aperture'></i>
+                        <span class="menu-title text-truncate" data-i18n="Business Settings">Business Settings</span>
                     </x-anchor-tag>
                     <ul class="menu-content">
                         <x-nav>
