@@ -20,8 +20,9 @@ class RolesTableSeeder extends Seeder
 		DB::table('roles')->truncate();
 		Schema::enableForeignKeyConstraints();
 
-		$role = Role::create(['name' => 'admin', 'title' => 'Admin', 'is_deletable' => 0]);
+		$role = Role::create(['name' => 'super-admin', 'title' => 'Super Admin', 'is_deletable' => 0]);
 		$role->permissions()->sync(Permission::pluck('id')->all());
+		Role::create(['name' => 'admin', 'title' => 'Admin', 'is_deletable' => 0]);
 		Role::create(['name' => 'client', 'title' => 'Client', 'is_deletable' => 0]);
 		Role::create(['name' => 'developer', 'title' => 'Developer', 'is_deletable' => 0]);
 		Role::create(['name' => 'team-lead', 'title' => 'Team Lead', 'is_deletable' => 0]);

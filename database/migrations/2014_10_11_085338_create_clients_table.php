@@ -13,12 +13,17 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('company_id');
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
+
+            $table->unsignedBigInteger('business_id');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+
             $table->string('name');
-            $table->string('street_address', 500)->nullable();
+            $table->string('slug');
+            $table->string('address', 500)->nullable();
             $table->string('city')->nullable();
+
             $table->unsignedBigInteger('country_id')->nullable();
+
             $table->string('postal_code')->nullable();
             $table->decimal('rate_per_hour')->nullable();
             $table->string('rate_unit')->nullable();

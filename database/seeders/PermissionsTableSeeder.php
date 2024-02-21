@@ -22,6 +22,11 @@ class PermissionsTableSeeder extends Seeder
 
 	    // Reset cached roles and permissions
 	    app()['cache']->forget('spatie.permission.cache');
+        // Businesses
+	    Permission::create(['group' => 'business', 'name' => 'add_businesses', 'title' => 'Add businesses']);
+	    Permission::create(['group' => 'business', 'name' => 'edit_businesses', 'title' => 'Edit businesses']);
+	    Permission::create(['group' => 'business', 'name' => 'view_businesses', 'title' => 'View businesses']);
+	    Permission::create(['group' => 'business', 'name' => 'delete_businesses', 'title' => 'Delete businesses']);
 	    // Companies
 	    Permission::create(['group' => 'company', 'name' => 'add_companies', 'title' => 'Add companies']);
 	    Permission::create(['group' => 'company', 'name' => 'edit_companies', 'title' => 'Edit companies']);
@@ -106,8 +111,9 @@ class PermissionsTableSeeder extends Seeder
 
         // Email permissions
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
-        $role = Role::updateOrCreate(['name' => 'admin'], ['title' => 'Admin']);
-		$role->permissions()->sync(Permission::pluck('id')->all());
+
+        $sudperAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
+		$sudperAdminRole->permissions()->sync(Permission::pluck('id')->all());
 
     }
 }

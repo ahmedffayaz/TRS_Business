@@ -1,13 +1,14 @@
 <?php
 
+use Carbon\Carbon;
 use App\Models\User;
 use App\Models\Setting;
-use Carbon\Carbon;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Auth;
 use Intervention\Image\ImageManager;
 use Illuminate\Support\Facades\Storage;
-use App\Notifications\InstantNotification;
-use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
+use App\Notifications\InstantNotification;
 
 /**
  * Get system name
@@ -542,4 +543,15 @@ function getSlug($url)
     preg_match('/[^\/]+$/', $path, $matches);
     $slug = isset($matches[0]) ? $matches[0] : '/';
     return $slug;
+}
+
+/**
+ * Nae to slug
+ *
+ * @param $name
+ * @return string
+ */
+function nameToSlug($name)
+{
+    return Str::slug($name);
 }

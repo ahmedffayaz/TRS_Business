@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Auth;
 
+use App\Enums\User\AccountType;
 use App\Livewire\Forms\LoginForm;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
@@ -25,7 +26,7 @@ class LoginComponent extends Component
         $validated = $this->form->validate();
         if (Auth::attempt($validated, $this->remember)) {
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Login successfully.']);
-            return redirect()->to('/dashboard');
+            return redirect()->route('dashboard');
         } else {
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Invalid credentials.']);
             session()->flash('error', 'Invalid credentials');
@@ -35,6 +36,7 @@ class LoginComponent extends Component
     public function logout()
     {
         Auth::logout();
+        session()->forget('business');
         session()->flash('status', 'Logout successful');
         $this->dispatch('alert', ['type' => 'success',  'message' => 'Logout successfully']);
         return redirect()->to('/');
