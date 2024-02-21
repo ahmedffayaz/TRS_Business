@@ -1,0 +1,34 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+
+class Business extends Model
+{
+    use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name',
+        'slug',
+        'logo',
+        'address',
+        'city',
+        'postal_code',
+        'country_id',
+        'invoice_prefix',
+        'invoice_serial'
+    ];
+
+    public function roles() : BelongsToMany
+    {
+        return $this->belongsToMany(Role::class);
+    }
+}

@@ -1,5 +1,5 @@
 @props(['value'])
 
 <a {!! $attributes->merge(['class' => 'link']) !!}>
-    {{ $value ?? $slug }}
+    {{ $value ?? $slot }}
 </a>
