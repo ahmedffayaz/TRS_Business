@@ -72,7 +72,6 @@ class BusinessForm extends Form
     {
         $this->id = $business?->id;
         $this->name = $business?->name;
-        $this->logo = $business?->logo;
         $this->address = $business?->address;
         $this->city = $business?->city;
         $this->country_id = $business?->country_id;
