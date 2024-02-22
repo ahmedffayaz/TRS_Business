@@ -6,6 +6,7 @@
   Item Name: Vuexy  - Vuejs, HTML & Laravel Admin Dashboard Template
 ==========================================================================================*/
 
+import jQuery from "jquery";
 import PerfectScrollbar from "perfect-scrollbar";
 
 (function (window, document, $) {

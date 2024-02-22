@@ -20,27 +20,24 @@
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-            <li class=" nav-item"><a class="d-flex align-items-center" href="{{ url('dashboard') }}"><i data-feather="home"></i><span class="menu-title text-truncate"
-                        data-i18n="Dashboard">Dashboard</span></a>
-            </li>
-            <li class="{{ request()->routeIs('dashboard.employees') ? 'active' : '' }} nav-item">
-                <a class="d-flex align-items-center" href="{{ route('dashboard.employees') }}">
-                    <i data-feather="users"></i>
-                    <span class="menu-title text-truncate" data-i18n="Companies">Employees</span>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('dashboard.companies') ? 'active' : '' }} nav-item">
-                <a class="d-flex align-items-center" href="{{ route('dashboard.companies') }}">
-                    <i data-feather="package"></i>
-                    <span class="menu-title text-truncate" data-i18n="Companies">Companies</span>
-                </a>
-            </li>
-            <li class="{{ request()->routeIs('dashboard.clients') ? 'active' : '' }} nav-item">
-                <a class="d-flex align-items-center" href="{{ route('dashboard.clients') }}">
+            <x-nav class="{{ request()->routeIs('dashboard') ? 'active' : '' }} nav-item">
+                <x-anchor-tag class="d-flex align-items-center" href="{{ url('dashboard') }}">
+                    <i data-feather="home"></i>
+                    <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
+                </x-anchor-tag>
+            </x-nav>
+            <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
+                <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
                     <i data-feather="user-check"></i>
                     <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
-                </a>
-            </li>
+                </x-anchor-tag>
+            </x-nav>
+            <x-nav class="{{ request()->routeIs('dashboard.employees') ? 'active' : '' }} nav-item">
+                <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.employees') }}">
+                    <i data-feather="users"></i>
+                    <span class="menu-title text-truncate" data-i18n="Companies">Employees</span>
+                </x-anchor-tag>
+            </x-nav>
             <li class="{{ request()->routeIs('dashboard.projects') ? 'active' : '' }} nav-item">
                 <a class="d-flex align-items-center" href="{{ route('dashboard.projects') }}">
                     <i data-feather="file-text"></i>
@@ -98,7 +95,7 @@
             <li class=" nav-item">
                 <a class="d-flex align-items-center" href="{{ route('dashboard.system-setting') }}">
                     <i data-feather="settings"></i>
-                    <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
+                    <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
                 </a>
             </li>
         </ul>

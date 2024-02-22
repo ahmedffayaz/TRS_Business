@@ -1,7 +1,12 @@
 import '@popperjs/core'
 
+import $ from 'jquery'
+import select2 from 'select2/dist/js/select2.full'
+select2()
 import Swal from 'sweetalert2'
-import './select2.full.js'
+
+window.jQuery = window.$ = $;
+
 import '../assets/js/app-menu'
 import '../assets/js/app-core'
 import 'toastr'
@@ -67,5 +72,4 @@ document.addEventListener('livewire:navigated', () => {
   });
 });
 
-window.$ = window.jQuery = $;
 window.Swal = Swal;
