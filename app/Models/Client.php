@@ -50,6 +50,13 @@ class Client extends Model
         return $query->orderBy($columnName, $sortDirection);
     }
 
+    public function scopeSessionBusiness($query)
+    {
+        return $query->whereHas('business', function ($query) {
+            $query->whereName(session('business'));
+        });
+    }
+
     public function business(): BelongsTo
     {
         return $this->belongsTo(Business::class);

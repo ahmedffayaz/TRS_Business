@@ -1,21 +1,21 @@
 import toastr from "toastr";
+import Quill from "quill";
 
 document.addEventListener("livewire:initialized", () => {
     /**
      * show offcanvas modal
      */
     Livewire.on("select-container", (data) => {
-        $(".multi-select").each(function () {
+        $('.select2').each(function () {
             var $this = $(this);
-            $this.select2('destroy');
-            // var formRole = data.roles;
+            $this.wrap('<div class="position-relative"></div>');
             $this.select2({
                 placeholder: "Select Value",
                 dropdownAutoWidth: true,
-                width: "100%",
                 dropdownParent: $this.parent(),
+                width: '100%',
+                containerCssClass: 'select-md'
             });
-
         });
     });
 
@@ -78,6 +78,8 @@ document.addEventListener("livewire:initialized", () => {
             if (result.isConfirmed) {
                 if (data?.type === "delete") {
                     Livewire.dispatch("delete", { id: data?.id });
+                } else {
+                    Livewire.dispatch(data?.type, { id: data?.id });
                 }
             }
         });
@@ -90,5 +92,39 @@ document.addEventListener("livewire:initialized", () => {
                 height: 14
             });
         }
-    })
+    });
+
+    Livewire.on('quill-editor', function (data) {
+        var toolbarOptions = [
+            [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            [
+                'bold', 'italic',
+                'underline',
+                'strike',
+                { 'color': [] },
+                { 'background': [] },
+                'blockquote',
+                'code-block',
+                { 'header': 1 },
+                { 'header': 2 },
+                { 'list': 'ordered'},
+                { 'list': 'bullet' },
+                { 'align': [] }
+            ],
+        ];
+
+        const quill = new Quill('.editor', {
+            modules: {
+                toolbar: toolbarOptions
+            },
+            theme: 'snow'
+        });
+    });
+
+    Livewire.on('editor-value-set', function (data) { alert('ds');
+        // Populate hidden form field with Quill editor content
+        let desc = document.querySelector('input[name=description]'); console.log(desc);
+        desc.value = quill.root.innerHTML; console.log(desc.value);
+    });
 });

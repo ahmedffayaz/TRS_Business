@@ -20,7 +20,6 @@ class DatabaseSeeder extends Seeder
 			ProjectsTableSeeder::class,
 			TasksTableSeeder::class,
 			CommentsTableSeeder::class,
-			KnowledgeBaseSeeder::class,
         ]);
 	}
 }
