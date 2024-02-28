@@ -3,7 +3,7 @@
         <div class="d-flex">
             <div class="col-md-7">
                 <x-anchor-tag class="btn btn-primary" href="javascript:void(0);"
-                    :value="__('Add Knowledge Base')" tabindex="0" aria-controls="table-hover"
+                    :value="__('Add Question')" tabindex="0" aria-controls="table-hover"
                     type="button" wire:click="openCreateKnowledgeBaseModal" wire:ignore />
             </div>
             <div class="col-md-5">

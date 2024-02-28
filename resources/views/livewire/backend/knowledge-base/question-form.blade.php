@@ -1,5 +1,5 @@
 <div class="text-center mb-2">
-    <h1 class="mb-1">{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Knowledge Base</h1>
+    <h1 class="mb-1">{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Question</h1>
 </div>
 <form wire:submit.prevent="{{ $questionForm->isUpdate ? 'updateKnowledgeBase(' . $questionForm->id . ')' : 'storeKnowledgeBase' }}">
     <div class="row">
@@ -38,8 +38,9 @@
             <div class="row mb-2">
                 <div class="col-md-12">
                     <span wire:ignore.>
-                        <x-input-label for="answer" value="Answer" />
-                        <x-textarea name="answer" id="count_text" rows="4" wire:model="questionForm.answer" />
+                        <x-input-label for="answer" class="required" value="Answer" />
+                        <x-textarea name="answer" id="count_text" rows="4" wire:model="questionForm.answer"
+                        :class="$errors->has('questionForm.question') ? 'error' : ''" />
                     </span>
                     @error('questionForm.answer')
                         <x-input-error :message="$message" />
@@ -49,7 +50,7 @@
 
             <div class="row mb-2">
                 <div class="col-md-12">
-                    <x-input-label for="keyword" value="Keywords (separated by , )" />
+                    <x-input-label for="keyword" class="required" value="Keywords (separated by , )" />
                     <x-input type="text" name="keywords" id="keywords"
                         :class="$errors->has('questionForm.keywords') ? 'error' : ''"
                         placeholder="A, B, C" wire:model="questionForm.keywords" />
@@ -72,7 +73,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <x-input-label for="answer" value="Answer" />
+            <x-input-label for="answer" value="Answer Preview" />
             <div class="form-group answer-preview">
         </div>
     </div>

@@ -23,14 +23,14 @@ class KnowledgeBaseForm extends Form
                 'knowledge_base_category_id' => 'required',
                 'question' => 'required|string|max:191|unique:knowledge_bases,question,' . $this->id . ',id',
                 'answer' => 'required|string',
-                'keywords' => 'nullable|string'
+                'keywords' => 'required|string'
             ];
         } else {
             return [
                 'knowledge_base_category_id' => 'required',
                 'question' => 'required|string|max:191|unique:knowledge_bases',
                 'answer' => 'required|string',
-                'keywords' => 'nullable|string'
+                'keywords' => 'required|string'
             ];
         }
     }
