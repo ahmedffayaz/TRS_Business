@@ -145,7 +145,7 @@
         $(document).ready(function () {
             Livewire.on('reinitialize-icons', () => {
                 Livewire.dispatch('feather-icons');
-            })
-        })
+            });
+        });
     </script>
 @endscript

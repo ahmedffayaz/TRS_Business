@@ -300,6 +300,7 @@ class KnowledgeBaseDataComponent extends Component
             $knowledgeBase = KnowledgeBase::where('knowledge_base_category_id', $categoryId)
                 ->with(['category', 'keywords'])->findOrFail($id);
             $this->knowledgeBaseDetail = $knowledgeBase;
+            $this->dispatch('resetMte');
             $this->dispatch('open-main-modal');
         } catch (Exception $exception) {
             Log::error('Get error while open knowledge base detail modal: ' . $exception->getMessage());

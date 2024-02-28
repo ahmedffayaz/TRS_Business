@@ -5,11 +5,14 @@ import select2 from 'select2/dist/js/select2.full'
 select2()
 import Swal from 'sweetalert2'
 import Quill from 'quill';
+import Showdown from 'showdown'
 window.jQuery = window.$ = $;
 
 import '../assets/js/app-menu'
 import '../assets/js/app-core'
 import 'toastr'
+import '../assets/vendors/editors/markdown-text-editor-master/js/editor.min'
+import MTE from '../assets/vendors/editors/markdown-text-editor-master/js/mte'
 import '../assets/js/script'
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,3 +77,5 @@ document.addEventListener('livewire:navigated', () => {
 
 window.Swal = Swal;
 window.Quill = Quill;
+window.Showdown = Showdown;
+window.MTE = MTE;
