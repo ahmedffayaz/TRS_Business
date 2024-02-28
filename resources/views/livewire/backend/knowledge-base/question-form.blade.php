@@ -9,9 +9,9 @@
                 <x-select-input id="category-select"
                     :class="$errors->has('questionForm.knowledge_base_category_id') ? 'error select2' : 'select2'"
                     wire:model="questionForm.knowledge_base_category_id">
-                    @isset($knowledgebaseCategories)
+                    @isset($knowledgeBaseCategories)
                         <option value="">Select Category ...</option>
-                        @foreach ($knowledgebaseCategories as $knowledgeBaseCategory)
+                        @foreach ($knowledgeBaseCategories as $knowledgeBaseCategory)
                             <option value="{{ $knowledgeBaseCategory?->id }}">{{ $knowledgeBaseCategory?->name }}</option>
                         @endforeach
                     @endisset
@@ -105,20 +105,26 @@
             Livewire.on('resetSelectInput', () => {
                 $(document).ready(function () {
                     Livewire.dispatch('select-container');
+                    categorySelect();
                 })
             });
 
-            Livewire.on('category-select', (data) => {
-                var $select = $('#category-select');
-                // Clear existing selections
-                $select.val(null).trigger('change');
-                // Set the new selections
-                $select.val(data[0].formCategory).trigger('change');
-            });
+            // Make function to reinitialize category select2 and bind values
+            function categorySelect() {
+                Livewire.on('category-select', (data) => {
+                    var $select = $('#category-select');
+                    // Clear existing selections
+                    $select.val(null).trigger('change');
+                    // Set the new selections
+                    $select.val(data[0].formCategory).trigger('change');
+                });
 
-            $('#category-select').on('change', function(event) {
-                @this.set('questionForm.knowledge_base_category_id', $(this).val());
-            });
+                $('#category-select').on('change', function(event) {
+                    @this.set('questionForm.knowledge_base_category_id', $(this).val());
+                });
+            }
+
+            categorySelect();
         })
     </script>
 @endscript

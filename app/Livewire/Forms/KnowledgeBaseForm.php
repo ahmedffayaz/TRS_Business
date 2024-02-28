@@ -51,5 +51,8 @@ class KnowledgeBaseForm extends Form
         $this->knowledge_base_category_id = $knowledgeBase?->knowledge_base_category_id;
         $this->question = $knowledgeBase?->question;
         $this->answer = $knowledgeBase?->answer;
+        $knowledgeBaseKeywords = $knowledgeBase?->keywords?->pluck('name')?->toArray();
+        $knowledgeBaseKeywordsString = $knowledgeBaseKeywords ? implode(', ', $knowledgeBaseKeywords) : '';
+        $this->keywords = $knowledgeBaseKeywordsString;
     }
 }

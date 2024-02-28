@@ -51,11 +51,6 @@
     <script>
         $(document).ready(function () {
             Livewire.dispatch('select-container');
-            Livewire.on('resetSelectInput', () => {
-                $(document).ready(function () {
-                    Livewire.dispatch('select-container');
-                })
-            });
             Livewire.on('roles-select', (data) => {
                 var $select = $('#category-role-select');
                 // Clear existing selections

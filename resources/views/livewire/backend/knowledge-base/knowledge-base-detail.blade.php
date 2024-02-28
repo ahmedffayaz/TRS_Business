@@ -1,17 +1,13 @@
 <div class="">
     <h1 class="mb-1">{{ $knowledgeBaseDetail->question }}</h1>
     <hr>
-    <div class="my-2">Roles:
-        @foreach ($knowledgeBaseDetail->category->roles as $role)
-            <span class="badge rounded-pill {{ getRandomColor() }}">{{ $role->name }}</span>
-        @endforeach
-    </div>
+    @if (count($knowledgeBaseDetail->keywords) > 0)
+        <div class="my-2"><b>Roles:</b> {{ implode(', ', $knowledgeBaseDetail->category->roles->pluck('title')->toArray()) }}</div>
+    @endif
     <div class="my-2">
         {!! $knowledgeBaseDetail->answer !!}
     </div>
-    <div class="my-2">
-        @foreach ($knowledgeBaseDetail->keywords as $keyword)
-            <div class="badge rounded-pill {{ getRandomColor() }}">{{ $keyword->name }}</div>
-        @endforeach
-    </div>
+    @if (count($knowledgeBaseDetail->keywords) > 0)
+        <div class="my-2"><b>Keywords:</b> {{ implode(', ', $knowledgeBaseDetail->keywords->pluck('name')->toArray()) }}</div>
+    @endif
 </div>

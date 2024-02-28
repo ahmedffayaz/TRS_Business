@@ -49,6 +49,7 @@ use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
+use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -76,6 +77,7 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
         });
         Route::prefix('knowledgebase')->name('knowledgebase.')->group(function () {
             Route::get('/', KnowledgeBaseComponent::class)->name('index');
+            Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
         });
         Route::get('/companies', CompanyComponent::class)->name('companies');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
