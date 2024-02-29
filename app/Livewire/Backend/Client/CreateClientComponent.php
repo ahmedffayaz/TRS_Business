@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
-#[Title('Create Client')]
+#[Title('Add Client')]
 class CreateClientComponent extends Component
 {
     public ClientForm $form;
@@ -67,11 +67,11 @@ class CreateClientComponent extends Component
 
             DB::commit();
             $this->form->reset();
-            session()->flash('success', 'Client created successfully.');
+            session()->flash('success', 'Client added successfully.');
             return redirect()->route('dashboard.clients.index');
         } catch (Exception $exception) {
             DB::rollBack();
-            Log::error('Got error while create client: ' . $exception);
+            Log::error('Got error while adding new client: ' . $exception);
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
     }
