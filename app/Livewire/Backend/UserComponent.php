@@ -13,7 +13,9 @@ use App\Livewire\Forms\UserForm;
 use App\Models\Company;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\Attributes\Title;
 
+#[Title('Employees')]
 class UserComponent extends Component
 {
     use WithPagination;

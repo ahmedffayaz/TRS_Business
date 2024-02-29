@@ -9,7 +9,9 @@ use App\Traits\WithOffcanvas;
 use App\Livewire\Forms\ProjectForm;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\Attributes\Title;
 
+#[Title('Projects')]
 class ProjectComponent extends Component
 {
     use WithPagination;

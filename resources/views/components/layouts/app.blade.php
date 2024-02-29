@@ -31,7 +31,7 @@
         <div class="header-navbar-shadow"></div>
         <div class="content-wrapper container-xxl p-0">
             <div class="content-header row">
-                @livewire('partials.breadcrumbs-component')
+                <x-breadcrumbs />
                 @livewire('partials.breadcrumbs-button-component')
             </div>
             <div class="content-body">
