@@ -75,7 +75,7 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
             Route::get('create', CreateClientComponent::class)->name('create');
             Route::get('edit/{slug}', EditClientComponent::class)->name('edit');
         });
-        Route::prefix('knowledgebase')->name('knowledgebase.')->group(function () {
+        Route::prefix('knowledgebase')->name('knowledgebase.')->middleware('permission:view_knowledgeBase')->group(function () {
             Route::get('/', KnowledgeBaseComponent::class)->name('index');
             Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
         });
