@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Demo</title>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="css/demo.css" rel="stylesheet">
+    <link href="css/mte.css" rel="stylesheet">
+    <style>
+    .editor-toolbar {
+      margin-right:1px;
+      margin-left:1px;
+    }
+    .editor-toolbar-button {
+      background-color:#3c3c3c;
+      color:#87ceeb;
+    }
+    .editor-toolbar-button:active {background-color:#252525}
+    .custom-modal-my-modal {width:auto}
+    .custom-modal-my-modal img {
+      display:block;
+      width:600px;
+      height:200px;
+    }
+    .custom-drop-color .color {
+      display:block;
+      height:15px;
+      cursor:pointer;
+    }
+    </style>
+  </head>
+  <body>
+
+    <div>
+      <textarea class="editor-area" id="editor-area" spellcheck="false">Lorem Ipsum
+
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Typi non habent claritatem insitam; est usus legentis in iis qui facit eorum claritatem. Investigationes demonstraverunt lectores legere me lius quod ii legunt saepius. Claritas est etiam processus dynamicus, qui sequitur mutationem consuetudium lectorum. Mirum est notare quam littera gothica, quam nunc putamus parum claram, anteposuerit litterarum formas humanitatis per seacula quarta decima et quinta decima. Eodem modo typi, qui nunc nobis videntur parum clari, fiant sollemnes in futurum.
+
+List Item
+List Item
+List Item
+List Item</textarea>
+    </div>
+
+    <script src="js/editor.min.js"></script>
+    <script src="js/mte.js"></script>
+    <script>
+
+    // Initiation
+    var myEditor = new MTE(document.getElementById('editor-area'), {
+        tabSize: '    ',
+        shortcut: true,
+        keydown: function(e, base) {
+            console.log('Updated! (keydown:' + base.grip.key(e) + ')');
+        },
+        update: function() {
+            console.log('Updated!');
+        },
+        click: function(e, base, type) {
+            console.log('Updated! (click:' + type + ')');
+        },
+        ready: function() {
+            console.log('Ready!');
+        },
+        cut: function(selection) {
+            console.log(selection);
+        },
+        copy: function(selection) {
+            console.log(selection);
+        },
+        paste: function(selection) {
+            console.log(selection);
+        }
+    });
+
+    // Custom Button and Modal
+    myEditor.button('strikethrough another-class-goes-here another-another-class-goes-here', {
+        title: 'Strike',
+        position: 3,
+        click: function(e, base) {
+            base.grip.toggle('~~', '~~');
+        }
+    });
+    myEditor.button('warning', {
+        title: 'Example Alert Box',
+        click: function(e, base) {
+            base.alert('Alert Box', 'This is an alert box.');
+        }
+    });
+    myEditor.button('question-circle', {
+        title: 'Example Confirm Box',
+        click: function(e, base) {
+            base.confirm('Confirm Box', 'This is a confirm box.', {
+                OK: function() {
+                    alert('Confirmed!');
+                },
+                CANCEL: function() {
+                    alert('Cancelled!');
+                }
+            });
+        }
+    });
+    myEditor.button('pencil', {
+        title: 'Example Custom Modal',
+        click: function(e, base) {
+            base.modal('my-modal', function(overlay, modal, header, content, footer) {
+                var btn = document.createElement('button');
+                btn.innerHTML = 'Save';
+                btn.onclick = function() {
+                    alert('Saved!');
+                    base.exit(true);
+                    return false;
+                };
+                header.innerHTML = 'Test Modal'; // Header
+                content.innerHTML = '<img src="http://lorempixel.com/600/200/animals">'; // Content
+                footer.appendChild(btn); // Footer
+            });
+        }
+    });
+
+    // Custom Drop
+    myEditor.button('paint-brush', {
+        title: 'Example Drop',
+        click: function(e, base) {
+            base.drop('color', function(drop) {
+                var colors = ['#5FB0E6', '#86CDEA', '#86BAA3', '#706D45'], color;
+                drop.innerHTML = "";
+                for (var i in colors) {
+                    color = document.createElement('span');
+                    color.className = 'color';
+                    color.title = colors[i];
+                    color.style.backgroundColor = colors[i];
+                    color.onclick = function() {
+                        base.grip.wrap('<span style="color:' + this.title + ';">', '</span>');
+                        base.exit(true);
+                    };
+                    drop.appendChild(color);
+                }
+            });
+        }
+    });
+
+    // Toolbar Separator
+    myEditor.separator({position: 4});
+
+    // Shortcut API
+    myEditor.shortcut('ctrl+f', function() {
+        return myEditor.prompt('Search', "", true, function(v) {
+            var start = myEditor.grip.area.value.toLowerCase().indexOf(v.toLowerCase());
+            if (start !== -1) {
+                myEditor.grip.select(start, start + v.length);
+            } else {
+                myEditor.alert('Not Found', 'Can&rdquo;t find &ldquo;' + v + '&rdquo;.');
+            }
+        }), false;
+    });
+
+    </script>
+
+    <p><button onclick="myEditor.grip.config.buttons.link.click();">Test</button></p>
+
+  </body>
+</html>
