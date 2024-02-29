@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Component;
 
+#[Title('System Settings')]
 class SettingComponent extends Component
 {
     public $logo;
@@ -22,7 +23,7 @@ class SettingComponent extends Component
         $favicon = Setting::where('name', 'favicon')->pluck('value')->first();
         $faviconImage = $favicon ? Storage::url($favicon) : '/assets/images/avatar.png';
 
-        
+
         $logo = Setting::where('name', 'logo')->pluck('value')->first();
         $logoImage = $logo ? Storage::url($logo) : '/assets/images/avatar.png';
 
@@ -32,7 +33,6 @@ class SettingComponent extends Component
         $this->form->cms_name = Setting::where('name', 'cms_name')->pluck('value')->first();
     }
 
-    #[Title('Settings')]
     public function render()
     {
         if (!auth()->user()->hasPermissionTo('edit_systems')) {

@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Livewire\Forms\BusinessForm;
 
-#[Title('Create Business')]
+#[Title('Add Business')]
 class CreateBusinessComponent extends Component
 {
     use WithFileUploads;
@@ -61,8 +61,8 @@ class CreateBusinessComponent extends Component
 
             // Reset form fields
             $this->form->reset();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business created successfully!']);
-            session()->flash('error', 'Business created successfully.');
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business added successfully!']);
+            session()->flash('error', 'Business added successfully.');
             return redirect()->route('dashboard');
         } catch (Exception $exception) {
             DB::rollBack();
