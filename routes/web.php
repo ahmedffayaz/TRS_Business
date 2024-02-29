@@ -41,17 +41,15 @@ use App\Livewire\Backend\UserProfileComponent;
 use App\Http\Controllers\AttachmentsController;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
-use App\Livewire\Backend\KnowledgeBaseComponent;
-use App\Http\Controllers\KnowledgeBaseController;
 use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\Business\BusinessComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\UserTermsConditionComponent;
-use App\Http\Controllers\KnowledgeBaseTopicController;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
-use App\Http\Controllers\KnowledgeBaseQuestionController;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
+use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
+use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -77,6 +75,10 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
             Route::get('create', CreateClientComponent::class)->name('create');
             Route::get('edit/{slug}', EditClientComponent::class)->name('edit');
         });
+        Route::prefix('knowledgebase')->name('knowledgebase.')->group(function () {
+            Route::get('/', KnowledgeBaseComponent::class)->name('index');
+            Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
+        });
         Route::get('/companies', CompanyComponent::class)->name('companies');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -85,16 +87,6 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
         Route::get('projects', ProjectComponent::class)->name('projects');
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
-        Route::get('knowledge-base-record', [KnowledgeBaseController::class, 'fetchRecord'])->name('knowledge-base.fetch-record');
-        Route::get('knowledge-base-search', [KnowledgeBaseController::class, 'search'])->name('knowledge-base.search');
-        Route::resource('knowledge-bases', KnowledgeBaseController::class);
-        Route::get('knowledge-base-topics-record/{id}', [KnowledgeBaseTopicController::class, 'fetchRecord'])->name('knowledge-base-topic.fetch-record');
-        Route::get('knowledge-base-topic-search', [KnowledgeBaseTopicController::class, 'search'])->name('knowledge-base-topic.search');
-        Route::get('knowledge-base-topic/{slug}', [KnowledgeBaseTopicController::class, 'index'])->name('knowledge-base-topics.index');
-        Route::resource('knowledge-base-topics', KnowledgeBaseTopicController::class)->except(['index']);
-        Route::resource('knowledge-base-question', KnowledgeBaseQuestionController::class);
-        Route::get('knowledge-base-search-keyword', [KnowledgeBaseQuestionController::class, 'searchKeyword'])->name('knowledge-base.search-keyword');
-        Route::get('knowledge-base-search-keyword-record/{keyword}', [KnowledgeBaseQuestionController::class, 'fetchSearchKeywordRecord'])->name('knowledge-base.fetch-search-keyword');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting');
