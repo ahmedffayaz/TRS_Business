@@ -6,17 +6,19 @@
         <div class="col-md-6">
             <div class="row mb-2">
                 <div class="col-md-12">
-                    <x-input-label for="category" value="Knowledge Base Category" />
-                    <x-select-input id="category-select"
-                        :class="$errors->has('questionForm.knowledge_base_category_id') ? 'error select2' : 'select2'"
-                        wire:model="questionForm.knowledge_base_category_id">
-                        @isset($knowledgeBaseCategories)
-                            <option value="">Select Category ...</option>
-                            @foreach ($knowledgeBaseCategories as $knowledgeBaseCategory)
-                                <option value="{{ $knowledgeBaseCategory?->id }}">{{ $knowledgeBaseCategory?->name }}</option>
-                            @endforeach
-                        @endisset
-                    </x-select-input>
+                    <span wire:ignore.>
+                        <x-input-label for="category" value="Knowledge Base Category" />
+                        <x-select-input id="category-select"
+                            :class="$errors->has('questionForm.knowledge_base_category_id') ? 'error select2' : 'select2'"
+                            wire:model="questionForm.knowledge_base_category_id">
+                            @isset($knowledgeBaseCategories)
+                                <option value="">Select Category ...</option>
+                                @foreach ($knowledgeBaseCategories as $knowledgeBaseCategory)
+                                    <option value="{{ $knowledgeBaseCategory?->id }}">{{ $knowledgeBaseCategory?->name }}</option>
+                                @endforeach
+                            @endisset
+                        </x-select-input>
+                    </span>
                     @error('questionForm.knowledge_base_category_id')
                         <x-input-error :message="$message" />
                     @enderror
@@ -87,6 +89,7 @@
                 $(document).ready(function () {
                     Livewire.dispatch('select-container');
                     categorySelect();
+                    markdownTextEditorInitialize();
                 })
             });
 
@@ -107,14 +110,19 @@
 
             categorySelect();
 
-            var converter = new Showdown.Converter();
-            var mte = new MTE(document.getElementsByTagName('textarea')[0]);
+            // Markdown reinitialize function
+            function markdownTextEditorInitialize() {
+                var converter = new Showdown.Converter();
+                var mte = new MTE(document.getElementsByTagName('textarea')[0]);
 
-            $('.fa-header').addClass('fa-heading');
+                $('.fa-header').addClass('fa-heading');
 
-            $(document).on('change keyup', '[name="answer"]', function() {
-                $('.answer-preview').html(converter.makeHtml($(this).val()));
-            });
+                $(document).on('change keyup', '[name="answer"]', function() {
+                    $('.answer-preview').html(converter.makeHtml($(this).val()));
+                });
+            }
+
+            markdownTextEditorInitialize();
         })
     </script>
 @endscript
