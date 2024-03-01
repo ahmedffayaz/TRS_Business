@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 
-class PermissionsTableSeeder extends Seeder
+class PermissionsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
