@@ -9,7 +9,7 @@ use Livewire\Attributes\Title;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 #[Title('Select Business')]
-class BusinessComponent extends Component
+class SelectBusinessComponent extends Component
 {
     use WithPagination;
 
@@ -23,7 +23,7 @@ class BusinessComponent extends Component
     public function render()
     {
         $businesses = $this->getBusinesses();
-        return view('livewire.backend.business.business-component', compact('businesses'));
+        return view('livewire.backend.business.select-business-component', compact('businesses'));
     }
 
     private function getBusinesses(): LengthAwarePaginator

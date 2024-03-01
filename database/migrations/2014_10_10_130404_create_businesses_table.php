@@ -17,6 +17,7 @@ return new class extends Migration
 			$table->string('name')->unique();
             $table->string('slug')->unique();
 			$table->string('logo')->nullable();
+			$table->string('favicon')->nullable();
 			$table->text('address');
 			$table->text('city');
 			$table->text('postal_code');
@@ -27,6 +28,7 @@ return new class extends Migration
 			$table->text('invoice_prefix');
 			$table->text('invoice_serial');
 
+            $table->string('date_format')->nullable();
 			$table->timestamps();
             $table->softDeletes();
         });

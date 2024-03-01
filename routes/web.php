@@ -42,12 +42,12 @@ use App\Http\Controllers\AttachmentsController;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
-use App\Livewire\Backend\Business\BusinessComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\UserTermsConditionComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
+use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 
@@ -63,7 +63,7 @@ Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
 Route::middleware(['auth', 'user-account-type'])->group(function () {
     Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
-    Route::get('select-business', BusinessComponent::class)->name('select-business');
+    Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
         Route::prefix('businesses')->name('businesses.')->middleware('permission:add_businesses|edit_businesses')->group(function () {
             Route::get('create', CreateBusinessComponent::class)->name('create')->middleware('permission:add_businesses');

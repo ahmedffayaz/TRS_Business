@@ -3,9 +3,9 @@
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
-                    <a class="navbar-brand" href="../../../html/ltr/vertical-menu-template/index.html">
+                    <a class="navbar-brand" href="{{ route('dashboard') }}">
                         <span class="brand-logo">
-                            <img src="{{ asset('trs_logo.svg') }}" alt="" height="40">
+                            <img src="{{ $business->logo ? asset('storage/' . $business->logo) : asset('trs_logo.svg') }}" alt="" height="40">
                         </span>
                         <h2 class="brand-text">TRS/DEV CMS</h2>
                     </a>
