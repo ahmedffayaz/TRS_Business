@@ -22,18 +22,23 @@ class EditBusinessComponent extends Component
     use WithFileUploads;
 
     public BusinessForm $form;
-    public $isUpdate, $countries, $slug, $user, $roles;
+    public $isUpdate, $countries, $slug, $user, $roles, $logoImage, $businessLogo, $businessFavicon;
+    public string $imagePath = 'images/business';
 
     public function mount($slug)
     {
         $this->user = auth()->user();
-        if ($slug === nameToSlug(session('business')))
+        if ($slug === nameToSlug(session('business'))) {
             $this->slug = Business::whereSlug($slug)->firstOrFail();
+            $this->businessLogo = $this->slug->logo;
+            $this->businessFavicon = $this->slug->favicon;
+        }
         else
             abort(404);
         $this->countries = Country::all();
         $this->roles = Role::all();
         $this->form->isUpdate = true;
+        $this->logoImage = 'assets/images/avatar.png';
         $this->form->roles = $this->slug->roles->pluck('id')->toArray();
         $this->dispatch('roles-select', ['formRoles' => $this->form->roles]);
         $this->form->set($this->slug);
@@ -59,16 +64,23 @@ class EditBusinessComponent extends Component
                 $validated['logo'] = $imageManager->setFile($validated['logo'])->resize(64)->setDirectory("images/business")->save();
             }
 
+            if (!empty($validated['favicon'])) {
+                $imageManager = new ImageManager();
+                $validated['favicon'] = $imageManager->setFile($validated['favicon'])->resize(64)->setDirectory($this->imagePath)->save();
+            }
+
             $business->update([
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']),
-                'logo' => !empty($validated['logo']) ? $validated['logo'] : $business->logo,
+                'logo' => $validated['logo'] ? $this->imagePath . '/' . $validated['logo'] : $business->logo,
+                'favicon' => $validated['favicon'] ? $this->imagePath . '/' . $validated['favicon'] : $business->favicon,
                 'address' => $validated['address'],
                 'city' => $validated['city'],
                 'country_id' => $validated['country_id'],
                 'postal_code' => $validated['postal_code'],
                 'invoice_prefix' => $validated['invoice_prefix'],
-                'invoice_serial' => $validated['invoice_serial']
+                'invoice_serial' => $validated['invoice_serial'],
+                'date_format' => $validated['date_format']
             ]);
             $business->roles()->sync($validated['roles']);
             DB::commit();
@@ -77,10 +89,19 @@ class EditBusinessComponent extends Component
             if (!empty($this->form->logo))
                 $this->form->logo = '';
 
+            // Reset form favicon field
+            if (!empty($this->form->favicon))
+                $this->form->favicon = '';
+
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Business updated successfully!']);
+            // Reset form fields
+            $this->resetValidation();
+            session()->forget('business');
+            session(['business' => $business->name]);
+            redirect()->route('dashboard.businesses.edit', $business->slug);
         } catch (Exception $exception) {
             DB::rollBack();
-            Log::error($exception);
+            Log::error('Get error while update business data: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
         }
     }
