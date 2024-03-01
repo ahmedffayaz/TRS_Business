@@ -21,7 +21,8 @@ class CreateBusinessComponent extends Component
     use WithFileUploads;
 
     public BusinessForm $form;
-    public $businesses, $countries, $user, $roles;
+    public $businesses, $countries, $user, $roles, $logoImage;
+    public string $imagePath = 'images/business';
 
     public function mount()
     {
@@ -29,6 +30,7 @@ class CreateBusinessComponent extends Component
         $this->businesses = Business::pluck('name', 'id')->all();
         $this->countries = Country::get();
         $this->roles = Role::all();
+        $this->logoImage = 'assets/images/avatar.png';
     }
 
     public function store()
@@ -40,33 +42,50 @@ class CreateBusinessComponent extends Component
 
             if (!empty($validated['logo'])) {
                 $imageManager = new ImageManager();
-                $validated['logo'] = $imageManager->setFile($validated['logo'])->resize(64)->setDirectory("images/business")->save();
+                $validated['logo'] = $imageManager->setFile($validated['logo'])->resize(64)->setDirectory($this->imagePath)->save();
+            }
+
+            if (!empty($validated['favicon'])) {
+                $imageManager = new ImageManager();
+                $validated['favicon'] = $imageManager->setFile($validated['favicon'])->resize(64)->setDirectory($this->imagePath)->save();
             }
 
             $business = Business::create([
                 'name' => $validated['name'],
                 'slug' => Str::slug($validated['name']),
-                'logo' => $validated['logo'],
+                'logo' => $validated['logo'] ? $this->imagePath . '/' . $validated['logo'] : null,
+                'favicon' => $validated['favicon'] ? $this->imagePath . '/' . $validated['favicon'] : null,
                 'address' => $validated['address'],
                 'city' => $validated['city'],
                 'country_id' => $validated['country_id'],
                 'postal_code' => $validated['postal_code'],
                 'invoice_prefix' => $validated['invoice_prefix'],
-                'invoice_serial' => $validated['invoice_serial']
+                'invoice_serial' => $validated['invoice_serial'],
+                'date_format' => $validated['date_format']
             ]);
 
             $business->roles()->attach($validated['roles']);
 
             DB::commit();
 
+            // Reset form logo field
+            if (!empty($this->form->logo))
+                $this->form->logo = '';
+
+            // Reset form favicon field
+            if (!empty($this->form->favicon))
+                $this->form->favicon = '';
+
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business added successfully!']);
             // Reset form fields
             $this->form->reset();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business added successfully!']);
-            session()->flash('error', 'Business added successfully.');
-            return redirect()->route('dashboard');
+            $this->resetValidation();
+            $this->dispatch('roles-select', ['formRoles' => []]);
+            $this->dispatch('country-select', ['formCountry' => []]);
+            $this->dispatch('date-format-select', ['formDateFormat' => []]);
         } catch (Exception $exception) {
             DB::rollBack();
-            Log::error($exception);
+            Log::error('Get error while adding business: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
         }
     }

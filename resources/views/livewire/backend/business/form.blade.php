@@ -81,16 +81,21 @@
         </div>
 
         <div class="col-md-6 ps-md-1">
-            <x-input-label for="logo" value="Business Logo" />
-            <x-input type="file" name="logo" id="logo"
-                :class="$errors->has('form.logo') ? 'error' : ''"
-                placeholder="Enter postal code" wire:model="form.logo" />
-            @error('form.logo')
+            <span wire:ignore.>
+                <x-input-label for="date-format" class="required" value="Date Format" />
+                <x-select-input name="date_format" id="date-format-select"
+                    :class="$errors->has('form.date_format') ? 'error select2' : 'select2'"
+                    wire:model="form.date_format">
+                    <option value="">--Select Date Format--</option>
+                    <option value="d M, Y">d M, Y</option>
+                    <option value="d/m/y">d/m/y</option>
+                    <option value="Y-m-d">Y-m-d</option>
+                    <option value="Y-m-d H:i:s">Y-m-d H:i:s</option>
+                </x-select-input>
+            </span>
+            @error('form.date_format')
                 <x-input-error :message="$message" />
             @enderror
-            @if ($form->logo)
-                <img src="{{ $form->logo->temporaryUrl() }}" class="mt-2" width="180px" />
-            @endif
         </div>
     </div>
 
@@ -109,6 +114,49 @@
                 wire:model="form.invoice_serial" />
             @error('form.invoice_serial')
                 <x-input-error :message="$message" />
+            @enderror
+        </div>
+    </div>
+
+    <div class="row mb-1">
+        <div class="col-md-6 mb-1">
+            <label class="col-form-label" for="Company favicon">Favicon</label>
+            <div class="d-flex">
+                <a href="#" class="me-25">
+                    <img src="{{ $form->favicon ? $form?->favicon?->temporaryUrl()
+                        : ($businessFavicon ? asset('storage/' . $businessFavicon) : asset($logoImage)) }}" id="favicon-img" class="uploadedAvatar rounded me-50"
+                    alt="Business favicon" height="100" width="100">
+                </a>
+                <div class="d-flex align-items-end mt-75 ms-1">
+                    <div>
+                        <label for="favicon" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Upload</label>
+                        <input type="file" id="favicon" hidden="" accept="image/*" wire:model="form.favicon">
+                        <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                    </div>
+                </div>
+            </div>
+            @error('form.favicon')
+                <small class="text-danger mt-2">{{ $message }}</small>
+            @enderror
+        </div>
+        <div class="col-md-6 mb-1">
+            <label class="col-form-label" for="Company Logo">Logo</label>
+            <div class="d-flex">
+                <a href="#" class="me-25">
+                    <img src="{{ $form->logo ? $form?->logo?->temporaryUrl()
+                        : ($businessLogo ? asset('storage/' . $businessLogo) : asset($logoImage)) }}" id="logo-img" class="uploadedAvatar rounded me-50"
+                    alt="Business logo" height="100" width="100">
+                </a>
+                <div class="d-flex align-items-end mt-75 ms-1">
+                    <div>
+                        <label for="logo" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Upload</label>
+                        <input type="file" id="logo" hidden="" accept="image/*" wire:model="form.logo">
+                        <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
+                    </div>
+                </div>
+            </div>
+            @error('form.logo')
+                <small class="text-danger mt-2">{{ $message }}</small>
             @enderror
         </div>
     </div>
@@ -132,12 +180,32 @@
                 $select.val(data[0].formRoles).trigger('change');
             });
 
+            Livewire.on('country-select', (data) => {
+                var $select = $('#country-select');
+                // Clear existing selections
+                $select.val(null).trigger('change');
+                // Set the new selections
+                $select.val(data[0].formCountry).trigger('change');
+            });
+
+            Livewire.on('date-format-select', (data) => {
+                var $select = $('#date-format-select');
+                // Clear existing selections
+                $select.val(null).trigger('change');
+                // Set the new selections
+                $select.val(data[0].formDateFormat).trigger('change');
+            });
+
             $('#role-select').on('change', function(e) {
                 @this.set('form.roles', $(this).val());
             });
 
             $('#country-select').on('change', function(e) {
                 @this.set('form.country_id', $(this).val());
+            });
+
+            $('#date-format-select').on('change', function(e) {
+                @this.set('form.date_format', $(this).val());
             });
         })
     </script>

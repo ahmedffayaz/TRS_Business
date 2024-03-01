@@ -29,6 +29,7 @@ class ClientComponent extends Component
     public string $sortDirection = 'desc';
     public int $limitPerPage = 10;
     public $business;
+    public $clientDetail;
 
     public ClientForm $form;
 
@@ -44,7 +45,7 @@ class ClientComponent extends Component
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return Client::whereHas('business', function ($query) {
             $query->whereName(session('business'));
-        })->with(['business', 'country'])
+        })->with(['business', 'country'])->withCount('employees')
         ->getList($this->search, $this->columnName, $this->sortDirection)
         ->paginate($this->limitPerPage);
     }
@@ -56,6 +57,23 @@ class ClientComponent extends Component
         $clients = $this->getClients();
 
         return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients'));
+    }
+
+    public function show($slug)
+    {
+        try {
+            $this->clientDetail = Client::sessionBusiness()->whereSlug($slug)
+                ->with(['employees', 'business', 'country'])->withCount('employees')->firstOrFail();
+            $this->dispatch('open-main-modal');
+        } catch (ModelNotFoundException $exception) {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Sorry, the client could not be found in our database.'
+            ]);
+        } catch (Exception $exception) {
+            Log::error('Get error while displaying client detail: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
+        }
     }
 
     public function deleteConfirmation($id)
@@ -79,9 +97,13 @@ class ClientComponent extends Component
             $user->delete();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Client Deleted Successfully!']);
         } catch (ModelNotFoundException $exception) {
-            session()->flash('error', 'Sorry, the client could not be found in our database.');
-        } catch (\Exception $exception) {
-            session()->flash('error', $exception->getMessage());
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Sorry, the client could not be found in our database.'
+            ]);
+        } catch (Exception $exception) {
+            Log::error('Get error while delete client: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
     }
 
@@ -93,7 +115,7 @@ class ClientComponent extends Component
                 'html' => view('livewire.backend.client.user-fields')->render()
             ], JsonResponse::HTTP_OK);
         } catch (Exception $exception) {
-            Log::error($exception->getMessage());
+            Log::error('Get error while add user fields on adding or updating clients: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
     }

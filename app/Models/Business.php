@@ -19,12 +19,14 @@ class Business extends Model
         'name',
         'slug',
         'logo',
+        'favicon',
         'address',
         'city',
         'postal_code',
         'country_id',
         'invoice_prefix',
-        'invoice_serial'
+        'invoice_serial',
+        'date_format'
     ];
 
     public function roles() : BelongsToMany
