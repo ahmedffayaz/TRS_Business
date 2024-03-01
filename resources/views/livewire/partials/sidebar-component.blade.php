@@ -66,7 +66,7 @@
                 @can('view_knowledgeBase')
                     <x-nav class="{{ request()->routeIs('dashboard.knowledge-bases.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">
-                            <i data-feather="file"></i>
+                            <i data-feather='help-circle'></i>
                             <span class="menu-title text-truncate" data-i18n="Knowledge Base">Knowledge Base</span>
                         </x-anchor-tag>
                     </x-nav>
