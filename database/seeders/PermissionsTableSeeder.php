@@ -27,6 +27,13 @@ class PermissionsTableSeeder extends Seeder
 	    Permission::create(['group' => 'business', 'name' => 'edit_businesses', 'title' => 'Edit businesses']);
 	    Permission::create(['group' => 'business', 'name' => 'view_businesses', 'title' => 'View businesses']);
 	    Permission::create(['group' => 'business', 'name' => 'delete_businesses', 'title' => 'Delete businesses']);
+
+        // Businesses
+	    Permission::create(['group' => 'clients', 'name' => 'add_clients', 'title' => 'Add clients']);
+	    Permission::create(['group' => 'clients', 'name' => 'edit_clients', 'title' => 'Edit clients']);
+	    Permission::create(['group' => 'clients', 'name' => 'view_clients', 'title' => 'View clients']);
+	    Permission::create(['group' => 'clients', 'name' => 'delete_clients', 'title' => 'Delete clients']);
+
 	    // Companies
 	    Permission::create(['group' => 'company', 'name' => 'add_companies', 'title' => 'Add companies']);
 	    Permission::create(['group' => 'company', 'name' => 'edit_companies', 'title' => 'Edit companies']);

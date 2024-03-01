@@ -2,9 +2,12 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Clients</h4>
-            <div>
-                <a href="{{ route('dashboard.clients.create') }}" class="btn btn-primary" tabindex="0" aria-controls="table-hover" type="button">Add Client</a>
-            </div>
+            @can('add_clients')
+                <div>
+                    <x-anchor-tag href="{{ route('dashboard.clients.create') }}" class="btn btn-primary"
+                        tabindex="0" aria-controls="table-hover" type="button">Add Client</x-anchor-tag>
+                </div>
+            @endcan
         </div>
         <div class="card-body">
             <div class="row mb-2">
@@ -52,19 +55,37 @@
                                     </td>
                                     <td>
                                         <div class="dropdown">
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-                                                <span wire:ignore><i data-feather="more-vertical"></i></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="{{ route('dashboard.clients.edit', $client->slug) }}">
-                                                    <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                    <span>Edit</span>
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $client?->id }}')">
-                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                    <span>Delete</span>
-                                                </a>
-                                            </div>
+                                            @can('edit_clients', 'delete_clients')
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
+                                                    <span wire:ignore><i data-feather="more-vertical"></i></span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    @can('edit_clients')
+                                                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.clients.edit', $client->slug) }}">
+                                                            <span wire:ignore>
+                                                                <i data-feather="edit-2" class="me-50"></i>
+                                                            </span>
+                                                            <span>Edit</span>
+                                                        </x-anchor-tag>
+                                                    @endcan
+                                                    @can('delete_clients')
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);"
+                                                            wire:click="deleteConfirmation('{{ $client?->id }}')">
+                                                            <span wire:ignore>
+                                                                <i data-feather="trash" class="me-50"></i>
+                                                            </span>
+                                                            <span>Delete</span>
+                                                        </x-anchor-tag>
+                                                    @endcan
+                                                </div>
+                                            @else
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                        data-bs-toggle="dropdown">
+                                                    <span wire:ignore.>
+                                                        <i data-feather='lock'></i>
+                                                    </span>
+                                                </button>
+                                            @endcan
                                         </div>
                                     </td>
                                 </tr>

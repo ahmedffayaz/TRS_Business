@@ -108,9 +108,11 @@
                         <a class="dropdown-item" href="{{ route('dashboard.update-password') }}"><i class="me-50" data-feather="key"></i> Change Password</a>
                         <div class="dropdown-divider"></div>
                         <a class="dropdown-item" href="{{ route('dashboard.system-setting') }}"><i class="me-50" data-feather="settings"></i> Settings</a>
-                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
-                            <i class="me-50" data-feather='edit'></i>Add Business
-                        </x-anchor-tag>
+                        @can('add_businesses')
+                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
+                                <i class="me-50" data-feather='edit'></i>Add Business
+                            </x-anchor-tag>
+                        @endcan
                         <a class="dropdown-item" href="{{ route('dashboard.user-contracts') }}"><i class="me-50" data-feather="file"></i> My Contracts</a>
                         <form class="border-0 m-0 p-0" action="{{ route('logout') }}" method="POST">
                             @csrf

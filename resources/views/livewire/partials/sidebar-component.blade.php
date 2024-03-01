@@ -27,12 +27,14 @@
                         <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
                     </x-anchor-tag>
                 </x-nav>
-                <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
-                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
-                        <i data-feather="user-check"></i>
-                        <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
-                    </x-anchor-tag>
-                </x-nav>
+                @can('view_clients')
+                    <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
+                            <i data-feather="user-check"></i>
+                            <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 <x-nav class="{{ request()->routeIs('dashboard.employees') ? 'active' : '' }} nav-item">
                     <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.employees') }}">
                         <i data-feather="users"></i>
@@ -101,20 +103,22 @@
                         <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
                     </a>
                 </li>
-                <x-nav class="nav-itme">
-                    <x-anchor-tag class="d-flex align-items-center" href="#">
-                        <i data-feather='aperture'></i>
-                        <span class="menu-title text-truncate" data-i18n="Business Settings">Business Settings</span>
-                    </x-anchor-tag>
-                    <ul class="menu-content">
-                        <x-nav>
-                            <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
-                                <i data-feather="settings"></i>
-                                <span class="menu-title text-truncate" data-i18n="Settings">Edit Business</span>
-                            </x-anchor-tag>
-                        </x-nav>
-                    </ul>
-                </x-nav>
+                @can('edit_businesses')
+                    <x-nav class="nav-itme">
+                        <x-anchor-tag class="d-flex align-items-center" href="#">
+                            <i data-feather='aperture'></i>
+                            <span class="menu-title text-truncate" data-i18n="Business Settings">Business Settings</span>
+                        </x-anchor-tag>
+                        <ul class="menu-content">
+                            <x-nav>
+                                <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
+                                    <i data-feather="settings"></i>
+                                    <span class="menu-title text-truncate" data-i18n="Settings">Edit Business</span>
+                                </x-anchor-tag>
+                            </x-nav>
+                        </ul>
+                    </x-nav>
+                @endcan
             </ul>
         </div>
     </div>
