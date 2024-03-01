@@ -39,6 +39,7 @@
                             <th>Name</th>
                             <th>Country</th>
                             <th>Under Business</th>
+                            <th>Employees</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -46,12 +47,19 @@
                         @isset($clients)
                             @foreach ($clients as $client)
                                 <tr>
-                                    <td>{{ $client?->name }}</td>
+                                    <td>
+                                        <x-anchor-tag href="javascript:void(0)"
+                                            wire:click="show('{{ $client?->slug }}')"
+                                        >{{ $client?->name }}</x-anchor-tag>
+                                    </td>
                                     <td>
                                         {{ $client?->country?->name }}
                                     </td>
                                     <td>
                                         {{ $client?->business?->name }}
+                                    </td>
+                                    <td>
+                                        <span class="badge rounded-pill badge-light-primary">{{ $client?->employees_count }}</span>
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -97,4 +105,53 @@
             </div>
         </div>
     </div>
+
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeMainModal">
+        <div class="mb-2">
+            <h1 class="mb-1">{{ $clientDetail?->name . ' Details' }}</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Business:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->business?->name }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Client:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->name }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Address:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->address }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">City:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->city }}</dd>
+                </dl>
+            </div>
+            <div class="col-md-6">
+                <dl class="row">
+                    <dt class="col-sm-4">Country:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->country?->name }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-4">Postal Code:</dt>
+                    <dd class="col-sm-8">{{ $clientDetail?->postal_code }}</dd>
+                </dl>
+
+                <dl class="row">
+                    <dt class="col-sm-6">Rate Per Hour:</dt>
+                    <dd class="col-sm-6">{{ $clientDetail?->rate_per_hour }}</dd>
+                </dl>
+                <dl class="row">
+                    <dt class="col-sm-6">Rate Per Hour Unit:</dt>
+                    <dd class="col-sm-6">{{ $clientDetail?->rate_unit }}</dd>
+                </dl>
+            </div>
+        </div>
+    </x-main-modal>
 </div>
