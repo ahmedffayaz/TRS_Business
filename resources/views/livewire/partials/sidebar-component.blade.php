@@ -97,12 +97,14 @@
                         </li>
                     </ul>
                 </li>
-                <li class=" nav-item">
-                    <a class="d-flex align-items-center" href="{{ route('dashboard.system-setting') }}">
-                        <i data-feather="settings"></i>
-                        <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
-                    </a>
-                </li>
+                @can('edit_systems')
+                    <x-nav class="nav-itme">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.system-setting') }}">
+                            <i data-feather="settings"></i>
+                            <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 @can('edit_businesses')
                     <x-nav class="nav-itme">
                         <x-anchor-tag class="d-flex align-items-center" href="#">

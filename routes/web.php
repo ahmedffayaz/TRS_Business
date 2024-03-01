@@ -89,7 +89,7 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
         Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
-        Route::get('/system-setting', SettingComponent::class)->name('system-setting');
+        Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
     });
 });
 
