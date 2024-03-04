@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('dashboard'))
 <div>
     <div class="content-header row">
     </div>
