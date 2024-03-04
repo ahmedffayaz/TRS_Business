@@ -93,11 +93,11 @@ class EditBusinessComponent extends Component
             if (!empty($this->form->favicon))
                 $this->form->favicon = '';
 
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business updated successfully!']);
             // Reset form fields
             $this->resetValidation();
             session()->forget('business');
             session(['business' => $business->name]);
+            session()->flash('success', 'Business updated successfully.');
             redirect()->route('dashboard.businesses.edit', $business->slug);
         } catch (Exception $exception) {
             DB::rollBack();
