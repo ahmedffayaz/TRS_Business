@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('system_settings'))
 <section id="basic-horizontal-layouts">
     <div class="row">
         <div class="col-md-12 col-12">

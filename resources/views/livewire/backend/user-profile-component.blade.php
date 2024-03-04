@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('user_profile'))
 <section id="basic-horizontal-layouts">
     <div class="row">
         <div class="col-md-12">

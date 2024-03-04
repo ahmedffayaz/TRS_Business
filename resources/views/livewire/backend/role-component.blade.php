@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('roles'))
 <div>
     <div class="row">
         @foreach ($recentRoles as $recentRole)

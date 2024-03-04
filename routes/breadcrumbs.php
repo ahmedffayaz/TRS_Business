@@ -1,107 +1,105 @@
-<?php
+<?php // routes/breadcrumbs.php
 
-use Illuminate\Http\Request;
-use WireUi\Breadcrumbs\Breadcrumbs;
-use WireUi\Breadcrumbs\Trail;
+// Note: Laravel will automatically resolve `Breadcrumbs::` without
+// this import. This is nice for IDE syntax and refactoring.
+use App\Models\User;
+use App\Models\Client;
+// This import is also not required, and you could replace `BreadcrumbTrail $trail`
+//  with `$trail`. This is nice for IDE type checking and completion.
+use App\Models\Business;
+use Diglactic\Breadcrumbs\Breadcrumbs;
+use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
-use function PHPUnit\Framework\callback;
+// Home
+Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
+    $trail->push('Dashboard', route('dashboard'));
+});
 
-Breadcrumbs::for('dashboard')
-    ->push('Dashboard')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Dashboard');
-    });
+// Roles
+Breadcrumbs::for('roles', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Roles', route('dashboard.roles'));
+});
 
-Breadcrumbs::for('dashboard.roles')
-    ->push('Dashboard', route('dashboard'))
-    ->push('User Roles')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('User Roles');
-    });
+// Permissions
+Breadcrumbs::for('permissions', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Permissions', route('dashboard.permissions'));
+});
 
-Breadcrumbs::for('dashboard.permissions')
-    ->push('Dashboard', route('dashboard'))
-    ->push('User Permissions')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('User Permissions');
-    });
+// System Settings
+Breadcrumbs::for('system_settings', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('System Settings', route('dashboard.system-setting'));
+});
 
-Breadcrumbs::for('dashboard.system-setting')
-    ->push('Dashboard', route('dashboard'))
-    ->push('System Settings')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('System Settings');
-    });
+// Businesses
+Breadcrumbs::for('business_create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Add Business', route('dashboard.businesses.create'));
+});
 
-Breadcrumbs::for('dashboard.businesses.create')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Add Business')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Add Business');
-    });
+Breadcrumbs::for('business_edit', function (BreadcrumbTrail $trail, Business $business) {
+    $trail->parent('dashboard');
+    $trail->push('Edit Business', route('dashboard.businesses.edit', $business->slug));
+});
 
-Breadcrumbs::for('dashboard.businesses.edit')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Edit Business')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Edit Business');
-    });
+// Clients
+Breadcrumbs::for('clients', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Clients', route('dashboard.clients.index'));
+});
 
-Breadcrumbs::for('dashboard.clients.index')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Clients')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Clients');
-    });
+Breadcrumbs::for('clients_create', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Clients', route('dashboard.clients.index'));
+    $trail->push('Add Client', route('dashboard.clients.create'));
+});
 
-Breadcrumbs::for('dashboard.clients.create')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Clients', route('dashboard.clients.index'))
-    ->push('Add Client')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Add Client');
-    });
+Breadcrumbs::for('clients_edit', function (BreadcrumbTrail $trail, Client $client) {
+    $trail->parent('dashboard');
+    $trail->push('Clients', route('dashboard.clients.index'));
+    $trail->push('Edit Client', route('dashboard.clients.edit', $client->slug));
+});
 
-Breadcrumbs::for('dashboard.clients.edit')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Clients', route('dashboard.clients.index'))
-    ->push('Edit Client')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Edit Client');
-    });
+// Employeed
+Breadcrumbs::for('employees', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Employees', route('dashboard.employees'));
+});
 
-Breadcrumbs::for('dashboard.employees')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Employees')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Employees');
-    });
+// Projects
+Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Projects', route('dashboard.projects'));
+});
 
-Breadcrumbs::for('dashboard.projects')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Projects')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Projects');
-    });
+// User Contracts
+Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Contracts', route('dashboard.user-contracts'));
+});
 
-Breadcrumbs::for('dashboard.user-contracts')
-    ->push('Dashboard', route('dashboard'))
-    ->push('User Terms & Conditions')
-    ->callback(function (Trail $trail, Request $request): Trail {
-        return $trail->push('Terms & Conditions');
-    });
+// User Profile
+Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Profile Detail', route('dashboard.profile.edit'));
+});
 
-Breadcrumbs::for('dashboard.knowledgebase.index')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Knowledge Base')
-    ->callback(function (Trail $trail, Request $request) : Trail {
-        return $trail->push('Knowledge Base');
-    });
+// User Profile
+Breadcrumbs::for('update_password', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Update Password', route('dashboard.update-password'));
+});
 
-Breadcrumbs::for('dashboard.knowledgebase.search-keyword')
-    ->push('Dashboard', route('dashboard'))
-    ->push('Knowledge Base', route('dashboard.knowledgebase.index'))
-    ->push('Search Knowledge Base')
-    ->callback(function (Trail $trail, Request $request) : Trail {
-        return $trail->push('Search Knowledge Base');
-    });
+// Knowledge base
+Breadcrumbs::for('knowledge_base', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Knowledge Base', route('dashboard.knowledgebase.index'));
+});
+
+Breadcrumbs::for('knowledge_base_keyword', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Knowledge Base', route('dashboard.knowledgebase.index'));
+    $trail->push('Search Knowledge Base');
+});

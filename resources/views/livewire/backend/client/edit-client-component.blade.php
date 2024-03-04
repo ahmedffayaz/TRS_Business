@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('clients_edit', $client))
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">Edit</h4>
