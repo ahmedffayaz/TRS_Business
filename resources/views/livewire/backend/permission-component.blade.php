@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('permissions'))
 <div>
     <div class="card">
         <div class="card-body  py-1 my-25">

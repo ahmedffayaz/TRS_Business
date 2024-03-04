@@ -1,3 +1,4 @@
+@section('breadcrumbs', Breadcrumbs::render('projects'))
 <div class="card">
     <div class="card-header">
         <h4 class="card-title">Projects</h4>
