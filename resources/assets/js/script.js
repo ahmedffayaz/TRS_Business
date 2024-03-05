@@ -122,9 +122,26 @@ document.addEventListener("livewire:initialized", () => {
         });
     });
 
-    Livewire.on('editor-value-set', function (data) { alert('ds');
+    Livewire.on('editor-value-set', function (data) {
         // Populate hidden form field with Quill editor content
         let desc = document.querySelector('input[name=description]'); console.log(desc);
         desc.value = quill.root.innerHTML; console.log(desc.value);
     });
+
+    Livewire.on('initialize-markup-editor', function (data) {
+        var converter = new Showdown.Converter();
+        var mte = new MTE(document.getElementsByTagName('textarea')[0]);
+
+        // Store converter in a data attribute for later access
+        // let textarea = data['textarea'];
+        $('textarea[name="'+data['textarea']+'"').data('converter', converter);
+
+        $('.fa-header').addClass('fa-heading');
+    });
+
+    Livewire.on('markup-editor-change', function (data) {
+        // Retrieve converter from the textarea's data attribute
+        var converter = $('textarea[name="'+data['textarea']+'"').data('converter');
+        $('.markup-preview').html(converter.makeHtml(data['value']));
+    })
 });

@@ -43,12 +43,12 @@ use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
-use App\Livewire\Backend\UserTermsConditionComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
+use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 
 Route::middleware(['guest'])->group(function () {
@@ -79,6 +79,9 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
             Route::get('/', KnowledgeBaseComponent::class)->name('index');
             Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
         });
+        Route::prefix('terms-conditions')->name('terms-conditions.')->group(function () {
+            Route::get('/', TermsConditionComponent::class)->name('index');
+        });
         Route::get('/companies', CompanyComponent::class)->name('companies');
         Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -88,7 +91,6 @@ Route::middleware(['auth', 'user-account-type'])->group(function () {
         Route::get('/roles', RoleComponent::class)->name('roles');
         Route::get('/permissions', PermissionComponent::class)->name('permissions');
         Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
-        Route::get('/user-contracts', UserTermsConditionComponent::class)->name('user-contracts');
         Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
     });
 });

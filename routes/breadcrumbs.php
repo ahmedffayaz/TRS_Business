@@ -75,9 +75,9 @@ Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
 });
 
 // User Contracts
-Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('terms_conditions', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('User Contracts', route('dashboard.user-contracts'));
+    $trail->push('Terms & Conditions', route('dashboard.terms-conditions.index'));
 });
 
 // User Profile

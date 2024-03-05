@@ -59,12 +59,14 @@
                         <span class="menu-title text-truncate" data-i18n="Invoices">Invoices</span>
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('dashboard.user-contracts') ? 'active' : '' }} nav-item">
-                    <a class="d-flex align-items-center" href="{{ route('dashboard.user-contracts') }}">
-                        <i data-feather="file"></i>
-                        <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
-                    </a>
-                </li>
+                @can('view_terms_conditions')
+                    <x-nav class="{{ request()->routeIs('dashboard.terms-conditions.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.terms-conditions.index') }}">
+                            <i data-feather='copy'></i>
+                            <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 @can('view_knowledgeBase')
                     <x-nav class="{{ request()->routeIs('dashboard.knowledge-bases.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">

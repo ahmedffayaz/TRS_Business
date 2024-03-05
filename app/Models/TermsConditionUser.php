@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class TermConditionUser extends Model
+class TermsConditionUser extends Model
 {
     protected $fillable =
     [
@@ -15,9 +15,8 @@ class TermConditionUser extends Model
         'pdf_url',
     ];
 
-    public function contract()
+    public function termsCondition()
     {
         return $this->belongsTo(TermsCondition::class);
     }
 }
-    

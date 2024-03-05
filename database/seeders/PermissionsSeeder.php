@@ -76,10 +76,11 @@ class PermissionsSeeder extends Seeder
 	    Permission::create(['group' => 'comment', 'name' => 'edit_comments', 'title' => 'Edit comments']);
 	    Permission::create(['group' => 'comment', 'name' => 'delete_comments', 'title' => 'Delete comments']);
 		// Contract Types
-	    Permission::create(['group' => 'contracts', 'name' => 'add_contracts', 'title' => 'Add contracts']);
-	    Permission::create(['group' => 'contracts', 'name' => 'edit_contracts', 'title' => 'Edit contracts']);
-	    Permission::create(['group' => 'contracts', 'name' => 'view_contracts', 'title' => 'View contracts']);
-		Permission::create(['group' => 'contracts', 'name' => 'download_contracts', 'title' => 'download contract types'
+	    Permission::create(['group' => 'terms_conditions', 'name' => 'add_terms_conditions', 'title' => 'Add terms & conditions']);
+	    Permission::create(['group' => 'terms_conditions', 'name' => 'edit_terms_conditions', 'title' => 'Edit terms & conditions']);
+	    Permission::create(['group' => 'terms_conditions', 'name' => 'view_terms_conditions', 'title' => 'View terms & conditions']);
+	    Permission::create(['group' => 'terms_conditions', 'name' => 'delete_terms_conditions', 'title' => 'Delete terms & conditions']);
+		Permission::create(['group' => 'terms_conditions', 'name' => 'download_terms_conditions', 'title' => 'download terms and conditions types'
 		]);
 	    // Invoices
 	    Permission::create(['group' => 'invoice', 'name' => 'add_invoices', 'title' => 'Generate invoices']);
