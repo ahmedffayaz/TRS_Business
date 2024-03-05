@@ -72,7 +72,7 @@
     <div class="row mb-1">
         <div class="col-md-6 pe-md-1">
             <x-input-label class="required" for="postal_code" value="Postal Code" />
-            <x-input type="number" name="postal_code" id="postal_code"
+            <x-input type="text" name="postal_code" id="postal_code"
                 :class="$errors->has('form.postal_code') ? 'error' : ''"
                 placeholder="Enter postal code" wire:model="form.postal_code" />
             @error('form.postal_code')
@@ -124,7 +124,7 @@
             <div class="d-flex">
                 <a href="#" class="me-25">
                     <img src="{{ $form->favicon ? $form?->favicon?->temporaryUrl()
-                        : ($businessFavicon ? asset('storage/' . $businessFavicon) : asset($logoImage)) }}" id="favicon-img" class="uploadedAvatar rounded me-50"
+                        : (isset($businessFavicon) && $businessFavicon ? asset('storage/' . $businessFavicon) : asset($logoImage)) }}" id="favicon-img" class="uploadedAvatar rounded me-50"
                     alt="Business favicon" height="100" width="100">
                 </a>
                 <div class="d-flex align-items-end mt-75 ms-1">
@@ -144,7 +144,7 @@
             <div class="d-flex">
                 <a href="#" class="me-25">
                     <img src="{{ $form->logo ? $form?->logo?->temporaryUrl()
-                        : ($businessLogo ? asset('storage/' . $businessLogo) : asset($logoImage)) }}" id="logo-img" class="uploadedAvatar rounded me-50"
+                        : (isset($businessLogo) && $businessLogo ? asset('storage/' . $businessLogo) : asset($logoImage)) }}" id="logo-img" class="uploadedAvatar rounded me-50"
                     alt="Business logo" height="100" width="100">
                 </a>
                 <div class="d-flex align-items-end mt-75 ms-1">
