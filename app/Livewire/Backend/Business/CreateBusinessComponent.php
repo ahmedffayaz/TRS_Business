@@ -76,13 +76,8 @@ class CreateBusinessComponent extends Component
             if (!empty($this->form->favicon))
                 $this->form->favicon = '';
 
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Business added successfully!']);
-            // Reset form fields
-            $this->form->reset();
-            $this->resetValidation();
-            $this->dispatch('roles-select', ['formRoles' => []]);
-            $this->dispatch('country-select', ['formCountry' => []]);
-            $this->dispatch('date-format-select', ['formDateFormat' => []]);
+            session()->flash('success', 'Business added successfully.');
+            return redirect()->route('dashboard.businesses.create');
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while adding business: ' . $exception->getMessage());
