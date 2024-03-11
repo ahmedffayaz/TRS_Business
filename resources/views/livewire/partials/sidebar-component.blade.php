@@ -3,9 +3,9 @@
         <div class="navbar-header">
             <ul class="nav navbar-nav flex-row">
                 <li class="nav-item me-auto">
-                    <a class="navbar-brand" href="{{ route('dashboard') }}">
+                    <a class="navbar-brand" href="{{ route('dashboard.home') }}">
                         <span class="brand-logo">
-                            <img src="{{ $business->logo ? asset('storage/' . $business->logo) : asset('trs_logo.svg') }}" alt="" height="40">
+                            <img src="{{ !empty($business->logo) ? asset('storage/' . $business->logo) : asset('trs_logo.svg') }}" alt="" height="40">
                         </span>
                         <h2 class="brand-text">TRS/DEV CMS</h2>
                     </a>
@@ -21,7 +21,7 @@
         <div class="shadow-bottom"></div>
         <div class="main-menu-content">
             <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-                <x-nav class="{{ request()->routeIs('dashboard') ? 'active' : '' }} nav-item">
+                <x-nav class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }} nav-item">
                     <x-anchor-tag class="d-flex align-items-center" href="{{ url('dashboard') }}">
                         <i data-feather="home"></i>
                         <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
@@ -59,12 +59,14 @@
                         <span class="menu-title text-truncate" data-i18n="Invoices">Invoices</span>
                     </a>
                 </li>
-                <li class="{{ request()->routeIs('dashboard.user-contracts') ? 'active' : '' }} nav-item">
-                    <a class="d-flex align-items-center" href="{{ route('dashboard.user-contracts') }}">
-                        <i data-feather="file"></i>
-                        <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
-                    </a>
-                </li>
+                @can('view_terms_conditions')
+                    <x-nav class="{{ request()->routeIs('dashboard.terms-conditions.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.terms-conditions.index') }}">
+                            <i data-feather='copy'></i>
+                            <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 @can('view_knowledgeBase')
                     <x-nav class="{{ request()->routeIs('dashboard.knowledge-bases.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">

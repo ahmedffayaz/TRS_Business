@@ -96,7 +96,7 @@ class TasksController extends Controller
         }
         catch (Exception $exception) {
             flash()->error($exception->getMessage());
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard.home');
         }
 
     }

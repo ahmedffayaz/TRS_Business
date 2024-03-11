@@ -8,7 +8,7 @@ use App\Enums\User\AccountType;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
-class VerifyUserAccounttype
+class VerifyUserAccountType
 {
     /**
      * Handle an incoming request.
@@ -23,7 +23,7 @@ class VerifyUserAccounttype
         } else if ($user->account_type === AccountType::CLIENT->value) {
             $userBusiness = $user->client->business;
             session(['business' => $userBusiness->name]);
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard.home');
         }
 
         return $next($request);

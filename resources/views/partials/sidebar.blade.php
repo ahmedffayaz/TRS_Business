@@ -20,7 +20,7 @@
     <div class="shadow-bottom"></div>
     <div class="main-menu-content">
         <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-            <x-nav class="{{ request()->routeIs('dashboard') ? 'active' : '' }} nav-item">
+            <x-nav class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }} nav-item">
                 <x-anchor-tag class="d-flex align-items-center" href="{{ url('dashboard') }}">
                     <i data-feather="home"></i>
                     <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
