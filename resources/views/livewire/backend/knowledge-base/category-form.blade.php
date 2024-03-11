@@ -22,6 +22,7 @@
                     :class="$errors->has('categoryForm.roles') ? 'error select2' : 'select2'"
                     wire:model="categoryForm.roles">
                     @isset($roles)
+                        <option value="" selected disabled>--Select Role--</option>
                         @foreach ($roles as $role)
                             <option value="{{ $role?->id }}">{{ $role?->title }}</option>
                         @endforeach

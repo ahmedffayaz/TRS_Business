@@ -18,7 +18,7 @@ class HeaderComponent extends Component
     {
         session()->forget('business');
         $this->getBusinesses();
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard.home');
     }
 
     private function getBusinesses()
@@ -52,11 +52,6 @@ class HeaderComponent extends Component
         }
         return $this->businesses;
     }
-
-    // private function businessIdSet()
-    // {
-    //     $this->businessId =
-    // }
 
     public function render()
     {

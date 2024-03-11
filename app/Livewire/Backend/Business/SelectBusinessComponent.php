@@ -41,6 +41,6 @@ class SelectBusinessComponent extends Component
     {
         session(['business' => $name]);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard.home');
     }
 }

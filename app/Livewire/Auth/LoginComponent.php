@@ -26,7 +26,7 @@ class LoginComponent extends Component
         $validated = $this->form->validate();
         if (Auth::attempt($validated, $this->remember)) {
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Login successfully.']);
-            return redirect()->route('dashboard');
+            return redirect()->route('dashboard.home');
         } else {
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Invalid credentials.']);
             session()->flash('error', 'Invalid credentials');

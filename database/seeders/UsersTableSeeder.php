@@ -25,7 +25,7 @@ class UsersTableSeeder extends Seeder
             'email_verified_at' => now(),
             'designation' => 'CEO',
             'phone' => '+17026723124',
-            'password' => 'admin',
+            'password' => 'password',
 			'address' => 'Islamabad',
             'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
@@ -40,12 +40,12 @@ class UsersTableSeeder extends Seeder
             'email_verified_at' => now(),
             'designation' => 'Admin',
             'phone' => '+17026723124',
-            'password' => 'admin',
+            'password' => 'password',
 			'address' => 'Islamabad',
             'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
             'account_type' => AccountType::BUSINESS->value,
-            'client_id' => null
+            'client_id' => 2
 		])->assignRole('admin');
 
 		UserFactory::new()->count(10)->create()->each(function ($user) {
