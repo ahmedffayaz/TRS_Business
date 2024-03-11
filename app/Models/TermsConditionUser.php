@@ -9,10 +9,10 @@ class TermsConditionUser extends Model
     protected $fillable =
     [
         'user_id',
-        'contract_id',
+        'terms_condition_id',
         'uuid',
         'signature_url',
-        'pdf_url',
+        'pdf_url'
     ];
 
     public function termsCondition()

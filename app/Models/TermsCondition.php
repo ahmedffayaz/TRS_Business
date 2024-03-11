@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\TermsConditionUser;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TermsCondition extends Model
 {
-   protected $fillable =
+    protected $fillable =
     [
         'uuid',
         'title',
@@ -18,11 +20,12 @@ class TermsCondition extends Model
         'updated_by',
     ];
 
-    public function scopeGetList($query, $search, $columnName, $sortDirection) {
+    public function scopeGetList($query, $search, $columnName, $sortDirection)
+    {
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('title', 'LIKE', '%' . $search . '%')
-                ->orWhere('description', 'LIKE', '%' . $search . '%');
+                    ->orWhere('description', 'LIKE', '%' . $search . '%');
             });
         }
 
@@ -36,22 +39,27 @@ class TermsCondition extends Model
         });
     }
 
-      public function roles()
-      {
-         return $this->belongsToMany(Role::class);
-      }
-      public function createdByUser()
-      {
-          return $this->belongsTo(User::class, 'created_by');
-      }
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+    public function createdByUser()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
 
-      public function updatedByUser()
-      {
-          return $this->belongsTo(User::class, 'updated_by');
-      }
+    public function updatedByUser()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
+    }
 
-      public function business() : BelongsTo
-      {
-          return $this->belongsTo(Business::class);
-      }
+    public function business(): BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    public function termsConditionUsers(): HasMany
+    {
+        return $this->hasMany(TermsConditionUser::class, 'terms_condition_id');
+    }
 }

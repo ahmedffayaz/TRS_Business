@@ -12,7 +12,7 @@ use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 // Home
 Breadcrumbs::for('dashboard', function (BreadcrumbTrail $trail) {
-    $trail->push('Dashboard', route('dashboard'));
+    $trail->push('Dashboard', route('dashboard.home'));
 });
 
 // Roles

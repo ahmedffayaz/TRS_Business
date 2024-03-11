@@ -50,6 +50,7 @@ use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -58,40 +59,43 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
-Route::get('/dashboard', DashboardComponent::class)->middleware(['auth', 'verified', 'user-account-type'])->name('dashboard');
 Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
-Route::middleware(['auth', 'user-account-type'])->group(function () {
+Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
     Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
-        Route::prefix('businesses')->name('businesses.')->middleware('permission:add_businesses|edit_businesses')->group(function () {
-            Route::get('create', CreateBusinessComponent::class)->name('create')->middleware('permission:add_businesses');
-            Route::get('edit/{slug}', EditBusinessComponent::class)->name('edit')->middleware('permission:edit_businesses');
+        Route::middleware(['terms.acceptance'])->group(function () {
+            Route::get('/', DashboardComponent::class)->name('home');
+            Route::prefix('businesses')->name('businesses.')->middleware('permission:add_businesses|edit_businesses')->group(function () {
+                Route::get('create', CreateBusinessComponent::class)->name('create')->middleware('permission:add_businesses');
+                Route::get('edit/{slug}', EditBusinessComponent::class)->name('edit')->middleware('permission:edit_businesses');
+            });
+            Route::prefix('clients')->name('clients.')->middleware('permission:view_clients|add_clients|edit_clients')->group(function () {
+                Route::get('/', ClientComponent::class)->name('index');
+                Route::get('add-user-fields', [ClientComponent::class, 'addUserFields'])->name('add-user-fields');
+                Route::get('create', CreateClientComponent::class)->name('create')->middleware('permission:add_clients');
+                Route::get('edit/{slug}', EditClientComponent::class)->name('edit')->middleware('permission:edit_clients');
+            });
+            Route::prefix('knowledgebase')->name('knowledgebase.')->middleware('permission:view_knowledgeBase')->group(function () {
+                Route::get('/', KnowledgeBaseComponent::class)->name('index');
+                Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
+            });
+            Route::prefix('terms-conditions')->name('terms-conditions.')->group(function () {
+                Route::get('/', TermsConditionComponent::class)->name('index');
+            });
+            Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
+            Route::get('/companies', CompanyComponent::class)->name('companies');
+            Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+            Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+            Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+            Route::get('/employees', UserComponent::class)->name('employees');
+            Route::get('projects', ProjectComponent::class)->name('projects');
+            Route::get('/roles', RoleComponent::class)->name('roles');
+            Route::get('/permissions', PermissionComponent::class)->name('permissions');
+            Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
+            Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
         });
-        Route::prefix('clients')->name('clients.')->middleware('permission:view_clients|add_clients|edit_clients')->group(function () {
-            Route::get('/', ClientComponent::class)->name('index');
-            Route::get('add-user-fields', [ClientComponent::class, 'addUserFields'])->name('add-user-fields');
-            Route::get('create', CreateClientComponent::class)->name('create')->middleware('permission:add_clients');
-            Route::get('edit/{slug}', EditClientComponent::class)->name('edit')->middleware('permission:edit_clients');
-        });
-        Route::prefix('knowledgebase')->name('knowledgebase.')->middleware('permission:view_knowledgeBase')->group(function () {
-            Route::get('/', KnowledgeBaseComponent::class)->name('index');
-            Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
-        });
-        Route::prefix('terms-conditions')->name('terms-conditions.')->group(function () {
-            Route::get('/', TermsConditionComponent::class)->name('index');
-        });
-        Route::get('/companies', CompanyComponent::class)->name('companies');
-        Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-        Route::get('/employees', UserComponent::class)->name('employees');
-        Route::get('projects', ProjectComponent::class)->name('projects');
-        Route::get('/roles', RoleComponent::class)->name('roles');
-        Route::get('/permissions', PermissionComponent::class)->name('permissions');
-        Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
-        Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
     });
 });
 
