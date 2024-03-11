@@ -114,12 +114,12 @@
                         @endcan
                         @can('add_businesses')
                             <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
-                                <i class="me-50" data-feather='edit'></i>Add Business
+                                <i class="me-50" data-feather="edit"></i> Add Business
                             </x-anchor-tag>
                         @endcan
-                        @can('view_terms_conditions')
-                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.terms-conditions.index') }}">
-                                <i clas="me-50" data-feather='copy'></i> My Contracts
+                        @can('view_contracts')
+                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.contracts') }}">
+                                <i class="me-50" data-feather="copy"></i> My Contracts
                             </x-anchor-tag>
                         @endcan
                         <form class="border-0 m-0 p-0" action="{{ route('logout') }}" method="POST">

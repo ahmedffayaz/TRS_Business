@@ -139,25 +139,30 @@
 
     {{-- footer --}}
     <footer class="footer footer-static footer-light">
-        <p class="clearfix mb-0"><span class="float-md-start d-block d-md-inline-block mt-25">COPYRIGHT &copy; 2023 A Project by <a class="ms-25" href="#" target="_blank">The Right Software</a><span class="d-none d-sm-inline-block"><i data-feather="heart"></i></span></p>
+        <div style="width: 100%;">
+            <div style="margin-left: 83%; margin-top:-100px;">
+                @php
+                    $src = '';
+                    if (!empty($termsConditionUser->signature_url) && Storage::disk('public')->has('user-terms-conditions/' . $termsConditionUser->signature_url)) {
+                        $sign = explode('.', $termsConditionUser->signature_url);
+                        $ext = end($sign);
+                        $baseEnCodeImage = base64_encode(Storage::disk('public')->get('user-terms-conditions/'. $termsConditionUser->signature_url));
+                        $src = "data:image/{$ext};base64,{$baseEnCodeImage}";
+                    }
+                @endphp
+                <img class="signature" height="90px" width="170px" src="{{ $src }}" alt="" />
+            </div>
+        </div>
+        <p class="clearfix mb-1"><span class="float-md-start d-block d-md-inline-block mt-25">© 2023, The Right Software, PVT Ltd. All rights reserved.</span></p>
     </footer>
-    {{-- <button class="btn btn-primary btn-icon scroll-top" type="button"><i data-feather="arrow-up"></i></button> --}}
 
     <main>
         <div style="margin-right: 15px; margin-left: 25px;">
-
             <div style="line-height: 1.6; margin-bottom:50px;">
                 <div style="margin-left: 50px; margin-left: 20px;text-transform:capitalize;">
-                    <h2 style=" text-align:center; font-weight:bold;">
-                        {!! $termsCondition->title . '[' . $termsCondition->version . ']' !!}</h2>
+                    <h2 style=" text-align:center; font-weight:bold;">{!! $termsCondition->title . '[' . $termsCondition->version . ']' !!}</h2>
                     {!! $termsCondition->description !!}
-                    <div style="margin-top: 30px;  text-align: right;" >
-                        <h5>
-                            {!! $name !!}
-                        </h5>
-                    </div>
                 </div>
-
             </div>
         </div>
     </main>

@@ -74,7 +74,7 @@ Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
     $trail->push('Projects', route('dashboard.projects'));
 });
 
-// User Contracts
+// Terms & Conditions
 Breadcrumbs::for('terms_conditions', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Terms & Conditions', route('dashboard.terms-conditions.index'));
@@ -90,6 +90,12 @@ Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('update_password', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Update Password', route('dashboard.update-password'));
+});
+
+Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Profile', route('user-profile'));
+    $trail->push('My Contracts', route('dashboard.users.contracts'));
 });
 
 // Knowledge base

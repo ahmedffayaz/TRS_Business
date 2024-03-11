@@ -14,7 +14,9 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Forms\TermsConditionAcceptForm;
+use Livewire\Attributes\Title;
 
+#[Title('Accept Terms & Conditions')]
 class TermsConditionAcceptComponent extends Component
 {
     use UserTermsCondition, WithFileUploads;
@@ -36,7 +38,7 @@ class TermsConditionAcceptComponent extends Component
 
         try {
             DB::beginTransaction();
-            $termsCondition = TermsCondition::findOrFail($id);
+            $termsCondition = TermsCondition::with('business')->findOrFail($id);
 
             $pdf = App::make('dompdf.wrapper');
             $pdf->setOptions(['isPhpEnabled' => true])->setPaper('a4', 'portrait');

@@ -17,10 +17,10 @@
 <div>
     <div class="card">
         <div class="card-body py-1 my-25">
-            <h1 class="card-title">{{ $termsConditions->title }}</h1>
+            <h1 class="card-title">{{ $termsConditions?->title }}</h1>
             <div class="row mb-2">
                 <div class="col-md-12 col-sm-6 ">
-                    {{$termsConditions->description}}
+                    {{$termsConditions?->description}}
                 </div>
             </div>
             <form wire:submit.prevent="acceptTerms('{{ $termsConditions?->id }}')">
@@ -44,7 +44,8 @@
                     <div class="col-md-12 col-sm-6 ">
                         <div class="demo-inline-spacing">
                             <div class="custom-control custom-checkbox">
-                                <x-input-checkbox type="checkbox" id="is_accept" name="is_accept" wire:model="form.is_accept"
+                                <x-input-checkbox type="checkbox" id="is_accept" name="is_accept"
+                                     wire:model="form.is_accept" statusClass="form-check-success"
                                     :class="$errors->has('form.is_accept') ? 'error' : ''"
                                     :value="__('Accept Terms & Conditions')" />
                                 @error('form.is_accept')

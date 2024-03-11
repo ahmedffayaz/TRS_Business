@@ -44,6 +44,8 @@ class PermissionsSeeder extends Seeder
 	    Permission::create(['group' => 'user', 'name' => 'edit_users', 'title' => 'Edit users']);
 	    Permission::create(['group' => 'user', 'name' => 'view_users', 'title' => 'View users']);
 	    Permission::create(['group' => 'user', 'name' => 'delete_users', 'title' => 'Delete users']);
+	    Permission::create(['group' => 'user', 'name' => 'view_contracts', 'title' => 'View contracts']);
+	    Permission::create(['group' => 'user', 'name' => 'download_contracts', 'title' => 'Download contracts']);
 	    // Settings
 	    Permission::create(['group' => 'settings', 'name' => 'manage_system_settings', 'title' => 'Manage system settings']);
 	    // Roles
@@ -113,7 +115,6 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'leave', 'name' => 'view_leaves', 'title' => 'View leave']);
         // project new field add
         Permission::create(['group' => 'project', 'name' => 'view_statistics', 'title' => 'View Statistics']);
-	    Permission::create(['group' => 'user', 'name' => 'view_user_contracts', 'title' => 'View Contracts']);
 		Permission::create(['group' => 'project', 'name' => 'view_associated_projects', 'title' => 'View Associated Projects']);
 		Permission::create(['group' => 'leave', 'name' => 'add_employees_leaves', 'title' => 'Add Employees Leaves']);
 

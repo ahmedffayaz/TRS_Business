@@ -21,7 +21,7 @@ class CheckForUnsignedUserTermsCondition
     {
         $user = request()->user();
 
-        if (!$this->user->hasRole('super-admin'))
+        if (!$this->user->hasRole('super-admin') && empty(session('business')))
             session(['business' => $this?->user?->client?->business?->name]);
 
         $hasTermsConditions = $this->getUserTermsRoles()->exists();
