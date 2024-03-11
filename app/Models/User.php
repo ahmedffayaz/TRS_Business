@@ -27,7 +27,9 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'alternative_email',
         'password',
+        'client_id',
         'account_type',
         'designation',
         'phone',
@@ -37,6 +39,7 @@ class User extends Authenticatable
         'alternative_number',
         'salary',
         'currency',
+        'is_active'
     ];
 
     /**

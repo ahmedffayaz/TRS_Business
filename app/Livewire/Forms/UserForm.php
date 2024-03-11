@@ -25,8 +25,9 @@ class UserForm extends Form
     public ?string $address;
     public ?string $phone;
     public ?string $alternative_number;
-    public ?string $company_id;
+    public ?string $client_id;
     public ?int $is_active;
+    public $roles = [];
 
     public function rules(): array
     {
@@ -44,8 +45,9 @@ class UserForm extends Form
             'address' => ['required', 'string'],
             'phone' => ['required', 'string', 'max:191'],
             'alternative_number' => ['nullable', 'string', 'unique:users,alternative_number,' . $this->id, 'max:191'],
-            'company_id' => ['required'],
-            'is_active' => ['required']
+            'client_id' => ['required'],
+            'is_active' => ['required'],
+            'roles' => 'required'
         ];
     }
 
@@ -65,8 +67,9 @@ class UserForm extends Form
             'address' => 'address',
             'phone' => 'phone',
             'alternative_number' => 'alternative_number',
-            'company_id' => 'company',
-            'is_active' => 'status'
+            'client_id' => 'client',
+            'is_active' => 'status',
+            'roles' => 'roles'
         ];
     }
 
@@ -82,7 +85,8 @@ class UserForm extends Form
         $this->address = $user?->address;
         $this->phone = $user?->phone;
         $this->alternative_number = $user?->alternative_number;
-        $this->company_id = $user?->company_id;
+        $this->client_id = $user?->client?->id;
         $this->is_active = $user?->is_active;
+        $this->roles = $user?->roles;
     }
 }

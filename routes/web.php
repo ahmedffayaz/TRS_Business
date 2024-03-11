@@ -3,7 +3,6 @@
 use App\Livewire\Auth\LoginComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
-use App\Livewire\Backend\UserComponent;
 use App\Livewire\Auth\RegisterComponent;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\TasksController;
@@ -20,7 +19,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-use App\Http\Controllers\CompaniesController;
+use App\Livewire\Backend\User\UserComponent;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,6 +32,7 @@ use App\Http\Controllers\CompaniesController;
 |
 */
 
+use App\Http\Controllers\CompaniesController;
 use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
@@ -43,15 +43,15 @@ use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
+use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
-use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
-use App\Livewire\Backend\User\UserContractComponent;
+use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -96,6 +96,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
+                Route::get('/', UserComponent::class)->name('index');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
                     ->name('contracts.view')->middleware('permission:view_contracts');
@@ -106,7 +107,6 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
             Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
             Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-            Route::get('/employees', UserComponent::class)->name('employees');
             Route::get('projects', ProjectComponent::class)->name('projects');
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('/permissions', PermissionComponent::class)->name('permissions');

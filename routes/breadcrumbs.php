@@ -63,9 +63,9 @@ Breadcrumbs::for('clients_edit', function (BreadcrumbTrail $trail, Client $clien
 });
 
 // Employeed
-Breadcrumbs::for('employees', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('users', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Employees', route('dashboard.employees'));
+    $trail->push('Users', route('dashboard.users.index'));
 });
 
 // Projects

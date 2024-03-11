@@ -35,12 +35,14 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                <x-nav class="{{ request()->routeIs('dashboard.employees') ? 'active' : '' }} nav-item">
-                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.employees') }}">
-                        <i data-feather="users"></i>
-                        <span class="menu-title text-truncate" data-i18n="Companies">Employees</span>
-                    </x-anchor-tag>
-                </x-nav>
+                @can('view_users')
+                    <x-nav class="{{ request()->routeIs('dashboard.users.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.users.index') }}">
+                            <i data-feather="users"></i>
+                            <span class="menu-title text-truncate" data-i18n="Companies">Users</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 <li class="{{ request()->routeIs('dashboard.projects') ? 'active' : '' }} nav-item">
                     <a class="d-flex align-items-center" href="{{ route('dashboard.projects') }}">
                         <i data-feather="file-text"></i>
