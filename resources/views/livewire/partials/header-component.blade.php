@@ -8,13 +8,15 @@
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
                 @if (! request()->routeIs('dashboard.businesses.select-business'))
-                    <x-nav class="nav-item header-select2">
-                        <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
-                            @foreach ($businesses as $key => $values)
-                                <option value="{{ $key }}">{{ $values }}</option>
-                            @endforeach
-                        </x-select-input>
-                    </x-nav>
+                    @if (count($business) > 0)
+                        <x-nav class="nav-item header-select2">
+                            <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
+                                @foreach ($businesses as $key => $values)
+                                    <option value="{{ $key }}">{{ $values }}</option>
+                                @endforeach
+                            </x-select-input>
+                        </x-nav>
+                    @endif
                 <li class="nav-item d-none d-lg-block"><a class="nav-link nav-link-style"><i class="ficon" data-feather="moon"></i></a></li>
                 <li class="nav-item dropdown dropdown-notification me-25">
                     <a class="nav-link" href="#" data-bs-toggle="dropdown">
