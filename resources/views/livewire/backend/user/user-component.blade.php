@@ -264,6 +264,12 @@
 @script
     <script>
         $(document).ready(function () {
+            // Reinitialize icons
+            Livewire.on('reinitialize-icons', () => {
+                Livewire.dispatch('feather-icons');
+            });
+
+            // Initialize select2
             Livewire.dispatch('select-container');
             Livewire.on('select-client', (data) => {
                 var $select = $('#client');

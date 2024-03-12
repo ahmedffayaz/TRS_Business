@@ -25,6 +25,13 @@ class LoginComponent extends Component
     {
         $validated = $this->form->validate();
         if (Auth::attempt($validated, $this->remember)) {
+            if (!auth()->user()->is_active) {
+                Auth::logout();
+                session()->forget('business');
+                session()->flash('error', 'Account not active, Please contact admin.');
+                $this->dispatch('alert', ['type' => 'error', 'message' => 'Account not active, Please contact admin.']);
+                return redirect()->to('/');
+            }
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Login successfully.']);
             return redirect()->route('dashboard.home');
         } else {

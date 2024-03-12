@@ -6,13 +6,11 @@ use Exception;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Client;
-use App\Models\Company;
 use Livewire\Component;
 use App\Models\Currency;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
-use App\Traits\WithOffcanvas;
 use App\Enums\User\UserStatus;
 use Livewire\Attributes\Title;
 use App\Livewire\Forms\UserForm;
@@ -25,7 +23,6 @@ use Illuminate\Support\Facades\Log;
 class UserComponent extends Component
 {
     use WithPagination, WithMainModal;
-    use WithOffcanvas;
 
     public string $search = '';
     public string $columnName = 'created_at';
@@ -44,9 +41,10 @@ class UserComponent extends Component
     {
         $currencies = Currency::get(['code']);
         $userStatuses = UserStatus::cases();
-        $clients = Client::all();
+        $clients = Client::sessionBusiness()->get();
         $roles = Role::all();
         $users = $this->getUsers();
+        $this->dispatch('reinitialize-icons');
         return view('livewire.backend.user.user-component', compact('currencies', 'userStatuses', 'clients', 'roles', 'users'));
     }
 
@@ -90,10 +88,11 @@ class UserComponent extends Component
 
             $this->closeModal();
 
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'User Created Successfully.']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'Sorry, the user could not be found in our database.']);
         } catch (Exception $exception) {
             DB::rollBack();
-            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+            Log::error('Get error while create user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
 
@@ -116,12 +115,12 @@ class UserComponent extends Component
             $this->openMainModal();
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
-            Log::error('Get error while create user: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+            Log::error('Get error while edit user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Sorry, the user could not be found in our database.']);
         } catch (Exception $exception) {
             DB::rollBack();
-            Log::error('Get error while create user: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+            Log::error('Get error while edit user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
 
@@ -156,15 +155,17 @@ class UserComponent extends Component
             DB::commit();
 
             $this->closeModal();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'User updated successfully.']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'User updated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while update user: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'Sorry, the user could not be found in our database.']);
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while update user: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
 
@@ -174,11 +175,15 @@ class UserComponent extends Component
             $user = User::findOrFail($id);
             $user->is_active = !$user->is_active;
             $user->update();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Status Changed Successfully!']);
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Status changed successfully!']);
         } catch (ModelNotFoundException $exception) {
-            session()->flash('error', 'Sorry, the user could not be found in our database.');
-        } catch (\Exception $exception) {
-            session()->flash('error', $exception->getMessage());
+            DB::rollBack();
+            Log::error('Get error while changing user status: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Sorry, the user could not be found in our database.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while changing user status: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
 
@@ -199,11 +204,15 @@ class UserComponent extends Component
         try {
             $user = User::findOrFail($id);
             $user->delete();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'User Deleted Successfully!']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'User deleted successfully.']);
         } catch (ModelNotFoundException $exception) {
-            session()->flash('error', 'Sorry, the user could not be found in our database.');
-        } catch (\Exception $exception) {
-            session()->flash('error', $exception->getMessage());
+            DB::rollBack();
+            Log::error('Get error while deleting user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Sorry, the user could not be found in our database.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while deleting user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
 }
