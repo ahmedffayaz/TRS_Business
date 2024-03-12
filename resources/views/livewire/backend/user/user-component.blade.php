@@ -18,6 +18,13 @@
                         aria-describedby="basic-addon-search2" />
                 </div>
             </div>
+            <div class="col-md-8 col-sm-12 text-end">
+                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'total')">Total <span class="badge rounded-pill bg-light-primary">{{ $totalUsers }}</span></x-anchor-tag>
+                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'active')">Active <span class="badge rounded-pill bg-light-primary">{{ $activeUsers }}</span></x-anchor-tag>
+                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'archived')">Archived <span class="badge rounded-pill bg-light-primary">{{ $archivedUsers }}</span></x-anchor-tag>
+                </div>
+            </div>
         </div>
 
         <div class="table-responsive">
@@ -63,6 +70,7 @@
                                 </td>
                                 <td>
                                     <div class="dropdown position-static">
+                                        @can('edit_clients', 'delete_users')
                                         <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
                                             <span wire:ignore><i data-feather="more-vertical">open</i></span>
                                         </button>
@@ -80,11 +88,14 @@
                                                     <span>Activate</span>
                                                 @endif
                                             </a>
-                                            <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
-                                                <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                <span>Delete</span>
-                                            </a>
+                                            @can('delete_users')
+                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
+                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                    <span>Delete</span>
+                                                </x-anchor-tag>
+                                            @endcan
                                         </div>
+                                        @endcan
                                     </div>
                                 </td>
                             </tr>

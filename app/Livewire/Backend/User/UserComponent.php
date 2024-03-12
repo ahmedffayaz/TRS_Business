@@ -28,13 +28,44 @@ class UserComponent extends Component
     public string $columnName = 'created_at';
     public string $sortDirection = 'desc';
     public int $limitPerPage = 10;
+    public string $userTypes = 'total'; // Default user type
     public UserForm $form;
 
-    private function getUsers(): LengthAwarePaginator
+    public function mount()
+    {
+        // Load total users by default when the component is mounted
+        $this->getTotalUsers();
+    }
+
+    private function getTotalUsers(): LengthAwarePaginator
+    {
+        $this->search ? $this->resetPage() : ''; // reset pagination while searching
+        return User::withTrashed()->getList($this->search, $this->columnName, $this->sortDirection)
+            ->paginate($this->limitPerPage);
+    }
+
+    private function getActiveUsers() : LengthAwarePaginator
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return User::getList($this->search, $this->columnName, $this->sortDirection)
             ->paginate($this->limitPerPage);
+    }
+
+    private function getArchivedUsers() : LengthAwarePaginator
+    {
+        $this->search ? $this->resetPage() : ''; // reset pagination while searching
+        return User::getList($this->search, $this->columnName, $this->sortDirection)
+            ->onlyTrashed()->paginate($this->limitPerPage);
+    }
+
+    public function getUsers()
+    {
+        if ($this->userTypes === 'total')
+            return $this->getTotalUsers();
+        else if ($this->userTypes === 'active')
+            return $this->getActiveUsers();
+        else if ($this->userTypes === 'archived')
+            return $this->getArchivedUsers();
     }
 
     public function render()
@@ -44,8 +75,11 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::all();
         $users = $this->getUsers();
+        $totalUsers = User::withTrashed()->count();
+        $activeUsers = User::count();
+        $archivedUsers = User::onlyTrashed()->count();
         $this->dispatch('reinitialize-icons');
-        return view('livewire.backend.user.user-component', compact('currencies', 'userStatuses', 'clients', 'roles', 'users'));
+        return view('livewire.backend.user.user-component', compact('currencies', 'userStatuses', 'clients', 'roles', 'users', 'totalUsers', 'activeUsers', 'archivedUsers'));
     }
 
     public function closeModal()

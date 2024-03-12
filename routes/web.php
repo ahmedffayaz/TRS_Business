@@ -96,8 +96,8 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
-                Route::get('/', UserComponent::class)->name('index');
-                Route::get('profile/{id}', ProfileComponent::class)->name('profile');
+                Route::get('/', UserComponent::class)->name('index')->middleware('permission:view_users');
+                Route::get('profile/{id}', ProfileComponent::class)->name('profile')->middleware('permission:view_users');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
                 ->name('contracts.view')->middleware('permission:view_contracts');
