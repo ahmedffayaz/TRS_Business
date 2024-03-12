@@ -106,7 +106,9 @@
                                 class="round" src="{{ url($avatar) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user" style="width : 15rem;">
-                        <a class="dropdown-item" href="{{ route('user-profile') }}"><i class="me-50" data-feather="user"></i> Profile</a>
+                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.profile') }}">
+                            <i class="me-50" data-feather="user"></i> Profile
+                        </x-anchor-tag>
                         <a class="dropdown-item" href="{{ route('dashboard.update-password') }}"><i class="me-50" data-feather="key"></i> Change Password</a>
                         <div class="dropdown-divider"></div>
                         @can('edit_systems')

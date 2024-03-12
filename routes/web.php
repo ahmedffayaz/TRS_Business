@@ -37,7 +37,6 @@ use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
 use App\Livewire\Auth\ForgotPasswordComponent;
-use App\Livewire\Backend\UserProfileComponent;
 use App\Http\Controllers\AttachmentsController;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
@@ -52,6 +51,7 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\User\UserProfileComponent as UserUserProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -60,7 +60,6 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
-Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
 Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
     Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
@@ -97,6 +96,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('/', UserComponent::class)->name('index');
+                Route::get('profile', UserUserProfileComponent::class)->name('profile');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
                     ->name('contracts.view')->middleware('permission:view_contracts');
