@@ -82,8 +82,7 @@ Breadcrumbs::for('users', function (BreadcrumbTrail $trail) {
 
 Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Users', route('dashboard.users.index'));
-    $trail->push('User Profile', route('dashboard.users.profile'));
+    $trail->push('User Profile', route('dashboard.profile'));
 });
 
 Breadcrumbs::for('update_password', function (BreadcrumbTrail $trail) {

@@ -96,20 +96,17 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('/', UserComponent::class)->name('index');
-                Route::get('profile', UserUserProfileComponent::class)->name('profile');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
-                    ->name('contracts.view')->middleware('permission:view_contracts');
+                ->name('contracts.view')->middleware('permission:view_contracts');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/companies', CompanyComponent::class)->name('companies');
-            Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-            Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-            Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
             Route::get('projects', ProjectComponent::class)->name('projects');
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('/permissions', PermissionComponent::class)->name('permissions');
+            Route::get('profile', UserUserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
         });
