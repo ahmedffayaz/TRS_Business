@@ -175,4 +175,9 @@ class User extends Authenticatable
             return $query->orWhere('is_active', 0);
         }
     }
+
+    public function getStatusAttribute()
+    {
+        return $this->is_active ? 'Active' : 'Inactive';
+    }
 }

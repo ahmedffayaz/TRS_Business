@@ -39,8 +39,11 @@
                                         <div class="avatar-wrapper">
                                             <div class="avatar  me-1"><img src="{{ $user?->avatar }}" alt="Avatar" height="32" width="32"></div>
                                         </div>
-                                        <div class="d-flex flex-column"><a href="app-user-view-account.html" class="user_name text-truncate text-body"><span
-                                                    class="fw-bolder">{{ $user?->getFullName() }}</span></a><small class="emp_post text-muted">{{ $user?->email }}</small>
+                                        <div class="d-flex flex-column">
+                                            <x-anchor-tag href="{{ route('dashboard.users.profile', $user->id) }}" class="user_name text-truncate text-body">
+                                                <span class="fw-bolder">{{ $user?->getFullName() }}</span>
+                                            </x-anchor-tag>
+                                            <small class="emp_post text-muted">{{ $user?->email }}</small>
                                         </div>
                                     </div>
                                 </td>

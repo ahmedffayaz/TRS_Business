@@ -15,7 +15,7 @@
                                     <img src="{{ $form->avatar
                                         ? $form?->avatar?->temporaryUrl()
                                         : (isset($profileLogo) && $profileLogo
-                                            ? asset('storage/profile/' . $profileLogo)
+                                            ? asset('storage/' . $profileLogo)
                                             : asset($defaultImage)) }}"
                                         id="account-upload-img" class="uploadedAvatar rounded me-50"
                                         alt="profile image" height="100" width="100">

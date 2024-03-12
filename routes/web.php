@@ -51,6 +51,7 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\User\ProfileComponent;
 use App\Livewire\Backend\User\UserProfileComponent as UserUserProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
@@ -96,6 +97,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
                 Route::get('/', UserComponent::class)->name('index');
+                Route::get('profile/{id}', ProfileComponent::class)->name('profile');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
                 ->name('contracts.view')->middleware('permission:view_contracts');

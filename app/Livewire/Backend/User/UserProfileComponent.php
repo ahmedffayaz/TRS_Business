@@ -43,7 +43,7 @@ class UserProfileComponent extends Component
             DB::beginTransaction();
             if (!empty($validated['avatar'])) {
                 $imageManager = new ImageManager();
-                $validated['avatar'] = $imageManager->setFile($validated['avatar'])->resize(64)->setDirectory($this->imagePath)->save();
+                $validated['avatar'] = 'profile/' . $imageManager->setFile($validated['avatar'])->resize(64)->setDirectory($this->imagePath)->save();
             }
             $user->update($validated);
             DB::commit();

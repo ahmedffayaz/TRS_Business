@@ -80,6 +80,13 @@ Breadcrumbs::for('users', function (BreadcrumbTrail $trail) {
     $trail->push('Users', route('dashboard.users.index'));
 });
 
+Breadcrumbs::for('users_profile', function (BreadcrumbTrail $trail, User $user) {
+    $trail->parent('dashboard');
+    $trail->push('Users', route('dashboard.users.index'));
+    $trail->push('Users Profile', route('dashboard.users.profile', $user->id));
+});
+
+// Auth user profile
 Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('User Profile', route('dashboard.profile'));
