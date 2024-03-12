@@ -94,12 +94,7 @@
                 <li class="nav-item dropdown dropdown-user">
                     <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @php
-                            $avatar = '';
-                            if (auth()->user()->avatar) {
-                                $avatar = Storage::url(auth()->user()->avatar);
-                            } else {
-                                $avatar = '/assets/images/avatar.png';
-                            }
+                            $avatar = auth()->user()->avatar ? asset('storage/profile/' . auth()->user()->avatar) : '/assets/images/avatar.png';
                         @endphp
                         <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder">{{ ucfirst(auth()->user()->first_name) }}
                                 {{ ucfirst(auth()->user()->last_name) }}</span><span class="user-status">{{ ucwords(getAuthRoles()) }}</span></div><span class="avatar"><img
