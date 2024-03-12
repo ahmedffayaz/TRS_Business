@@ -12,7 +12,6 @@ use App\Livewire\Backend\CompanyComponent;
 use App\Livewire\Backend\ProjectComponent;
 use App\Livewire\Backend\SettingComponent;
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ContractController;
@@ -41,6 +40,7 @@ use App\Http\Controllers\AttachmentsController;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
+use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
@@ -106,7 +106,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::get('projects', ProjectComponent::class)->name('projects');
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('/permissions', PermissionComponent::class)->name('permissions');
-            Route::get('profile', UserUserProfileComponent::class)->name('profile');
+            Route::get('profile', UserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
         });
