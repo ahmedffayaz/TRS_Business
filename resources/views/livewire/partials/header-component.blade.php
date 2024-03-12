@@ -8,7 +8,7 @@
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
                 @if (! request()->routeIs('dashboard.businesses.select-business'))
-                    @if (count($business) > 0)
+                    @if (count($businesses) > 0)
                         <x-nav class="nav-item header-select2">
                             <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
                                 @foreach ($businesses as $key => $values)
