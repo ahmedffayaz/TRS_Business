@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use App\Models\Client;
 use Livewire\Component;
+use App\Models\Business;
 use App\Models\Currency;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
@@ -15,15 +16,16 @@ use App\Enums\User\UserStatus;
 use Livewire\Attributes\Title;
 use App\Livewire\Forms\UserForm;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Log;
 
 #[Title('Users')]
 class UserComponent extends Component
 {
     use WithPagination, WithMainModal;
 
+    public $business_id;
     public string $search = '';
     public string $columnName = 'created_at';
     public string $sortDirection = 'desc';
@@ -33,29 +35,34 @@ class UserComponent extends Component
 
     public function mount()
     {
+        $this->business_id = Business::whereName(session('business'))->first()->id;
         // Load total users by default when the component is mounted
         $this->getTotalUsers();
     }
 
-    private function getTotalUsers(): LengthAwarePaginator
+    private function getUserQuery()
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return User::withTrashed()->getList($this->search, $this->columnName, $this->sortDirection)
-            ->paginate($this->limitPerPage);
+        return User::sessionBusiness()->where(function($query){
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            });
+        })->getList($this->search, $this->columnName, $this->sortDirection);
+    }
+
+    private function getTotalUsers(): LengthAwarePaginator
+    {
+        return $this->getUserQuery()->withTrashed()->paginate($this->limitPerPage);
     }
 
     private function getActiveUsers() : LengthAwarePaginator
     {
-        $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return User::getList($this->search, $this->columnName, $this->sortDirection)
-            ->where('is_active', 1)->paginate($this->limitPerPage);
+        return $this->getUserQuery()->where('is_active', 1)->paginate($this->limitPerPage);
     }
 
     private function getArchivedUsers() : LengthAwarePaginator
     {
-        $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return User::getList($this->search, $this->columnName, $this->sortDirection)
-            ->where('is_active', 0)->paginate($this->limitPerPage);
+        return $this->getUserQuery()->where('is_active', 0)->paginate($this->limitPerPage);
     }
 
     public function getUsers()
@@ -73,7 +80,7 @@ class UserComponent extends Component
         $currencies = Currency::get(['code']);
         $userStatuses = UserStatus::cases();
         $clients = Client::sessionBusiness()->get();
-        $roles = Role::all();
+        $roles = Role::where('name', '!=', 'client')->get();
         $users = $this->getUsers();
         $totalUsers = User::count();
         $activeUsers = User::where('is_active', 1)->count();
@@ -106,7 +113,7 @@ class UserComponent extends Component
                 'alternative_email' => $validated['alternative_email'],
                 'email_verified_at' => now(),
                 'password' => $validated['password'],
-                'client_id' => $validated['client_id'],
+                'business_id' => $this->business_id,
                 'designation' => $validated['designation'],
                 'phone' => $validated['phone'],
                 'alternative_number' => $validated['alternative_number'],
@@ -174,7 +181,7 @@ class UserComponent extends Component
                 'alternative_email' => $validated['alternative_email'],
                 'email_verified_at' => now(),
                 'password' => $validated['password'] !== null ? $validated['password'] : $user->password,
-                'client_id' => $validated['client_id'],
+                'business_id' => $this->business_id,
                 'designation' => $validated['designation'],
                 'phone' => $validated['phone'],
                 'alternative_number' => $validated['alternative_number'],

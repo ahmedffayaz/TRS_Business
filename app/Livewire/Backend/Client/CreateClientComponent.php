@@ -100,6 +100,7 @@ class CreateClientComponent extends Component
                 'phone' => $this->form->phone[$index],
                 'password' => Hash::make($this->form->password[$index]),
                 'account_type' => AccountType::CLIENT->value,
+                'business_id' => $this->form->business_id,
                 'client_id' => $client->id,
                 'is_active' => UserStatus::ACTIVE->value
             ]);

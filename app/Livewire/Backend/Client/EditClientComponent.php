@@ -66,6 +66,7 @@ class EditClientComponent extends Component
                 'business_id' => $validated['business_id'],
                 'address' => $validated['address'],
                 'city' => $validated['city'],
+                'business_id' => $this->form->business_id,
                 'country_id' => $validated['country_id'],
                 'postal_code' => $validated['postal_code'],
                 'rate_per_hour' => $validated['rate_per_hour'],
