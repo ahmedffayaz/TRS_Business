@@ -70,31 +70,35 @@
                                 </td>
                                 <td>
                                     <div class="dropdown position-static">
-                                        @can('edit_clients', 'delete_users')
-                                        <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-                                            <span wire:ignore><i data-feather="more-vertical">open</i></span>
-                                        </button>
-                                        <div class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $user?->id }}')">
-                                                <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                <span>Edit</span>
-                                            </a>
-                                            <a class="dropdown-item" href="javascript:void(0);" wire:click="toggleStatus('{{ $user?->id }}')">
-                                                @if ($user?->is_active)
-                                                    <span wire:ignore><i data-feather="arrow-down" class="me-50"></i></span>
-                                                    <span>Deactivate</span>
-                                                @else
-                                                    <span wire:ignore><i data-feather="arrow-up" class="me-50"></i></span>
-                                                    <span>Activate</span>
-                                                @endif
-                                            </a>
-                                            @can('delete_users')
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
-                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                    <span>Delete</span>
-                                                </x-anchor-tag>
-                                            @endcan
-                                        </div>
+                                        @can('edit_users', 'delete_users')
+                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
+                                                <span wire:ignore><i data-feather="more-vertical">open</i></span>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                @can('edit_users')
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $user?->id }}')">
+                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                        <span>Edit</span>
+                                                    </x-anchor-tag>
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="toggleStatus('{{ $user?->id }}')">
+                                                        @if ($user?->is_active)
+                                                            <span wire:ignore><i data-feather="arrow-down" class="me-50"></i></span>
+                                                            <span>Deactivate</span>
+                                                        @else
+                                                            <span wire:ignore><i data-feather="arrow-up" class="me-50"></i></span>
+                                                            <span>Activate</span>
+                                                        @endif
+                                                    </x-anchor-tag>
+                                                @endcan
+                                                @can('delete_users')
+                                                    @if (empty($user->deleted_at))
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
+                                                            <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                            <span>Delete</span>
+                                                        </x-anchor-tag>
+                                                    @endif
+                                                @endcan
+                                            </div>
                                         @endcan
                                     </div>
                                 </td>
@@ -106,173 +110,175 @@
             {{ $users->links('components.pagination') }}
         </div>
     </div>
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-        <div class="text-center mb-2">
-            <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} User</h1>
-        </div>
-        <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
-            <div class="row">
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="designation" class="required" value="Designation" />
-                    <x-input type="text" name="designation" id="designation" :class="$errors->has('form.designation') ? 'error' : ''" placeholder="Enter designation" wire:model="form.designation" />
-                    @error('form.designation')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="client" class="required" value="Client" />
-                    <span wire:ignore.>
-                        <x-select-input name="client_id" id="client" :class="$errors->has('form.client_id') ? 'error select2' : 'select2'" wire:model="form.client_id">
-                            <option value="" selected>--Select Client--</option>
-                            @isset($clients)
-                                @foreach ($clients as $client)
-                                    <option value="{{ $client?->id }}">{{ $client?->name }}</option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </span>
-                    @error('form.client_id')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="first_name" class="required" value="First Name" />
-                    <x-input type="text" name="first_name" id="first_name" :class="$errors->has('form.first_name') ? 'error' : ''" placeholder="Enter first name" wire:model="form.first_name"
-                        autocomplete="given-name" />
-                    @error('form.first_name')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="last_name" class="required" value="Last Name" />
-                    <x-input type="text" name="last_name" id="last_name" :class="$errors->has('form.last_name') ? 'error' : ''" placeholder="Enter last name" wire:model="form.last_name"
-                        autocomplete="family-name" />
-                    @error('form.last_name')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="email" class="required" value="Email" />
-                    <x-input type="email" name="email" id="email" :class="$errors->has('form.email') ? 'error' : ''" placeholder="Enter email" wire:model="form.email" autocomplete="username" />
-                    @error('form.email')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="alternative_email" value="Alternative Email" />
-                    <x-input type="email" name="alternative_email" id="alternative_email" :class="$errors->has('form.alternative_email') ? 'error' : ''" placeholder="Enter alternative email"
-                        wire:model="form.alternative_email" autocomplete="username" />
-                    @error('form.alternative_email')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="salary" value="Salary" />
-                    <x-input type="number" name="salary" id="salary" :class="$errors->has('form.salary') ? 'error' : ''" placeholder="Enter Salary" wire:model="form.salary" />
-                    @error('form.salary')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="currency" value="Currency" />
-                    <span wire:ignore.>
-                        <x-select-input name="currency" id="currency" :class="$errors->has('form.currency') ? 'error select2' : 'select2'" wire:model="form.currency">
-                            @isset($currencies)
-                            <option value="" selected>--Select Currency--</option>
-                            @foreach ($currencies as $currency)
-                                    <option value="{{ $currency?->code }}">{{ $currency?->code }}</option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </span>
-                    @error('form.currency')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="password" class="{{ !$form->isUpdate ? 'required' : '' }}" value="Password" />
-                        <x-input type="password" name="password" id="password" :class="$errors->has('form.password') ? 'error' : ''" placeholder="Enter password" wire:model="form.password"
-                            autocomplete="new-password" />
-                        @error('form.password')
-                            <x-input-error :message="$message" />
-                        @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="password_confirmation" class="{{ !$form->isUpdate ? 'required' : '' }}" value="Confirm Password" />
-                        <x-input type="password" name="password_confirmation" id="password_confirmation" :class="$errors->has('form.password_confirmation') ? 'error' : ''" placeholder="Re-enter password"
-                            wire:model="form.password_confirmation" autocomplete="new-password" />
-                        @error('form.password_confirmation')
-                            <x-input-error :message="$message" />
-                        @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="phone" class="required" value="Phone Number" />
-                    <x-input type="text" name="phone" id="phone" :class="$errors->has('form.phone') ? 'error' : ''" placeholder="Enter phone number" wire:model="form.phone" />
-                    @error('form.phone')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="alternative_number" value="Alternative Phone Number" />
-                    <x-input type="text" name="alternative_number" id="alternative_number" :class="$errors->has('form.alternative_number') ? 'error' : ''" placeholder="Enter alternative phone number"
-                        wire:model="form.alternative_number" />
-                    @error('form.alternative_number')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="roles" class="required" value="roles" />
-                    <span wire:ignore.>
-                        <x-select-input name="roles" id="roles" :class="$errors->has('form.roles') ? 'error select2' : 'select2'" multiple wire:model="form.roles">
-                            @isset($roles)
-                            <option value="" selected>--Select Roles--</option>
-                            @foreach ($roles as $role)
-                                    <option value="{{ $role?->id }}">{{ $role?->name }}</option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </span>
-                    @error('form.roles')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="status" class="required" value="Status" />
-                    <span wire:ignore.>
-                        <x-select-input name="is_active" id="status" :class="$errors->has('form.is_active') ? 'error select2' : 'select2'" wire:model="form.is_active">
-                            @isset($userStatuses)
-                            <option value="" selected>--Select Status--</option>
-                            @foreach ($userStatuses as $userStatus)
-                                    <option value="{{ $userStatus?->value }}">{{ ucfirst(strtolower($userStatus?->name)) }}
-                                    </option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </span>
-                    @error('form.is_active')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-12 mb-2">
-                    <x-input-label for="address" class="required" value="Address" />
-                    <x-textarea name="address" id="address" :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'" data-length="200" length="200" rows="3" placeholder="Enter address"
-                        autocomplete="on" wire:model="form.address"></x-textarea>
-                    @error('form.address')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-12 text-center">
-                    <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
-                        <span wire:loading>
-                            <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
-                        </span>
-                    </x-button>
-                </div>
+    @can('add_users')
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            <div class="text-center mb-2">
+                <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} User</h1>
             </div>
-        </form>
-    </x-main-modal>
+            <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
+                <div class="row">
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="designation" class="required" value="Designation" />
+                        <x-input type="text" name="designation" id="designation" :class="$errors->has('form.designation') ? 'error' : ''" placeholder="Enter designation" wire:model="form.designation" />
+                        @error('form.designation')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="client" class="required" value="Client" />
+                        <span wire:ignore.>
+                            <x-select-input name="client_id" id="client" :class="$errors->has('form.client_id') ? 'error select2' : 'select2'" wire:model="form.client_id">
+                                <option value="" selected>--Select Client--</option>
+                                @isset($clients)
+                                    @foreach ($clients as $client)
+                                        <option value="{{ $client?->id }}">{{ $client?->name }}</option>
+                                    @endforeach
+                                @endisset
+                            </x-select-input>
+                        </span>
+                        @error('form.client_id')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="first_name" class="required" value="First Name" />
+                        <x-input type="text" name="first_name" id="first_name" :class="$errors->has('form.first_name') ? 'error' : ''" placeholder="Enter first name" wire:model="form.first_name"
+                            autocomplete="given-name" />
+                        @error('form.first_name')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="last_name" class="required" value="Last Name" />
+                        <x-input type="text" name="last_name" id="last_name" :class="$errors->has('form.last_name') ? 'error' : ''" placeholder="Enter last name" wire:model="form.last_name"
+                            autocomplete="family-name" />
+                        @error('form.last_name')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="email" class="required" value="Email" />
+                        <x-input type="email" name="email" id="email" :class="$errors->has('form.email') ? 'error' : ''" placeholder="Enter email" wire:model="form.email" autocomplete="username" />
+                        @error('form.email')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="alternative_email" value="Alternative Email" />
+                        <x-input type="email" name="alternative_email" id="alternative_email" :class="$errors->has('form.alternative_email') ? 'error' : ''" placeholder="Enter alternative email"
+                            wire:model="form.alternative_email" autocomplete="username" />
+                        @error('form.alternative_email')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="salary" value="Salary" />
+                        <x-input type="number" name="salary" id="salary" :class="$errors->has('form.salary') ? 'error' : ''" placeholder="Enter Salary" wire:model="form.salary" />
+                        @error('form.salary')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="currency" value="Currency" />
+                        <span wire:ignore.>
+                            <x-select-input name="currency" id="currency" :class="$errors->has('form.currency') ? 'error select2' : 'select2'" wire:model="form.currency">
+                                @isset($currencies)
+                                <option value="" selected>--Select Currency--</option>
+                                @foreach ($currencies as $currency)
+                                        <option value="{{ $currency?->code }}">{{ $currency?->code }}</option>
+                                    @endforeach
+                                @endisset
+                            </x-select-input>
+                        </span>
+                        @error('form.currency')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="password" class="{{ !$form->isUpdate ? 'required' : '' }}" value="Password" />
+                            <x-input type="password" name="password" id="password" :class="$errors->has('form.password') ? 'error' : ''" placeholder="Enter password" wire:model="form.password"
+                                autocomplete="new-password" />
+                            @error('form.password')
+                                <x-input-error :message="$message" />
+                            @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="password_confirmation" class="{{ !$form->isUpdate ? 'required' : '' }}" value="Confirm Password" />
+                            <x-input type="password" name="password_confirmation" id="password_confirmation" :class="$errors->has('form.password_confirmation') ? 'error' : ''" placeholder="Re-enter password"
+                                wire:model="form.password_confirmation" autocomplete="new-password" />
+                            @error('form.password_confirmation')
+                                <x-input-error :message="$message" />
+                            @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="phone" class="required" value="Phone Number" />
+                        <x-input type="text" name="phone" id="phone" :class="$errors->has('form.phone') ? 'error' : ''" placeholder="Enter phone number" wire:model="form.phone" />
+                        @error('form.phone')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="alternative_number" value="Alternative Phone Number" />
+                        <x-input type="text" name="alternative_number" id="alternative_number" :class="$errors->has('form.alternative_number') ? 'error' : ''" placeholder="Enter alternative phone number"
+                            wire:model="form.alternative_number" />
+                        @error('form.alternative_number')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="roles" class="required" value="roles" />
+                        <span wire:ignore.>
+                            <x-select-input name="roles" id="roles" :class="$errors->has('form.roles') ? 'error select2' : 'select2'" multiple wire:model="form.roles">
+                                @isset($roles)
+                                <option value="" selected>--Select Roles--</option>
+                                @foreach ($roles as $role)
+                                        <option value="{{ $role?->id }}">{{ $role?->name }}</option>
+                                    @endforeach
+                                @endisset
+                            </x-select-input>
+                        </span>
+                        @error('form.roles')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="status" class="required" value="Status" />
+                        <span wire:ignore.>
+                            <x-select-input name="is_active" id="status" :class="$errors->has('form.is_active') ? 'error select2' : 'select2'" wire:model="form.is_active">
+                                @isset($userStatuses)
+                                <option value="" selected>--Select Status--</option>
+                                @foreach ($userStatuses as $userStatus)
+                                        <option value="{{ $userStatus?->value }}">{{ ucfirst(strtolower($userStatus?->name)) }}
+                                        </option>
+                                    @endforeach
+                                @endisset
+                            </x-select-input>
+                        </span>
+                        @error('form.is_active')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-12 mb-2">
+                        <x-input-label for="address" class="required" value="Address" />
+                        <x-textarea name="address" id="address" :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'" data-length="200" length="200" rows="3" placeholder="Enter address"
+                            autocomplete="on" wire:model="form.address"></x-textarea>
+                        @error('form.address')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
+                            wire:loading.attr="disabled">
+                            <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
+                            <span wire:loading>
+                                <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
+                            </span>
+                        </x-button>
+                    </div>
+                </div>
+            </form>
+        </x-main-modal>
+    @endcan
 </div>
 
 @script

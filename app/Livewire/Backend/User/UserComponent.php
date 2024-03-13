@@ -48,14 +48,14 @@ class UserComponent extends Component
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return User::getList($this->search, $this->columnName, $this->sortDirection)
-            ->paginate($this->limitPerPage);
+            ->where('is_active', 1)->paginate($this->limitPerPage);
     }
 
     private function getArchivedUsers() : LengthAwarePaginator
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return User::getList($this->search, $this->columnName, $this->sortDirection)
-            ->onlyTrashed()->paginate($this->limitPerPage);
+            ->where('is_active', 0)->paginate($this->limitPerPage);
     }
 
     public function getUsers()
@@ -75,9 +75,9 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::all();
         $users = $this->getUsers();
-        $totalUsers = User::withTrashed()->count();
-        $activeUsers = User::count();
-        $archivedUsers = User::onlyTrashed()->count();
+        $totalUsers = User::count();
+        $activeUsers = User::where('is_active', 1)->count();
+        $archivedUsers = User::where('is_active', 0)->count();
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.user.user-component', compact('currencies', 'userStatuses', 'clients', 'roles', 'users', 'totalUsers', 'activeUsers', 'archivedUsers'));
     }
@@ -228,7 +228,7 @@ class UserComponent extends Component
             'type' => 'delete',
             'iconType' => 'warning',
             'title' => 'Are you sure?',
-            'description' => 'You are about to delete the employee. This action cannot be undone.',
+            'description' => 'You are about to delete the user. This action cannot be undone.',
         ]);
     }
 
@@ -236,8 +236,10 @@ class UserComponent extends Component
     public function destroy($id)
     {
         try {
+            DB::beginTransaction();
             $user = User::findOrFail($id);
             $user->delete();
+            DB::commit();
             $this->dispatch('alert', ['type' => 'success', 'message' => 'User deleted successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
