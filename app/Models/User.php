@@ -27,7 +27,9 @@ class User extends Authenticatable
         'first_name',
         'last_name',
         'email',
+        'alternative_email',
         'password',
+        'client_id',
         'account_type',
         'designation',
         'phone',
@@ -37,6 +39,7 @@ class User extends Authenticatable
         'alternative_number',
         'salary',
         'currency',
+        'is_active'
     ];
 
     /**
@@ -171,5 +174,10 @@ class User extends Authenticatable
         if ($keyword === 'inactive' || $keyword === 'Inactive' || $keyword === 'INACTIVE') {
             return $query->orWhere('is_active', 0);
         }
+    }
+
+    public function getStatusAttribute()
+    {
+        return $this->is_active ? 'Active' : 'Inactive';
     }
 }

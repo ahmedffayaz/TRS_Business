@@ -3,7 +3,6 @@
 use App\Livewire\Auth\LoginComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
-use App\Livewire\Backend\UserComponent;
 use App\Livewire\Auth\RegisterComponent;
 use App\Http\Controllers\PagesController;
 use App\Http\Controllers\TasksController;
@@ -13,14 +12,13 @@ use App\Livewire\Backend\CompanyComponent;
 use App\Livewire\Backend\ProjectComponent;
 use App\Livewire\Backend\SettingComponent;
 
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-use App\Http\Controllers\CompaniesController;
+use App\Livewire\Backend\User\UserComponent;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,25 +31,28 @@ use App\Http\Controllers\CompaniesController;
 |
 */
 
+use App\Http\Controllers\CompaniesController;
 use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
 use App\Livewire\Auth\ForgotPasswordComponent;
-use App\Livewire\Backend\UserProfileComponent;
 use App\Http\Controllers\AttachmentsController;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
+use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
+use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
-use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
-use App\Livewire\Backend\User\UserContractComponent;
+use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\User\ProfileComponent;
+use App\Livewire\Backend\User\UserProfileComponent as UserUserProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -60,7 +61,6 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
-Route::get('/user-profile', UserProfileComponent::class)->name('user-profile');
 
 Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
     Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
@@ -96,20 +96,19 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             // Users routes
             Route::prefix('users')->name('users.')->group(function () {
+                Route::get('/', UserComponent::class)->name('index')->middleware('permission:view_users');
+                Route::get('profile/{id}', ProfileComponent::class)->name('profile')->middleware('permission:view_users');
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
-                    ->name('contracts.view')->middleware('permission:view_contracts');
+                ->name('contracts.view')->middleware('permission:view_contracts');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/companies', CompanyComponent::class)->name('companies');
-            Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-            Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-            Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-            Route::get('/employees', UserComponent::class)->name('employees');
             Route::get('projects', ProjectComponent::class)->name('projects');
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('/permissions', PermissionComponent::class)->name('permissions');
+            Route::get('profile', UserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
         });
