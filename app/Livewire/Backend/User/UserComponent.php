@@ -203,20 +203,64 @@ class UserComponent extends Component
         }
     }
 
-    public function toggleStatus($id)
+    public function deactivateUserConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' =>  $id,
+            'type' => 'deactivate',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You want to deactivate this user, user can not be login after this.',
+        ]);
+    }
+
+    #[On('deactivate')]
+    public function deactivateUser($id)
     {
         try {
+            DB::beginTransaction();
             $user = User::findOrFail($id);
-            $user->is_active = !$user->is_active;
-            $user->update();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Status changed successfully!']);
+            $user->update(['is_active' => false]);
+            DB::commit();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'User deactivated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
-            Log::error('Get error while changing user status: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error', 'message' => 'Sorry, the user could not be found in our database.']);
+            Log::error('Get error on deactivate user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         } catch (Exception $exception) {
             DB::rollBack();
-            Log::error('Get error while changing user status: ' . $exception->getMessage());
+            Log::error('Get error on deactivate user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    public function activateUserConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' =>  $id,
+            'type' => 'activate',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You want to activate this user.',
+        ]);
+    }
+
+    #[On('activate')]
+    public function activateUser($id)
+    {
+        try {
+            DB::beginTransaction();
+            $user = User::findOrFail($id);
+            $user->update(['is_active' => true]);
+            DB::commit();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'User activated successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error on deactivate user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error on deactivate user: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }

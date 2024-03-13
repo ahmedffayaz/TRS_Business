@@ -80,15 +80,17 @@
                                                         <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                         <span>Edit</span>
                                                     </x-anchor-tag>
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="toggleStatus('{{ $user?->id }}')">
-                                                        @if ($user?->is_active)
+                                                    @if ($user->is_active)
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deactivateUserConfirmation('{{ $user?->id }}')">
                                                             <span wire:ignore><i data-feather="arrow-down" class="me-50"></i></span>
                                                             <span>Deactivate</span>
-                                                        @else
+                                                        </x-anchor-tag>
+                                                    @else
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="activateUserConfirmation('{{ $user?->id }}')">
                                                             <span wire:ignore><i data-feather="arrow-up" class="me-50"></i></span>
                                                             <span>Activate</span>
-                                                        @endif
-                                                    </x-anchor-tag>
+                                                        </x-anchor-tag>
+                                                    @endif
                                                 @endcan
                                                 @can('delete_users')
                                                     @if (empty($user->deleted_at))
