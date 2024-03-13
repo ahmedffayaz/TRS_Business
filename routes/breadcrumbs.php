@@ -62,12 +62,6 @@ Breadcrumbs::for('clients_edit', function (BreadcrumbTrail $trail, Client $clien
     $trail->push('Edit Client', route('dashboard.clients.edit', $client->slug));
 });
 
-// Employeed
-Breadcrumbs::for('employees', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push('Employees', route('dashboard.employees'));
-});
-
 // Projects
 Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
@@ -80,13 +74,24 @@ Breadcrumbs::for('terms_conditions', function (BreadcrumbTrail $trail) {
     $trail->push('Terms & Conditions', route('dashboard.terms-conditions.index'));
 });
 
-// User Profile
-Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
+// Users
+Breadcrumbs::for('users', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Profile Detail', route('dashboard.profile.edit'));
+    $trail->push('Users', route('dashboard.users.index'));
 });
 
-// User Profile
+Breadcrumbs::for('users_profile', function (BreadcrumbTrail $trail, User $user) {
+    $trail->parent('dashboard');
+    $trail->push('Users', route('dashboard.users.index'));
+    $trail->push('Users Profile', route('dashboard.users.profile', $user->id));
+});
+
+// Auth user profile
+Breadcrumbs::for('user_profile', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('User Profile', route('dashboard.profile'));
+});
+
 Breadcrumbs::for('update_password', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Update Password', route('dashboard.update-password'));

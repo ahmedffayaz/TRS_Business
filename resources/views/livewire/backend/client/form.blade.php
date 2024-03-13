@@ -188,7 +188,6 @@
                     url: url,
                     type: 'GET',
                     success: function (response) {
-                        console.log(response);
                         $('#user-fields').append(response.html);
                         Livewire.dispatch('feather-icons');
                     },

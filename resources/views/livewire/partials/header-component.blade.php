@@ -8,13 +8,15 @@
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
                 @if (! request()->routeIs('dashboard.businesses.select-business'))
-                    <x-nav class="nav-item header-select2">
-                        <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
-                            @foreach ($businesses as $key => $values)
-                                <option value="{{ $key }}">{{ $values }}</option>
-                            @endforeach
-                        </x-select-input>
-                    </x-nav>
+                    @if (count($businesses) > 0)
+                        <x-nav class="nav-item header-select2">
+                            <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
+                                @foreach ($businesses as $key => $values)
+                                    <option value="{{ $key }}">{{ $values }}</option>
+                                @endforeach
+                            </x-select-input>
+                        </x-nav>
+                    @endif
                 <li class="nav-item d-none d-lg-block"><a class="nav-link nav-link-style"><i class="ficon" data-feather="moon"></i></a></li>
                 <li class="nav-item dropdown dropdown-notification me-25">
                     <a class="nav-link" href="#" data-bs-toggle="dropdown">
@@ -92,19 +94,16 @@
                 <li class="nav-item dropdown dropdown-user">
                     <a class="nav-link dropdown-toggle dropdown-user-link" id="dropdown-user" href="#" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         @php
-                            $avatar = '';
-                            if (auth()->user()->avatar) {
-                                $avatar = Storage::url(auth()->user()->avatar);
-                            } else {
-                                $avatar = '/assets/images/avatar.png';
-                            }
+                            $avatar = auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : '/assets/images/avatar.png';
                         @endphp
                         <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder">{{ ucfirst(auth()->user()->first_name) }}
                                 {{ ucfirst(auth()->user()->last_name) }}</span><span class="user-status">{{ ucwords(getAuthRoles()) }}</span></div><span class="avatar"><img
                                 class="round" src="{{ url($avatar) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user" style="width : 15rem;">
-                        <a class="dropdown-item" href="{{ route('user-profile') }}"><i class="me-50" data-feather="user"></i> Profile</a>
+                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.profile') }}">
+                            <i class="me-50" data-feather="user"></i> Profile
+                        </x-anchor-tag>
                         <a class="dropdown-item" href="{{ route('dashboard.update-password') }}"><i class="me-50" data-feather="key"></i> Change Password</a>
                         <div class="dropdown-divider"></div>
                         @can('edit_systems')
