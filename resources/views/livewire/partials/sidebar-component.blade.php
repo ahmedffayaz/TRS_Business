@@ -7,7 +7,7 @@
                         <span class="brand-logo">
                             <img src="{{ !empty($business->logo) ? asset('storage/' . $business->logo) : asset('trs_logo.svg') }}" alt="" height="40">
                         </span>
-                        <h2 class="brand-text">TRS/DEV CMS</h2>
+                        <h2 class="brand-text">{{ !empty($business->name) ? $business->name : cmsName() }}</h2>
                     </a>
                 </li>
                 <li class="nav-item nav-toggle">
@@ -70,7 +70,7 @@
                     </x-nav>
                 @endcan
                 @can('view_knowledgeBase')
-                    <x-nav class="{{ request()->routeIs('dashboard.knowledge-bases.index') ? 'active' : '' }} nav-item">
+                    <x-nav class="{{ request()->routeIs('dashboard.knowledgebase.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">
                             <i data-feather='help-circle'></i>
                             <span class="menu-title text-truncate" data-i18n="Knowledge Base">Knowledge Base</span>
@@ -101,28 +101,12 @@
                         </li>
                     </ul>
                 </li>
-                @can('edit_systems')
-                    <x-nav class="nav-itme">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.system-setting') }}">
-                            <i data-feather="settings"></i>
-                            <span class="menu-title text-truncate" data-i18n="System Settings">System Settings</span>
-                        </x-anchor-tag>
-                    </x-nav>
-                @endcan
                 @can('edit_businesses')
                     <x-nav class="nav-itme">
-                        <x-anchor-tag class="d-flex align-items-center" href="#">
-                            <i data-feather='aperture'></i>
-                            <span class="menu-title text-truncate" data-i18n="Business Settings">Business Settings</span>
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
+                            <i data-feather="settings"></i>
+                            <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
                         </x-anchor-tag>
-                        <ul class="menu-content">
-                            <x-nav>
-                                <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
-                                    <i data-feather="settings"></i>
-                                    <span class="menu-title text-truncate" data-i18n="Settings">Edit Business</span>
-                                </x-anchor-tag>
-                            </x-nav>
-                        </ul>
                     </x-nav>
                 @endcan
             </ul>

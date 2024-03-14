@@ -109,14 +109,14 @@
                                 <i class="me-50" data-feather="key"></i> Change Password
                             </x-anchor-tag>
                             <div class="dropdown-divider"></div>
-                            @can('edit_systems')
-                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.system-setting') }}">
-                                    <i class="me-50" data-feather="settings"></i> System Settings
-                                </x-anchor-tag>
-                            @endcan
                             @can('add_businesses')
                                 <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
                                     <i class="me-50" data-feather="edit"></i> Add Business
+                                </x-anchor-tag>
+                            @endcan
+                            @can('edit_businesses')
+                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
+                                    <i class="me-50" data-feather="settings"></i> Settings
                                 </x-anchor-tag>
                             @endcan
                             @can('view_contracts')
