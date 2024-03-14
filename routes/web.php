@@ -62,8 +62,8 @@ Route::middleware(['guest'])->group(function () {
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
 
+Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout')->middleware(['auth', 'verified']);
 Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
-    Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout');
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
         Route::middleware(['terms.acceptance'])->group(function () {

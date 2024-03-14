@@ -7,7 +7,7 @@
                 </ul>
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
-                @if (! request()->routeIs('dashboard.businesses.select-business'))
+                @if (auth()->check() && !request()->routeIs('select-business') && !request()->routeIs('dashboard.terms-conditions.accept'))
                     @if (count($businesses) > 0)
                         <x-nav class="nav-item header-select2">
                             <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
@@ -101,26 +101,30 @@
                                 class="round" src="{{ url($avatar) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user" style="width : 15rem;">
-                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.profile') }}">
-                            <i class="me-50" data-feather="user"></i> Profile
-                        </x-anchor-tag>
-                        <a class="dropdown-item" href="{{ route('dashboard.update-password') }}"><i class="me-50" data-feather="key"></i> Change Password</a>
-                        <div class="dropdown-divider"></div>
-                        @can('edit_systems')
-                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.system-setting') }}">
-                                <i class="me-50" data-feather="settings"></i> System Settings
+                        @if (auth()->check() && !request()->routeIs('select-business') && !request()->routeIs('dashboard.terms-conditions.accept'))
+                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.profile') }}">
+                                <i class="me-50" data-feather="user"></i> Profile
                             </x-anchor-tag>
-                        @endcan
-                        @can('add_businesses')
-                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
-                                <i class="me-50" data-feather="edit"></i> Add Business
+                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.update-password') }}">
+                                <i class="me-50" data-feather="key"></i> Change Password
                             </x-anchor-tag>
-                        @endcan
-                        @can('view_contracts')
-                            <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.contracts') }}">
-                                <i class="me-50" data-feather="copy"></i> My Contracts
-                            </x-anchor-tag>
-                        @endcan
+                            <div class="dropdown-divider"></div>
+                            @can('edit_systems')
+                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.system-setting') }}">
+                                    <i class="me-50" data-feather="settings"></i> System Settings
+                                </x-anchor-tag>
+                            @endcan
+                            @can('add_businesses')
+                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
+                                    <i class="me-50" data-feather="edit"></i> Add Business
+                                </x-anchor-tag>
+                            @endcan
+                            @can('view_contracts')
+                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.contracts') }}">
+                                    <i class="me-50" data-feather="copy"></i> My Contracts
+                                </x-anchor-tag>
+                            @endcan
+                        @endif
                         <form class="border-0 m-0 p-0" action="{{ route('logout') }}" method="POST">
                             @csrf
                             <button class="dropdown-item w-100"><i class="me-50" data-feather="power"></i> Logout</button>

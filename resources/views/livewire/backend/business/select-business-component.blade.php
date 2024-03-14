@@ -4,28 +4,54 @@
             margin-left: 0px;
         }
 
-        .header-navbar.floating-nav {
-            right: auto;
-            margin-left: -27px;
+        .header-navbar.fixed-top, .header-navbar.floating-nav {
+            left: 0px;
+        }
+
+        @media screen and (max-width: 280px) {
+            .card-width {
+                width: 230px;
+            }
+        }
+
+        @media screen and (min-width: 281px) and (max-width: 539px) {
+            .card-width {
+                width: 300px;
+            }
+        }
+
+        @media screen and (min-width: 540px) {
+            .card-width {
+                width: 400px;
+            }
         }
     </style>
 @endassets
 <div>
     <div class="row">
-        @foreach($businesses as $business)
-            <div class="col-md-4 mb-2">
-                <a wire:click="selectBusiness('{{ $business->name }}')" class="brand-logo">
-                    <div class="card h-100">
-                        <div class="card-body text-center">
-                            <img src="{{ asset('storage/images/business/' . $business->logo) }}" class="mb-2"
-                                alt="" height="60" onerror="_business_logo(this)">
-                            <h4 class="card-title mb-1 text-center">{{ $business->name }}</h4>
-                        </div>
-                    </div>
-                </a>
+        <div class="d-flex justify-content-center">
+            <div class="card card-employee-task card-width mb-1">
+                <div class="card-body">
+                    @foreach($businesses as $business)
+                        <a wire:click="selectBusiness('{{ $business->name }}')" class="brand-logo">
+                            <div class="employee-task d-flex justify-content-between align-items-center mb-2">
+                                <div class="d-flex flex-row">
+                                    <div class="avatar me-75">
+                                        <img src="{{ asset('storage/' . $business->logo) }}" class="rounded" width="42" height="42" alt="Avatar" onerror="_business_logo(this)" />
+                                    </div>
+                                    <div class="my-auto">
+                                        <h6 class="mb-0">{{ $business->name }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        @if (!$loop->last)
+                            <hr>
+                        @endif
+                    @endforeach
+                </div>
             </div>
-        @endforeach
-
-        {{ $businesses->links('components.pagination') }}
+        </div>
+        {{ $businesses->links('components.pagination', ['align' => 'justify-content-center']) }}
     </div>
 </div>
