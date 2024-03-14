@@ -82,9 +82,25 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::where('name', '!=', 'client')->get();
         $users = $this->getUsers();
-        $totalUsers = User::count();
-        $activeUsers = User::where('is_active', 1)->count();
-        $archivedUsers = User::where('is_active', 0)->count();
+
+        $totalUsers = User::sessionBusiness()->where(function($query){
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            });
+        })->count();
+
+        $activeUsers = User::sessionBusiness()->where(function($query){
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            });
+        })->where('is_active', 1)->count();
+
+        $archivedUsers = User::sessionBusiness()->where(function($query){
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            });
+        })->where('is_active', 0)->count();
+
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.user.user-component', compact('currencies', 'userStatuses', 'clients', 'roles', 'users', 'totalUsers', 'activeUsers', 'archivedUsers'));
     }
