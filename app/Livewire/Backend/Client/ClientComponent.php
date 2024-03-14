@@ -45,7 +45,7 @@ class ClientComponent extends Component
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return Client::whereHas('business', function ($query) {
             $query->whereName(session('business'));
-        })->with(['business', 'country'])->withCount('employees')
+        })->with(['business', 'country', 'employees'])->withCount('employees')
         ->getList($this->search, $this->columnName, $this->sortDirection)
         ->paginate($this->limitPerPage);
     }

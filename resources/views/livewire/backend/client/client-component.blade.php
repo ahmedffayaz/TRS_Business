@@ -150,5 +150,33 @@
                 </dl>
             </div>
         </div>
+        @if ($clientDetail?->employees)
+            <hr>
+            <div class="row">
+                <div class="mb-2">
+                    <h2 class="mb-1">Employees</h2>
+                </div>
+                @foreach($clientDetail?->employees as $employee)
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="col-sm-6">Name:</dt>
+                            <dt class="col-sm-6">{{ $employee?->name }}</dt>
+                        </dl>
+                    </div>
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="col-sm-4">Email:</dt>
+                            <dt class="col-sm-4">{{ $employee?->email }}</dt>
+                        </dl>
+                    </div>
+                    <div class="col-md-4">
+                        <dl class="row">
+                            <dt class="col-sm-4">Phone:</dt>
+                            <dt class="col-sm-4">{{ $employee?->phone }}</dt>
+                        </dl>
+                    </div>
+                @endforeach
+            </div>
+        @endif
     </x-main-modal>
 </div>
