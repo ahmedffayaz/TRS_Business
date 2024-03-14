@@ -23,10 +23,6 @@
 
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible" role="alert">
-                    <h4 class="alert-heading d-flex align-items-center">
-                        <span wire:ignore><i data-feather="alert-triangle" class="me-50"></i></span>
-                        Success
-                    </h4>
                     <div class="alert-body">
                         {{ session('success') }}
                     </div>
