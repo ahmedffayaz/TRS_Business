@@ -1,7 +1,8 @@
+@props(['align' => null])
 <div>
     @if ($paginator?->hasPages())
         <nav aria-label="Page navigation">
-            <ul class="justify-content-end pagination mt-2">
+            <ul class="{{ $align ? $align : 'justify-content-end' }} pagination mt-2">
                 {{-- Previous Page Link --}}
                 @if ($paginator->onFirstPage())
                     <li class="page-item prev-item disabled"><a class="page-link" href="#"></a></li>

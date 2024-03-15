@@ -45,7 +45,7 @@ class ClientComponent extends Component
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return Client::whereHas('business', function ($query) {
             $query->whereName(session('business'));
-        })->with(['business', 'country'])->withCount('employees')
+        })->with(['business', 'country', 'employees'])->withCount('employees')
         ->getList($this->search, $this->columnName, $this->sortDirection)
         ->paginate($this->limitPerPage);
     }
@@ -103,19 +103,6 @@ class ClientComponent extends Component
             ]);
         } catch (Exception $exception) {
             Log::error('Get error while delete client: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
-        }
-    }
-
-    public function addUserFields()
-    {
-        try {
-            return response()->json([
-                'status' => JsonResponse::HTTP_OK,
-                'html' => view('livewire.backend.client.user-fields')->render()
-            ], JsonResponse::HTTP_OK);
-        } catch (Exception $exception) {
-            Log::error('Get error while add user fields on adding or updating clients: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
     }

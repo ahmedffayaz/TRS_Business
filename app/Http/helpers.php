@@ -13,7 +13,7 @@ use App\Notifications\InstantNotification;
 /**
  * Get system name
  */
-function cms_name()
+function cmsName()
 {
     $cms_name = Setting::where('name', 'cms_name')->first();
     return isset($cms_name) ? $cms_name->value : config('app.name');
