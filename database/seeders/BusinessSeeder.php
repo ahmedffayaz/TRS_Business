@@ -3,12 +3,14 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
+use App\Models\Client;
 use App\Models\Business;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Business\BusinessType;
 use Illuminate\Support\Facades\Schema;
 use Database\Factories\BusinessFactory;
+use Database\Factories\ClientFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class BusinessSeeder extends Seeder
@@ -61,6 +63,11 @@ class BusinessSeeder extends Seeder
             $business->roles()->attach($roles);
         });
 
-        BusinessFactory::new()->count(10)->create();
+        $businessFactory = BusinessFactory::new()->count(10)->create();
+
+        // For each business, create some clients
+        $businessFactory->each(function ($business) {
+            ClientFactory::new()->count(10)->create();
+        });
     }
 }

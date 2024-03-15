@@ -19,6 +19,16 @@ class UserFactory extends Factory
     public function definition(): array
     {
         $faker = Faker::create();
+
+        // Get all businesses with their clients
+        $businesses = Business::with('clients')->get();
+
+        // Choose a random business
+        $business = $businesses->random();
+
+        // Choose a random client from the selected business
+        $client = $business->clients->random();
+
         return [
             'first_name' => $faker->firstName(),
             'last_name' => $faker->lastName(),
@@ -28,7 +38,8 @@ class UserFactory extends Factory
             'phone' => '0000000000',
             'address' => 'Islamabad',
             'account_type' => AccountType::CLIENT->value,
-            'client_id' => $this->faker->randomElement(Client::pluck('id'))
+            'business_id' => $business->id,
+            'client_id' => $client->id
         ];
     }
 }

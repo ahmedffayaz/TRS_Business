@@ -53,9 +53,15 @@ class HeaderComponent extends Component
         return $this->businesses;
     }
 
+    private function getSessionBusiness()
+    {
+        return Business::whereName(session('business'))->first();
+    }
+
     public function render()
     {
         $businesses = $this->businesses;
-        return view('livewire.partials.header-component', compact('businesses'));
+        $business = $this->getSessionBusiness();
+        return view('livewire.partials.header-component', compact('businesses', 'business'));
     }
 }

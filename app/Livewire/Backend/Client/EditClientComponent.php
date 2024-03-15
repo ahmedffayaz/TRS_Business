@@ -25,7 +25,7 @@ class EditClientComponent extends Component
 {
     public ClientForm $form;
 
-    public $countries, $rateUnits, $client;
+    public $countries, $rateUnits, $client, $inputs, $i;
 
     public function mount($slug)
     {
@@ -33,7 +33,7 @@ class EditClientComponent extends Component
 
         $this->client = Client::whereHas('business', function ($query) use ($business) {
             $query->whereId($business->id);
-        })->whereSlug($slug)->first();
+        })->whereSlug($slug)->firstOrFail();
 
         $this->form->business_id = $business->id;
         $this->countries = Country::all();
@@ -41,12 +41,28 @@ class EditClientComponent extends Component
         $this->form->isUpdate = true;
         $this->form->id = $this->client->id;
         $this->form->set($this->client);
+
+        $this->inputs = [];
+        $this->i = 1;
+    }
+
+    public function addUserFields($i)
+    {
+        $this->i = $i + 1;
+        array_push($this->inputs, 1);
+        $this->dispatch('feather-icons');
+    }
+
+    public function removeUserFields($key)
+    {
+        unset($this->inputs[$key]);
     }
 
     public function render()
     {
         $countries = $this->countries;
         $rateUnits = $this->rateUnits;
+        $this->dispatch('reinitialize-icons');
         return view('livewire.backend.client.edit-client-component', compact('countries', 'rateUnits'));
     }
 
@@ -66,6 +82,7 @@ class EditClientComponent extends Component
                 'business_id' => $validated['business_id'],
                 'address' => $validated['address'],
                 'city' => $validated['city'],
+                'business_id' => $this->form->business_id,
                 'country_id' => $validated['country_id'],
                 'postal_code' => $validated['postal_code'],
                 'rate_per_hour' => $validated['rate_per_hour'],
@@ -73,8 +90,9 @@ class EditClientComponent extends Component
                 'note' => $validated['note']
             ]);
 
-            if ($validated['add_user'] === '1')
+            if ($validated['add_user'] === '1') {
                 $this->addUser($client);
+            }
 
             DB::commit();
             $this->form->reset();
@@ -89,34 +107,43 @@ class EditClientComponent extends Component
 
     private function addUser($client)
     {
-        foreach ($this->form->first_name as $index => $first_name) {
-            $userValidate = Validator::make([
-                'email' => $this->form->email[$index]
-            ], [
-                'email' => 'required|email|unique:users'
-            ]);
-
-            if ($userValidate->fails()) {
-                DB::rollBack();
-                return $this->dispatch('alert', [
-                    'type' => 'error',
-                    'message' => 'Client email already taken.'
+        if (!empty($this->form->first_name) && !empty($this->form->email) && !empty($this->form->last_name)
+        && !empty($this->form->phone) && !empty($this->form->password)) {
+            foreach ($this->form->first_name as $index => $first_name) {
+                $userValidate = Validator::make([
+                    'email' => $this->form->email[$index]
+                ], [
+                    'email' => 'required|email|unique:users'
                 ]);
+
+                if ($userValidate->fails()) {
+                    $this->dispatch('alert', [
+                        'type' => 'error',
+                        'message' => $this->form->email[$index] . ' email already exist.'
+                    ]);
+                }
+
+                DB::beginTransaction();
+                $user = User::create([
+                    'first_name' => $first_name,
+                    'last_name' => $this->form->last_name[$index],
+                    'email' => $this->form->email[$index],
+                    'phone' => $this->form->phone[$index],
+                    'password' => Hash::make($this->form->password[$index]),
+                    'account_type' => AccountType::CLIENT->value,
+                    'client_id' => $client->id,
+                    'is_active' => UserStatus::ACTIVE->value
+                ]);
+
+                $clientRoleId = Role::whereName('client')->pluck('id')->toArray();
+                $user->roles()->sync($clientRoleId);
+                DB::commit();
             }
-
-            $user = User::create([
-                'first_name' => $first_name,
-                'last_name' => $this->form->last_name[$index],
-                'email' => $this->form->email[$index],
-                'phone' => $this->form->phone[$index],
-                'password' => Hash::make($this->form->password[$index]),
-                'account_type' => AccountType::CLIENT->value,
-                'client_id' => $client->id,
-                'is_active' => UserStatus::ACTIVE->value
+        } else {
+            $this->dispatch('alert', [
+                'type' => 'error',
+                'message' => 'User input fields are required.'
             ]);
-
-            $clientRoleId = Role::whereName('client')->pluck('id')->toArray();
-            $user->roles()->sync($clientRoleId);
         }
     }
 }

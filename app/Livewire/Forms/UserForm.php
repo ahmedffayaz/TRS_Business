@@ -38,14 +38,13 @@ class UserForm extends Form
             'email' => ['required', 'string', 'email:strict', 'unique:users,email,' . $this->id, 'max:191'],
             'alternative_email' => ['nullable', 'string', 'email:strict,dns', 'unique:users,alternative_email,' . $this->id, 'max:191'],
             'designation' => ['required', 'string', 'max:191'],
-            'salary' => ['nullable', 'numeric', 'between:0,99999999.99'],
-            'currency' => ['nullable', 'string'],
+            'salary' => ['required', 'numeric', 'gt:0'],
+            'currency' => ['required', 'string'],
             'password' => [$this->isUpdate ? 'nullable' : 'required', 'string', Password::min(6), 'max:191', 'confirmed'],
             'password_confirmation' => [$this->isUpdate ? 'nullable' : 'required', 'string'],
             'address' => ['required', 'string'],
             'phone' => ['required', 'string', 'max:191'],
             'alternative_number' => ['nullable', 'string', 'unique:users,alternative_number,' . $this->id, 'max:191'],
-            'client_id' => ['required'],
             'is_active' => ['required'],
             'roles' => 'required'
         ];

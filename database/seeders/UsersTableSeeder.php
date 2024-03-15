@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 
-use App\Enums\User\AccountType;
 use App\Models\User;
+use App\Models\Business;
 use Illuminate\Support\Str;
 use App\Enums\User\UserStatus;
+use App\Enums\User\AccountType;
 use Illuminate\Database\Seeder;
 use Database\Factories\UserFactory;
 
@@ -30,6 +31,7 @@ class UsersTableSeeder extends Seeder
             'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
             'account_type' => AccountType::BUSINESS->value,
+            'business_id' => null,
             'client_id' => null
 		])->assignRole('super-admin');
 
@@ -45,7 +47,8 @@ class UsersTableSeeder extends Seeder
             'is_active' => UserStatus::ACTIVE->value,
             'remember_token' => Str::random(10),
             'account_type' => AccountType::BUSINESS->value,
-            'client_id' => 2
+            'business_id' => Business::first()->id,
+            'client_id' => Business::first()->clients()->first()->id
 		])->assignRole('admin');
 
 		UserFactory::new()->count(10)->create()->each(function ($user) {

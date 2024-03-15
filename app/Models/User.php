@@ -180,4 +180,16 @@ class User extends Authenticatable
     {
         return $this->is_active ? 'Active' : 'Inactive';
     }
+
+    public function business() : BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    public function scopeSessionBusiness($query)
+    {
+        return $query->whereHas('business', function ($query) {
+            $query->whereName(session('business'));
+        });
+    }
 }

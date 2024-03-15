@@ -10,28 +10,13 @@
         @endcan
     </div>
     <div class="card-body">
-        <div class="row mb-2">
-            <div class="col-md-4 col-sm-12">
-                <div class="input-group input-group-merge">
-                    <span class="input-group-text" id="basic-addon-search2" wire:ignore><i data-feather="search"></i></span>
-                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
-                        aria-describedby="basic-addon-search2" />
-                </div>
-            </div>
-            <div class="col-md-8 col-sm-12 text-end">
-                <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'total')">Total <span class="badge rounded-pill bg-light-primary">{{ $totalUsers }}</span></x-anchor-tag>
-                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'active')">Active <span class="badge rounded-pill bg-light-primary">{{ $activeUsers }}</span></x-anchor-tag>
-                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary" wire:click="$set('userTypes', 'archived')">Archived <span class="badge rounded-pill bg-light-primary">{{ $archivedUsers }}</span></x-anchor-tag>
-                </div>
-            </div>
-        </div>
+        <x-table-search :total="$totalUsers" :active="$activeUsers" :archived="$archivedUsers" />
 
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>Employee</th>
+                        <th>Users</th>
                         <th>Status</th>
                         <th>Role</th>
                         <th>Actions</th>
@@ -80,15 +65,17 @@
                                                         <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                         <span>Edit</span>
                                                     </x-anchor-tag>
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="toggleStatus('{{ $user?->id }}')">
-                                                        @if ($user?->is_active)
+                                                    @if ($user->is_active)
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deactivateUserConfirmation('{{ $user?->id }}')">
                                                             <span wire:ignore><i data-feather="arrow-down" class="me-50"></i></span>
                                                             <span>Deactivate</span>
-                                                        @else
+                                                        </x-anchor-tag>
+                                                    @else
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="activateUserConfirmation('{{ $user?->id }}')">
                                                             <span wire:ignore><i data-feather="arrow-up" class="me-50"></i></span>
                                                             <span>Activate</span>
-                                                        @endif
-                                                    </x-anchor-tag>
+                                                        </x-anchor-tag>
+                                                    @endif
                                                 @endcan
                                                 @can('delete_users')
                                                     @if (empty($user->deleted_at))
@@ -118,25 +105,25 @@
             <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
                 <div class="row">
                     <div class="col-md-6 mb-1">
-                        <x-input-label for="designation" class="required" value="Designation" />
-                        <x-input type="text" name="designation" id="designation" :class="$errors->has('form.designation') ? 'error' : ''" placeholder="Enter designation" wire:model="form.designation" />
-                        @error('form.designation')
-                            <x-input-error :message="$message" />
-                        @enderror
-                    </div>
-                    <div class="col-md-6 mb-1">
-                        <x-input-label for="client" class="required" value="Client" />
+                        <x-input-label for="roles" class="required" value="roles" />
                         <span wire:ignore.>
-                            <x-select-input name="client_id" id="client" :class="$errors->has('form.client_id') ? 'error select2' : 'select2'" wire:model="form.client_id">
-                                <option value="" selected>--Select Client--</option>
-                                @isset($clients)
-                                    @foreach ($clients as $client)
-                                        <option value="{{ $client?->id }}">{{ $client?->name }}</option>
+                            <x-select-input name="roles" id="roles" :class="$errors->has('form.roles') ? 'error select2' : 'select2'" multiple wire:model="form.roles">
+                                @isset($roles)
+                                <option value="" selected>--Select Roles--</option>
+                                @foreach ($roles as $role)
+                                        <option value="{{ $role?->id }}">{{ $role?->title }}</option>
                                     @endforeach
                                 @endisset
                             </x-select-input>
                         </span>
-                        @error('form.client_id')
+                        @error('form.roles')
+                            <x-input-error :message="$message" />
+                        @enderror
+                    </div>
+                    <div class="col-md-6 mb-1">
+                        <x-input-label for="designation" class="required" value="Designation" />
+                        <x-input type="text" name="designation" id="designation" :class="$errors->has('form.designation') ? 'error' : ''" placeholder="Enter designation" wire:model="form.designation" />
+                        @error('form.designation')
                             <x-input-error :message="$message" />
                         @enderror
                     </div>
@@ -172,14 +159,14 @@
                         @enderror
                     </div>
                     <div class="col-md-6 mb-1">
-                        <x-input-label for="salary" value="Salary" />
+                        <x-input-label for="salary" class="required" value="Salary" />
                         <x-input type="number" name="salary" id="salary" :class="$errors->has('form.salary') ? 'error' : ''" placeholder="Enter Salary" wire:model="form.salary" />
                         @error('form.salary')
                             <x-input-error :message="$message" />
                         @enderror
                     </div>
                     <div class="col-md-6 mb-1">
-                        <x-input-label for="currency" value="Currency" />
+                        <x-input-label for="currency" class="required" value="Currency" />
                         <span wire:ignore.>
                             <x-select-input name="currency" id="currency" :class="$errors->has('form.currency') ? 'error select2' : 'select2'" wire:model="form.currency">
                                 @isset($currencies)
@@ -225,23 +212,7 @@
                             <x-input-error :message="$message" />
                         @enderror
                     </div>
-                    <div class="col-md-6 mb-1">
-                        <x-input-label for="roles" class="required" value="roles" />
-                        <span wire:ignore.>
-                            <x-select-input name="roles" id="roles" :class="$errors->has('form.roles') ? 'error select2' : 'select2'" multiple wire:model="form.roles">
-                                @isset($roles)
-                                <option value="" selected>--Select Roles--</option>
-                                @foreach ($roles as $role)
-                                        <option value="{{ $role?->id }}">{{ $role?->name }}</option>
-                                    @endforeach
-                                @endisset
-                            </x-select-input>
-                        </span>
-                        @error('form.roles')
-                            <x-input-error :message="$message" />
-                        @enderror
-                    </div>
-                    <div class="col-md-6 mb-1">
+                    <div class="col-md-12 mb-1">
                         <x-input-label for="status" class="required" value="Status" />
                         <span wire:ignore.>
                             <x-select-input name="is_active" id="status" :class="$errors->has('form.is_active') ? 'error select2' : 'select2'" wire:model="form.is_active">

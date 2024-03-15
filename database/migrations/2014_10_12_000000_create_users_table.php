@@ -25,6 +25,9 @@ class CreateUsersTable extends Migration
 
 			$table->string('account_type')->default(AccountType::CLIENT->value);
 
+            $table->unsignedBigInteger('business_id')->nullable();
+            $table->foreign('business_id')->references('id')->on('businesses');
+
             $table->unsignedBigInteger('client_id')->nullable();
             $table->foreign('client_id')->references('id')->on('clients');
 

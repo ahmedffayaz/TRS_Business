@@ -108,31 +108,32 @@
                 </div>
             </div>
         </div>
+        <span wire:ignore.>
         <div class="user-form d-none" id="user-form">
             <div class="row mb-1">
                 <div class="col-md-2 pe-md-1">
                     <x-input-label for="first_name" value="First Name" />
-                    <x-input type="text" id="first_name" placeholder="Enter first name"
+                    <x-input type="text" name="first_name[]" placeholder="Enter first name"
                         wire:model="form.first_name.0" />
                 </div>
                 <div class="col-md-2 px-md-1">
                     <x-input-label for="last_name" value="Last Name" />
-                    <x-input type="text" id="last_name" placeholder="Enter last name"
+                    <x-input type="text" name="last_name[]" placeholder="Enter last name"
                         wire:model="form.last_name.0" />
                 </div>
                 <div class="col-md-3 px-md-1">
                     <x-input-label for="email" value="Email" />
-                    <x-input type="text" id="email" placeholder="Enter email"
+                    <x-input type="text"  name="email[]" placeholder="Enter email"
                         wire:model="form.email.0" />
                 </div>
                 <div class="col-md-2 px-md-1">
                     <x-input-label for="phone" value="Phone" />
-                    <x-input type="text" id="phone" placeholder="Enter phone number"
+                    <x-input type="text"  name="phone[]" placeholder="Enter phone number"
                         wire:model="form.phone.0" />
                 </div>
                 <div class="col-md-2 px-md-1">
                     <x-input-label for="password" value="Password" />
-                    <x-input type="text" id="password" placeholder="Enter password"
+                    <x-input type="text"  name="password[]" placeholder="Enter password"
                         wire:model="form.password.0" />
                 </div>
                 <div class="col-md-1 ps-md-1">
@@ -144,13 +145,61 @@
                     <div class="row">
                         <div class="col-md-12">
                             <x-anchor-tag class="btn btn-icon btn-outline-primary"
-                                href="javascript:void(0);" id="add-user-fields" wire:ignore.>
+                                href="javascript:void(0);" wire:click="addUserFields({{ $i }})" wire:ignore.>
                                     <i data-feather="plus"></i>
                             </x-anchor-tag>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        </span>
+
+        <div>
+            @foreach($inputs as $key => $value)
+            <div class="row mb-1">
+                <div class="col-md-2 pe-md-1">
+                    <x-input-label for="first_name" value="First Name" />
+                    <x-input type="text" name="first_name[]" placeholder="Enter first name"
+                        wire:model="form.first_name.{{ $key + 1 }}" />
+                </div>
+                <div class="col-md-2 px-md-1">
+                    <x-input-label for="last_name" value="Last Name" />
+                    <x-input type="text" name="last_name[]" placeholder="Enter last name"
+                        wire:model="form.last_name.{{ $key + 1 }}" />
+                </div>
+                <div class="col-md-3 px-md-1">
+                    <x-input-label for="email" value="Email" />
+                    <x-input type="text"  name="email[]" placeholder="Enter email"
+                        wire:model="form.email.{{ $key + 1 }}" />
+                </div>
+                <div class="col-md-2 px-md-1">
+                    <x-input-label for="phone" value="Phone" />
+                    <x-input type="text"  name="phone[]" placeholder="Enter phone number"
+                        wire:model="form.phone.{{ $key + 1 }}" />
+                </div>
+                <div class="col-md-2 px-md-1">
+                    <x-input-label for="password" value="Password" />
+                    <x-input type="text"  name="password[]" placeholder="Enter password"
+                        wire:model="form.password.{{ $key + 1 }}" />
+                </div>
+                <div class="col-md-1 ps-md-1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <x-input-label for="action" value="Action" />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <x-anchor-tag class="btn btn-icon btn-outline-danger"
+                                href="javascript:void(0);" wire:click="removeUserFields({{ $key }})" wire:ignore.>
+                                    <i data-feather="trash-2"></i>
+                            </x-anchor-tag>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endforeach
 
             <div id="user-fields"></div>
         </div>
@@ -166,6 +215,11 @@
 @script
     <script>
         $(document).ready(function () {
+            // Reinitialize icons
+            Livewire.dispatch('feather-icons');
+            Livewire.on('reinitialize-icons', () => {
+                Livewire.dispatch('feather-icons');
+            });
             $(document).on('change', '#add-user', function (event) {
                 var $this = $(this);
                 // Check if the checkbox is checked
@@ -179,20 +233,6 @@
                     $this.val('off')
                     $('.user-form').addClass('d-none');
                 }
-            });
-
-            $(document).on('click', '#add-user-fields', function (event) {
-                event.preventDefault();
-                let url = "{{ route('dashboard.clients.add-user-fields') }}";
-                $.ajax({
-                    url: url,
-                    type: 'GET',
-                    success: function (response) {
-                        $('#user-fields').append(response.html);
-                        Livewire.dispatch('feather-icons');
-                    },
-                    error: function (response) {}
-                });
             });
 
             $('#country-select').on('change', function(e) {

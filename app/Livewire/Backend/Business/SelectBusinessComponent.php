@@ -13,7 +13,7 @@ class SelectBusinessComponent extends Component
 {
     use WithPagination;
 
-    public $user, $limitPerPage = 15;
+    public $user, $limitPerPage = 10;
 
     public function mount()
     {

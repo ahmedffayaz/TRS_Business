@@ -70,6 +70,8 @@ class Client extends Model
 
     public function employees() : HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class)->whereHas('roles', function ($query) {
+            $query->whereName('client');
+        });
     }
 }
