@@ -5,7 +5,7 @@ use App\Models\Project;
 use Database\Factories\ProjectFactory;
 use Illuminate\Database\Seeder;
 
-class ProjectsTableSeeder extends Seeder
+class ProjectsSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,7 +14,7 @@ class ProjectsTableSeeder extends Seeder
      */
     public function run()
     {
-        ProjectFactory::new()->count(10)->create()->each(function ($project) {
+        ProjectFactory::new()->count(300)->create()->each(function ($project) {
             $itrations = mt_rand(0, 2);
             $ids = [];
             for ($i = 0; $i < $itrations; $i++) {

@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             UsersTableSeeder::class,
 			CurrencySeeder::class,
-			ProjectsTableSeeder::class,
+			ProjectsSeeder::class,
 			TasksTableSeeder::class,
 			CommentsTableSeeder::class,
         ]);

@@ -192,4 +192,11 @@ class User extends Authenticatable
             $query->whereName(session('business'));
         });
     }
+
+    public function scopeUsersWithoutClientRole()
+    {
+        return $this->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            });
+    }
 }

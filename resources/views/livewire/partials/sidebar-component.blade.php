@@ -43,12 +43,14 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                <li class="{{ request()->routeIs('dashboard.projects') ? 'active' : '' }} nav-item">
-                    <a class="d-flex align-items-center" href="{{ route('dashboard.projects') }}">
-                        <i data-feather="file-text"></i>
-                        <span class="menu-title text-truncate" data-i18n="Projects">Projects</span>
-                    </a>
-                </li>
+                @can('view_projects')
+                    <x-nav class="{{ request()->routeIs('dashboard.projects.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.projects.index') }}">
+                            <i data-feather="file-text"></i>
+                            <span class="menu-title text-truncate" data-i18n="Projects">Projects</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 <li class=" nav-item">
                     <a class="d-flex align-items-center" href="#">
                         <i data-feather="check-circle"></i>

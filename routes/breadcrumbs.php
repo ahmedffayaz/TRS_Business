@@ -65,7 +65,7 @@ Breadcrumbs::for('clients_edit', function (BreadcrumbTrail $trail, Client $clien
 // Projects
 Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Projects', route('dashboard.projects'));
+    $trail->push('Projects', route('dashboard.projects.index'));
 });
 
 // Terms & Conditions

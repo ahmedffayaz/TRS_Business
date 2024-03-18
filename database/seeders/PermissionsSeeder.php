@@ -34,11 +34,6 @@ class PermissionsSeeder extends Seeder
 	    Permission::create(['group' => 'clients', 'name' => 'view_clients', 'title' => 'View clients']);
 	    Permission::create(['group' => 'clients', 'name' => 'delete_clients', 'title' => 'Delete clients']);
 
-	    // Companies
-	    Permission::create(['group' => 'company', 'name' => 'add_companies', 'title' => 'Add companies']);
-	    Permission::create(['group' => 'company', 'name' => 'edit_companies', 'title' => 'Edit companies']);
-	    Permission::create(['group' => 'company', 'name' => 'view_companies', 'title' => 'View companies']);
-	    Permission::create(['group' => 'company', 'name' => 'delete_companies', 'title' => 'Delete companies']);
 	    // Users
 	    Permission::create(['group' => 'user', 'name' => 'add_users', 'title' => 'Add users']);
 	    Permission::create(['group' => 'user', 'name' => 'edit_users', 'title' => 'Edit users']);

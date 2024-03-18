@@ -30,7 +30,7 @@ class UserComponent extends Component
     public string $columnName = 'created_at';
     public string $sortDirection = 'desc';
     public int $limitPerPage = 10;
-    public string $userTypes = 'total'; // Default user type
+    public string $dataCountType = 'total'; // Default user type
     public UserForm $form;
 
     public function mount()
@@ -52,7 +52,7 @@ class UserComponent extends Component
 
     private function getTotalUsers(): LengthAwarePaginator
     {
-        return $this->getUserQuery()->withTrashed()->paginate($this->limitPerPage);
+        return $this->getUserQuery()->paginate($this->limitPerPage);
     }
 
     private function getActiveUsers() : LengthAwarePaginator
@@ -67,11 +67,11 @@ class UserComponent extends Component
 
     public function getUsers()
     {
-        if ($this->userTypes === 'total')
+        if ($this->dataCountType === 'total')
             return $this->getTotalUsers();
-        else if ($this->userTypes === 'active')
+        else if ($this->dataCountType === 'active')
             return $this->getActiveUsers();
-        else if ($this->userTypes === 'archived')
+        else if ($this->dataCountType === 'archived')
             return $this->getArchivedUsers();
     }
 
@@ -145,7 +145,7 @@ class UserComponent extends Component
 
             $this->closeModal();
 
-            $this->dispatch('alert', ['type' => 'success', 'message' => 'Sorry, the user could not be found in our database.']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'User created successfully.']);
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while create user: ' . $exception->getMessage());

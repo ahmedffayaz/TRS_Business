@@ -42,17 +42,13 @@
                 @endif
                 <div class="row mb-2">
                     <div class="col-md-12 col-sm-6 ">
-                        <div class="demo-inline-spacing">
-                            <div class="custom-control custom-checkbox">
-                                <x-input-checkbox type="checkbox" id="is_accept" name="is_accept"
-                                     wire:model="form.is_accept" statusClass="form-check-success"
-                                    :class="$errors->has('form.is_accept') ? 'error' : ''"
-                                    :value="__('Accept Terms & Conditions')" />
-                                @error('form.is_accept')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-                        </div>
+                        <x-input-checkbox type="checkbox" id="is_accept" name="is_accept"
+                                wire:model="form.is_accept" statusClass="form-check-success"
+                            :class="$errors->has('form.is_accept') ? 'error' : ''"
+                            :labelValue="__('Accept Terms & Conditions')" />
+                        @error('form.is_accept')
+                            <small class="text-danger">{{ $message }}</small>
+                        @enderror
                     </div>
                 </div>
                 <div class="row">

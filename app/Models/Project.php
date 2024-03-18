@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Enums\Project\ProjectIsAutoArchived;
 use App\Enums\Project\ProjectNature;
+use App\Enums\Project\ProjectStatus;
 use App\Enums\Project\ProjectType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,8 +25,8 @@ class Project extends Model
      * @var array
      */
     protected $fillable = [
-        'company_id',
-        'client_company_id',
+        'business_id',
+        'client_id',
         'name',
         'reports_schedule',
         'client_email',
@@ -45,9 +46,10 @@ class Project extends Model
         'type' => ProjectType::class,
         'is_auto_archived' => ProjectIsAutoArchived::class,
         'nature' => ProjectNature::class,
+        'status' => ProjectStatus::class,
         'last_updated_at' => 'datetime',
     ];
-    
+
     public function scopeGetList($query, $search, $columnName, $sortDirection) {
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
@@ -55,14 +57,19 @@ class Project extends Model
                     ->orWhere('status', 'LIKE', '%' . $search . '%')
                     ->orWhere('description', 'LIKE', '%' . $search . '%')
                     ->orWhere('budget', 'LIKE', '%' . $search . '%')
-                    ->orWhere('rate_per_hour', 'LIKE', '%' . $search . '%')
-                    ->orWhere('rate_unit', 'LIKE', '%' . $search . '%')
                     ->orWhere('type', 'LIKE', '%' . $search . '%')
                     ->orWhere('reports_schedule', 'LIKE', '%' . $search . '%');
             });
         }
 
         return $query->orderBy($columnName, $sortDirection);
+    }
+
+    public function scopeSessionBusiness($query)
+    {
+        return $query->whereHas('business', function ($query) {
+            $query->whereName(session('business'));
+        });
     }
 
     public function members(): BelongsToMany
@@ -101,17 +108,14 @@ class Project extends Model
     /**
      * @return BelongsTo
      */
-    public function company(): BelongsTo
+    public function business(): BelongsTo
     {
-        return $this->belongsTo(Company::class);
+        return $this->belongsTo(Business::class);
     }
 
-    /**
-     * @return BelongsTo
-     */
-    public function client_company(): BelongsTo
+    public function client() : BelongsTo
     {
-        return $this->belongsTo(Company::class, 'client_company_id', 'id');
+        return $this->belongsTo(Client::class);
     }
 
     /**

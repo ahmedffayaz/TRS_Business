@@ -19,7 +19,7 @@ class ClientFactory extends Factory
      */
     public function definition(): array
     {
-        $currencies = selectCurrencies();
+        $currencies = currencies();
         $currencyKeys = array_keys($currencies);
         shuffle($currencyKeys); // Shuffle the currency keys array to randomize the order
         $randomCurrency = $currencyKeys[0]; // Select the first currency key after shuffling
