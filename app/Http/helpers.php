@@ -555,3 +555,17 @@ function nameToSlug($name)
 {
     return Str::slug($name);
 }
+
+function status($status)
+{
+    switch ($status->name) {
+        case 'SUCCESS':
+            return 'success';
+        case 'PENDING':
+            return 'warning';
+        case 'DELIVERED':
+            return 'success';
+        default:
+            return 'primary';
+    }
+}

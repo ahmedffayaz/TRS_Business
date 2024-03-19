@@ -4,6 +4,6 @@ namespace App\Enums\Project;
 
 enum ProjectIsAutoArchived: int
 {
-    case ARCHIVED = 1;
-    case UNARCHIVED = 0;
+    case ARCHIVE = 1;
+    case UNARCHIVE = 0;
 }

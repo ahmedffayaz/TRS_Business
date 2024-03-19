@@ -10,7 +10,15 @@
         @endcan
     </div>
     <div class="card-body">
-        <x-table-search :total="$totalUsers" :active="$activeUsers" :archived="$archivedUsers" />
+        @php
+            $dataCount = [
+                'total' => $totalUsers,
+                'active' => $activeUsers,
+                'archived' => $archivedUsers
+            ];
+        @endphp
+
+        <x-table-search :dataCounter="$dataCount" />
 
         <div class="table-responsive">
             <table class="table table-hover">

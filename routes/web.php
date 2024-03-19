@@ -8,8 +8,6 @@ use App\Http\Controllers\PagesController;
 use App\Http\Controllers\TasksController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LeavesController;
-use App\Livewire\Backend\CompanyComponent;
-use App\Livewire\Backend\ProjectComponent;
 use App\Livewire\Backend\SettingComponent;
 
 use App\Http\Controllers\ReportsController;
@@ -51,8 +49,9 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\Project\ProjectComponent;
+use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\User\ProfileComponent;
-use App\Livewire\Backend\User\UserProfileComponent as UserUserProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -89,7 +88,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
                 Route::get('search/{keyword}', SearchKnowledgeBaseKeywordComponent::class)->name('search-keyword');
             });
 
-            // Terms & conditios routes
+            // Terms & conditions routes
             Route::prefix('terms-conditions')->name('terms-conditions.')->group(function () {
                 Route::get('/', TermsConditionComponent::class)->name('index');
             });
@@ -103,9 +102,13 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
                 ->name('contracts.view')->middleware('permission:view_contracts');
             });
 
+            // Projects routes
+            Route::prefix('projects')->name('projects.')->group(function () {
+                Route::get('/', ProjectComponent::class)->name('index');
+                Route::get('{slug}', ProjectDetailComponent::class)->name('detail');
+            });
+
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
-            Route::get('/companies', CompanyComponent::class)->name('companies');
-            Route::get('projects', ProjectComponent::class)->name('projects');
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('/permissions', PermissionComponent::class)->name('permissions');
             Route::get('profile', UserProfileComponent::class)->name('profile');
