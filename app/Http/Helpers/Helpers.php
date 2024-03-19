@@ -64,7 +64,8 @@ function formatDate($date, $format = 'd M y')
 {
     $business = Business::whereName(session('business'))->first();
 
-    if ($business) $format = $business->date_format;
+    // Check $business & business date_format column not null
+    if ($business && $business->date_format) $format = $business->date_format;
 
     return empty($date) ? $date : Carbon::parse($date)->format($format);
 
