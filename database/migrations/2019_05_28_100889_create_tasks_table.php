@@ -33,6 +33,7 @@ class CreateTasksTable extends Migration
 			$table->foreign('task_type_id')->references('id')->on('task_types')->onDelete('restrict');
 
 			$table->timestamps();
+            $table->softDeletes();
 		});
 	}
 

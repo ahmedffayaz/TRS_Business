@@ -1,3 +1,5 @@
+@import url('../assets/vendors/pickers/css/pickers/pickadate/pickadate.css');
+@import url('../assets/vendors/pickers/css/pickers/flatpickr/flatpickr.min.css');
 /* Theme CSS */
 @import url('../assets/css/select2/select2.min.css');
 @import url('../../node_modules/quill/dist/quill.snow.css');
@@ -18,4 +20,6 @@
 @import url('../assets/css/sweet-alerts.min.css');
 @import url('../assets/css/forms/form-quill-editor.css');
 @import url('../assets/vendors/editors/markdown-text-editor-master/css/mte.css');
+@import url('../assets/css/forms/pickers/form-flat-pickr.css');
+@import url('../assets/css/forms/pickers/form-pickadate.css');
 @import url('custom.css');

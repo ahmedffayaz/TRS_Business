@@ -1,4 +1,4 @@
-@props(['total', 'active', 'archived'])
+@props(['dataCounter' => []])
 <div class="row mb-2">
     <div class="col-md-4 col-sm-12">
         <div class="input-group input-group-merge">
@@ -19,15 +19,12 @@
     </div>
     <div class="col-md-6 col-sm-12 text-end">
         <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
-                wire:click="$set('userTypes', 'total')">Total <span
-                    class="badge rounded-pill bg-light-primary">{{ $total }}</span></x-anchor-tag>
-            <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
-                wire:click="$set('userTypes', 'active')">Active <span
-                    class="badge rounded-pill bg-light-primary">{{ $active }}</span></x-anchor-tag>
-            <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
-                wire:click="$set('userTypes', 'archived')">Archived <span
-                    class="badge rounded-pill bg-light-primary">{{ $archived }}</span></x-anchor-tag>
+            @foreach($dataCounter as $key => $value)
+                <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
+                    wire:click="$set('dataCountType', '{{ $key }}')">{{ $key }} <span
+                    class="badge rounded-pill bg-light-primary">{{ $value }}</span>
+                </x-anchor-tag>
+            @endforeach
         </div>
     </div>
 </div>

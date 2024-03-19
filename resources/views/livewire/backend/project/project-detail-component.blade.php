@@ -1,0 +1,368 @@
+@assets
+    <style>
+        .avatar-group .avatar .avatar-content {
+            background-color: unset !important;
+        }
+    </style>
+@endassets
+
+<div>
+    @section('breadcrumbs', Breadcrumbs::render('project_details', $project))
+    <section class="row">
+        <div class="col-md-6">
+            <div class="result-toggler">
+                <h1 class="fs-3">{{ $project?->name }} ( <x-anchor-tag href="#" class="fw-bold" :value="$project?->client?->name" /> )</h1>
+            </div>
+        </div>
+        <div class="col-md-6 float-end">
+            <div class="view-options float-end d-flex">
+                @can('view_statistics')
+                    <x-button class="btn btn-primary me-1" type="button"  data-bs-toggle="collapse"
+                        data-bs-target="#project-statistics" aria-expanded="false" aria-controls="project-statistics">
+                        Project Statistics
+                    </x-button>
+                @endcan
+                <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Revenue')"
+                    tabindex="0" aria-controls="table-hover" type="button" wire:click="showRevenueModal" wire:ignore. />
+
+                @if ($project->tasks_count == 0 && $project->status->value !== 'delivered' && is_null($project->deleted_at))
+                    <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Deliver Project')"
+                        tabindex="0" aria-controls="table-hover" type="button" wire:ignore. />
+                @endif
+
+                <x-anchor-tag href="{{ route('dashboard.projects.index') }}" class="btn btn-primary" value="Back" />
+            </div>
+        </div>
+    </section>
+
+    @can('view_statistics')
+        <section class="collapse mt-2" id="project-statistics">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-app-design h-100">
+                        <div class="card-body">
+                            <h4 class="card-title mt-1 mb-75">{{ $project?->name }}</h4>
+                            <p class="card-text font-small-2 mb-2">{!! $project?->detail !!}</p>
+                            <div class="design-group row">
+                                <div class="col-md-9">
+                                    <div class="mb-1">
+                                        <h6 class="section-label">Business</h6>
+                                        <span class="badge badge-light-primary me-1">{{ $project?->client?->business?->name }}</span>
+                                    </div>
+                                    <div>
+                                        <h6 class="section-label">Client</h6>
+                                        <span class="badge badge-light-primary me-1">{{ $project?->client?->name }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    <div class="avatar bg-light-primary rounded p-1">
+                                        <div class="avatar-conent">{{ $project?->tasks_count }}
+                                            <div class="fs-5 text-primary">Tasks</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 mt-2">
+                                    {!! $project?->description !!}
+                                </div>
+                            </div>
+                            <div class="mb-2">
+                                <h6 class="section-label">Members</h6>
+                                <div class="avatar-group">
+                                    @foreach ($project?->members?->take(10) as $member)
+                                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
+                                            title="{{ $member?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
+                                            @if ($member?->avatar)
+                                                <img src="{{ getUserAvatar($member) }}" alt="Avatar" width="33" height="33" />
+                                            @else
+                                                <div class="avatar-content">{{ $member?->avatarName }}</div>
+                                            @endif
+                                        </div>
+                                    @endforeach
+                                    @if ($project?->members?->count() > 10)
+                                        <h6 class="align-self-center cursor-pointer ms-50 mb-0">+{{ $project?->members?->count() - 5 }}</h6>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="design-planning-wrapper">
+                                <div class="design-planning">
+                                    <p class="card-text mb-25">Start Date</p>
+                                    <h6 class="mb-0">{{ formatDate($project?->start_date) }}</h6>
+                                </div>
+                                <div class="design-planning">
+                                    <p class="card-text mb-25">Due Date</p>
+                                    <h6 class="mb-0">{{ formatDate($project?->end_date) }}</h6>
+                                </div>
+                                <div class="design-planning">
+                                    <p class="card-text mb-25">Billing Type</p>
+                                    <h6 class="mb-0">{{ $project?->type?->value }}</h6>
+                                </div>
+                                @can('view_budget')
+                                    @if ($project?->type?->value === 'hourly')
+                                        <div class="design-planning">
+                                            <p class="card-text mb-25">Hourly Rate</p>
+                                            <h6 class="mb-0">{{ formatCurrency($project->hourly_rate, $project->currency) }}</h6>
+                                        </div>
+                                    @endif
+                                @endcan
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-transaction h-100">
+                        <div class="card-body">
+                            <div style="max-height: 200px; overflow-y: auto; margin-bottom: 1rem;">
+                                @foreach ($project?->members as $member)
+                                    <div class="transaction-item">
+                                        <div class="d-flex">
+                                            <div class="avatar bg-light-primary rounded float-start">
+                                                <div class="avatar-content">{{ $member?->avatarName }}</div>
+                                            </div>
+                                            <div class="transaction-percentage">
+                                                <h6 class="transaction-title">{{ $member?->fullName }}</h6>
+                                                <small>{{ implode(', ', $member->roles->pluck('title')->toArray()) }}</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-statistics h-100">
+                        <div class="card-header">
+                            <h4 class="card-title">Status</h4>
+                        </div>
+                        <div class="card-body statistics-body">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-primary me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather='meh' class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ ucfirst(str_replace('-', ' ', $project?->status?->value)) }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Status</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-success me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="dollar-sign" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ formatCurrency($project?->budget) }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Budget</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-info me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="users" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ $project?->members_count }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Members</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-danger me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="box" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ $project?->tasks_count }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Tasks</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-danger me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="align-justify" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ $project?->tasks_count }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Completed Tasks</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-sm-12 mb-2">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-warning me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="align-center" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">{{ $project?->tasks_count }}</h4>
+                                            <p class="card-text font-small-3 mb-0">Pending Tasks</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-primary me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="database" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">0</h4>
+                                            <p class="card-text font-small-3 mb-0">Modules</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6 col-sm-12">
+                                    <div class="d-flex flex-row">
+                                        <div class="avatar bg-light-secondary me-2">
+                                            <div class="avatar-content">
+                                                <i data-feather="activity" class="avatar-icon"></i>
+                                            </div>
+                                        </div>
+                                        <div class="my-auto">
+                                            <h4 class="fw-bolder mb-0">0</h4>
+                                            <p class="card-text font-small-3 mb-0">Completed Modules</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endcan
+
+    <section class="mt-3">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="card-title">Tasks</h4>
+                @can('add_tasks')
+                    <div>
+                        <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
+                            type="button" wire:click="openMainModal" value="Add Task" />
+                    </div>
+                @endcan
+            </div>
+            <div class="card-body">
+                @php
+                    $dataCount = [
+                        'total' => 10,
+                        'active' => 8,
+                        'archived' => 2
+                    ];
+                @endphp
+
+                <x-table-search :dataCounter="$dataCount" />
+
+                <div class="table-responsive overflow-visible">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>p</th>
+                                <th>Title</th>
+                                <th>Deadline</th>
+                                <th>Assigned To</th>
+                                <th>Time Spent</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($project?->tasks as $task)
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <x-anchor-tag href="#" class="user_name text-truncate text-body">
+                                                <span class="fw-bolder">{{ $task?->name }}</span>
+                                            </x-anchor-tag>
+                                        </div>
+                                    </td>
+                                    <td>{{ formatDate($task?->end_date) }}</td>
+                                    <td>Members</td>
+                                    <td>Time Spent</td>
+                                    <td>{{ $task?->status }}</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            @can('edit_tasks', 'delete_tasks')
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                    data-bs-toggle="dropdown">
+                                                    <span wire:ignore><i data-feather="more-vertical">open</i></span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    @can('edit_tasks')
+                                                        <x-anchor-tag class="dropdown-item" href="#"
+                                                            wire:click="edit({{ $task->id }})">
+                                                            <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                            <span>Edit</span>
+                                                        </x-anchor-tag>
+                                                    @endcan
+                                                    @can('delete_tasks')
+                                                        <x-anchor-tag class="dropdown-item" href="#"
+                                                            wire:click="deleteConfirmation({{ $task->id }})">
+                                                            <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                            <span>Delete</span>
+                                                        </x-anchor-tag>
+                                                    @endcan
+                                                </div>
+                                            @else
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                    data-bs-toggle="dropdown">
+                                                    <span wire:ignore.>
+                                                        <i data-feather='lock'></i>
+                                                    </span>
+                                                </button>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </section>
+    @can('add_tasks')
+        @if ($isTaskModalOpen)
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            </x-main-modal>
+        @endif
+    @endcan
+
+    @if ($isRevenueModalOpen)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm">
+            <div class="mb-2">
+                <h1 class="mb-1">Project Revenue</h1>
+            </div>
+            <div class="row">
+                <p>
+                    <b>Project Cost:</b> <span>-</span>
+                </p>
+                <p>
+                    <b>Revenue:</b> <span>-</span>
+                </p>
+            </div>
+        </x-main-modal>
+    @endif
+</div>

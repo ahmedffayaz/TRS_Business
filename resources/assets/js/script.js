@@ -1,5 +1,6 @@
 import toastr from "toastr";
 import Quill from "quill";
+import flatpickr from "flatpickr";
 
 document.addEventListener("livewire:initialized", () => {
     /**
@@ -143,5 +144,9 @@ document.addEventListener("livewire:initialized", () => {
         // Retrieve converter from the textarea's data attribute
         var converter = $('textarea[name="'+data['textarea']+'"').data('converter');
         $('.markup-preview').html(converter.makeHtml(data['value']));
+    });
+
+    Livewire.on('flatpickr', function (data) {
+        flatpickr('.flatpickr-basic');
     })
 });
