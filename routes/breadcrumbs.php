@@ -7,6 +7,7 @@ use App\Models\Client;
 // This import is also not required, and you could replace `BreadcrumbTrail $trail`
 //  with `$trail`. This is nice for IDE type checking and completion.
 use App\Models\Business;
+use App\Models\Project;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -66,6 +67,12 @@ Breadcrumbs::for('clients_edit', function (BreadcrumbTrail $trail, Client $clien
 Breadcrumbs::for('projects', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Projects', route('dashboard.projects.index'));
+});
+
+Breadcrumbs::for('project_details', function (BreadcrumbTrail $trail, Project $project) {
+    $trail->parent('dashboard');
+    $trail->push('Projects', route('dashboard.projects.index'));
+    $trail->push('Project Details', route('dashboard.projects.detail', $project->slug));
 });
 
 // Terms & Conditions

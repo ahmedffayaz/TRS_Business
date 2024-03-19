@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
 use App\Enums\User\AccountType;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Notifications\Notifiable;
@@ -139,7 +140,7 @@ class User extends Authenticatable
         return $this->hasMany(Leave::class);
     }
 
-    public function getFullName(): string
+    public function getFullNameAttribute(): string
     {
         return "{$this->first_name} {$this->last_name}";
     }
@@ -198,5 +199,10 @@ class User extends Authenticatable
         return $this->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client');
             });
+    }
+
+    public function getAvatarNameAttribute()
+    {
+        return Str::upper(Str::substr($this->first_name, 0, 1)) . Str::upper(Str::substr($this->last_name, 0, 1));
     }
 }

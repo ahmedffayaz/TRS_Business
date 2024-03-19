@@ -80,3 +80,35 @@ function currencies($currency = null) : array
     }
     return $currencies;
 }
+
+function currencyToShortName($currency = null)
+{
+    $currencies = ['EURO' => 'EUR', 'USD' => 'USD', 'PKR' => 'PKR', 'Pound' => 'GBP', 'GBP' => 'GBP', 'CAD' => 'CAD'];
+    if ($currency) {
+        return $currencies[$currency];
+    }
+    return $currency;
+}
+
+function formatCurrency($amount, $currency = "EUR")
+{
+    if ($amount == 0) {
+        return '-';
+    }
+    $formatter = new \NumberFormatter('en-US', NumberFormatter::CURRENCY);
+    $currency = currencyToShortName($currency);
+    return $formatter->formatCurrency($amount, $currency);
+}
+
+function randomColors()
+{
+    $colors = ['success', 'danger', 'primary', 'info', 'secondary'];
+
+     // Select a random color from the array
+     return $colors[array_rand($colors)];
+}
+
+function getUserAvatar($user)
+{
+    return $user?->avatar ? asset('storage/' . $user?->avatar) : '/assets/images/avatar.png';
+}

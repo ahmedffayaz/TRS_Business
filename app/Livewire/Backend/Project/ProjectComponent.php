@@ -8,6 +8,8 @@ use App\Models\Client;
 use App\Models\Project;
 use Livewire\Component;
 use App\Models\Business;
+use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
 use Livewire\Attributes\Title;
@@ -16,7 +18,6 @@ use App\Livewire\Forms\ProjectForm;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Livewire\Attributes\On;
 
 #[Title('Projects')]
 class ProjectComponent extends Component
@@ -105,6 +106,7 @@ class ProjectComponent extends Component
                 'business_id' => $validated['business_id'],
                 'client_id' => $validated['client_id'],
                 'name' => $validated['name'],
+                'slug' => Str::slug($validated['name']),
                 'description' => $validated['description'],
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date'],
@@ -166,7 +168,6 @@ class ProjectComponent extends Component
     public function update($id)
     {
         $validated = $this->form->validate();
-        // dd($validated);
 
         try {
             $project = Project::sessionBusiness()->findOrFail($id);
@@ -175,6 +176,7 @@ class ProjectComponent extends Component
                 'business_id' => $validated['business_id'],
                 'client_id' => $validated['client_id'],
                 'name' => $validated['name'],
+                'slug' => Str::slug($validated['name']),
                 'description' => $validated['description'],
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date'],

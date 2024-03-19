@@ -2,14 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Enums\Project\ProjectNature;
-use App\Enums\Project\ProjectStatus;
-use App\Enums\Project\ProjectType;
 use Carbon\Carbon;
 use App\Models\Project;
 use App\Models\Business;
-
 use Faker\Factory as Faker;
+use Illuminate\Support\Str;
+use App\Enums\Project\ProjectType;
+
+use App\Enums\Project\ProjectNature;
+use App\Enums\Project\ProjectStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 
@@ -44,10 +45,13 @@ class ProjectFactory extends Factory
             ProjectNature::WEEKLY,
         ];
 
+        $projectName = $faker->catchPhrase;
+
         return [
             'business_id' => $business->id,
             'client_id' => $client->id,
-            'name' => $faker->catchPhrase,
+            'name' => $projectName,
+            'slug' => Str::slug($projectName),
             'start_date' => Carbon::now()->subDays($faker->numberBetween(0, 14))->format('Y-m-d'),
             'end_date' => Carbon::now()->addDays($faker->numberBetween(7, 365))->format('Y-m-d'),
             'status' => $faker->randomElement($statuses)->value,

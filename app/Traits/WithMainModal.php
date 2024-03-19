@@ -16,7 +16,9 @@ trait WithMainModal
     public function closeMainModal()
     {
         $this->dispatch('close-main-modal');
-        $this->form->reset();
+        if (isset($this->form))
+            $this->form->reset();
+
         $this->resetValidation();
     }
 

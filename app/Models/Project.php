@@ -28,6 +28,7 @@ class Project extends Model
         'business_id',
         'client_id',
         'name',
+        'slug',
         'reports_schedule',
         'client_email',
         'description',

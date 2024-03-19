@@ -27,7 +27,8 @@ class CreateProjectsTable extends Migration
             $table->unsignedBigInteger('client_id');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('restrict');
 
-			$table->string('name')->nullable();
+			$table->string('name')->unique();
+			$table->string('slug')->unique();
 			$table->date('start_date')->nullable();
 			$table->date('end_date')->nullable();
 			$table->string('status')->default(ProjectStatus::PENDING->value);
