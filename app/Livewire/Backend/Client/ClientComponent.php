@@ -42,12 +42,24 @@ class ClientComponent extends Component
 
     private function getClients(): LengthAwarePaginator
     {
+        $user = auth()->user();
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return Client::whereHas('business', function ($query) {
+        $clients = Client::whereHas('business', function ($query) {
             $query->whereName(session('business'));
-        })->with(['business', 'country', 'employees'])->withCount('employees')
-        ->getList($this->search, $this->columnName, $this->sortDirection)
-        ->paginate($this->limitPerPage);
+        })->when($user->hasRole('client'), function ($query) use ($user) {
+            $query->whereHas('employees', function ($query) use ($user) {
+                $query->whereId($user->id);
+            });
+        });
+
+        if ($user->hasPermissionTo('view_clients') && !$user->hasRole('super-admin')) {
+            $clients = $clients;
+        }
+
+
+        return $clients->with(['business', 'country', 'employees'])->withCount('employees')
+            ->getList($this->search, $this->columnName, $this->sortDirection)
+            ->paginate($this->limitPerPage);
     }
 
     public function render()

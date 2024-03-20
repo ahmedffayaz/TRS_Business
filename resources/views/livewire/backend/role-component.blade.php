@@ -65,7 +65,7 @@
                                 <tr>
                                     <td>{{ ucwords($role?->name) }}</td>
                                     <td>
-                                        <span class="badge rounded-pill {{ getRandomColor() }}">{{ $role->users()->count() }}</span>
+                                        <span class="badge rounded-pill {{ randomColors() }}">{{ $role->users()->count() }}</span>
                                     </td>
                                     <td>
                                         <div class="dropdown">
@@ -123,7 +123,7 @@
                                             @foreach ($allPermissions['title'][$permissionGroup] as $permissionName)
                                                 <div class="col-4 mb-1 form-check me-3 me-lg-5">
                                                     <input class="form-check-input" type="checkbox" id="{{ $permissionName }}" value="{{ $permissionName }}" wire:model="form.permissions"
-                                                        {{ in_array(old('permissions', isset($form->permissions) && checkRolehasPermission($form->permissions, $permissionName) ?? ''), [$permissionName]) ? 'checked' : '' }}>
+                                                        {{ in_array(old('permissions', isset($form->permissions) && checkRoleHasPermission($form->permissions, $permissionName) ?? ''), [$permissionName]) ? 'checked' : '' }}>
                                                     <label class="form-check-label" for="{{ $permissionName }}"> {{ ucfirst($permissionName) }} </label>
                                                 </div>
                                             @endforeach
