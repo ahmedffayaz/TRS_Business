@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
-class RolesTableSeeder extends Seeder
+class RoleSeeder extends Seeder
 {
 	/**
 	 * Run the database seeds.

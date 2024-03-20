@@ -2,11 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Task;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Task;
+use App\Models\Project;
 
 use Faker\Factory as Faker;
+use App\Enums\Task\TaskPriority;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 
 class TaskFactory extends Factory
@@ -19,15 +21,18 @@ class TaskFactory extends Factory
         $isCompleted = $faker->boolean(20);
         $completeDate = Carbon::now()->subDays($faker->numberBetween(0, 14))->format('Y-m-d');
 
+        // Retrieve a random project along with a random user associated with that project
+        $project = Project::inRandomOrder()->with('members')->first();
+
         return [
             'name' => $faker->sentence($faker->numberBetween(3, 6)),
             'description' => $faker->realText(150),
-            'user_id' => $faker->numberBetween(1, 11),
-            'project_id' => $faker->numberBetween(1, 5),
+            'user_id' => $project->members->isNotEmpty() ? $project->members->random()->user_id : null,
+            'project_id' => $project->id,
             'priority' => $faker->randomElement([
-                'low',
-                'medium',
-                'high',
+                TaskPriority::LOW->value,
+                TaskPriority::MEDIUM->value,
+                TaskPriority::HIGH->value
             ]),
             'start_date' => Carbon::now()->subDays($faker->numberBetween(0, 14))->format('Y-m-d'),
             'end_date' => Carbon::now()->addDays($faker->numberBetween(7, 365))->format('Y-m-d'),
