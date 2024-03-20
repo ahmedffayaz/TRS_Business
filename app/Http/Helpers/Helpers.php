@@ -5,6 +5,7 @@ use App\Models\Setting;
 use App\Models\Business;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Permission;
 
 /**
  * Get system name
@@ -102,7 +103,7 @@ function formatCurrency($amount, $currency = "EUR")
 
 function randomColors()
 {
-    $colors = ['success', 'danger', 'primary', 'info', 'secondary'];
+    $colors = ['success', 'danger', 'primary', 'info', 'secondary', 'warning', 'dark'];
 
      // Select a random color from the array
      return $colors[array_rand($colors)];
@@ -111,4 +112,27 @@ function randomColors()
 function getUserAvatar($user)
 {
     return $user?->avatar ? asset('storage/' . $user?->avatar) : '/assets/images/avatar.png';
+}
+
+function checkRoleHasPermission($rolePermissionName, $permissionName)
+{
+    return in_array($permissionName, $rolePermissionName);
+}
+
+function getGroupPermissions()
+{
+    $permissionGroups = Permission::pluck('group')->unique()->toArray();
+    $permissionArray = [
+        'group' => [],
+        'title' => [],
+    ];
+
+    foreach ($permissionGroups as $groupName) {
+        $permissionArray['group'][] = $groupName;
+        $permissionArray['title'][$groupName] = Permission::where('group', $groupName)
+            ->pluck('title')
+            ->toArray();
+    }
+
+    return $permissionArray;
 }

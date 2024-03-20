@@ -3,7 +3,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\Setting;
 
-class SettingsSeeder extends Seeder
+class SettingSeeder extends Seeder
 {
     /**
      * Run the database seeds.

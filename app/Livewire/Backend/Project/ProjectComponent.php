@@ -42,8 +42,13 @@ class ProjectComponent extends Component
 
     private function getProjectQuery()
     {
+        $user = auth()->user();
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return Project::sessionBusiness()->with(['client', 'members', 'tasks'])->withCount(['members', 'tasks'])
+        return Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+                $query->whereHas('members', function ($query) use ($user) {
+                    $query->where('user_id', $user->id);
+                });
+            })->with(['client', 'members', 'tasks'])->withCount(['members', 'tasks'])
             ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
