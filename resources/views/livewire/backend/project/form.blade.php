@@ -218,7 +218,7 @@
                         <option value="">--Select Members--</option>
                         @isset($members)
                             @foreach ($members as $member)
-                                <option value="{{ $member?->id }}">{{ $member?->name }}</option>
+                                <option value="{{ $member?->id }}">{{ $member?->name }} - {{ implode(', ', $member->roles->pluck('title')->toArray()) }}</option>
                             @endforeach
                         @endisset
                     </x-select-input>
