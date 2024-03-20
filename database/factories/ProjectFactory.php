@@ -45,7 +45,7 @@ class ProjectFactory extends Factory
             ProjectNature::WEEKLY,
         ];
 
-        $projectName = $faker->catchPhrase;
+        $projectName = $faker->unique()->catchPhrase;
 
         return [
             'business_id' => $business->id,

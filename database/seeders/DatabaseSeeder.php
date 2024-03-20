@@ -8,17 +8,16 @@ class DatabaseSeeder extends Seeder
 	public function run()
 	{
 		$this->call([
-            SettingsSeeder::class,
+            SettingSeeder::class,
 			CountrySeeder::class,
-            CompaniesTableSeeder::class,
             PermissionsSeeder::class,
-            RolesTableSeeder::class,
+            RoleSeeder::class,
             BusinessSeeder::class,
             ClientSeeder::class,
-            UsersTableSeeder::class,
+            UserSeeder::class,
 			CurrencySeeder::class,
-			ProjectsSeeder::class,
-			TasksTableSeeder::class,
+			ProjectSeeder::class,
+			TaskSeeder::class,
 			CommentsTableSeeder::class,
         ]);
 	}

@@ -10,7 +10,7 @@ use App\Enums\User\AccountType;
 use Illuminate\Database\Seeder;
 use Database\Factories\UserFactory;
 
-class UsersTableSeeder extends Seeder
+class UserSeeder extends Seeder
 {
 	/**
 	 * Run the database seeds.

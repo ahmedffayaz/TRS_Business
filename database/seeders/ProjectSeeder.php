@@ -2,10 +2,11 @@
 
 namespace Database\Seeders;
 use App\Models\Project;
-use Database\Factories\ProjectFactory;
 use Illuminate\Database\Seeder;
+use Database\Factories\ProjectFactory;
+use Illuminate\Support\Facades\Schema;
 
-class ProjectsSeeder extends Seeder
+class ProjectSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -14,6 +15,10 @@ class ProjectsSeeder extends Seeder
      */
     public function run()
     {
+        Schema::disableForeignKeyConstraints();
+        Project::truncate();
+        Schema::enableForeignKeyConstraints();
+
         ProjectFactory::new()->count(300)->create()->each(function ($project) {
             $itrations = mt_rand(0, 2);
             $ids = [];
