@@ -104,8 +104,8 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             // Projects routes
             Route::prefix('projects')->name('projects.')->group(function () {
-                Route::get('/', ProjectComponent::class)->name('index');
-                Route::get('{slug}', ProjectDetailComponent::class)->name('detail');
+                Route::get('/', ProjectComponent::class)->name('index')->middleware('permission:view_projects');
+                Route::get('{slug}', ProjectDetailComponent::class)->name('detail')->middleware('permission:view_users');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
