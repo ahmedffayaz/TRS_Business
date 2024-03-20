@@ -41,7 +41,7 @@
                                         </div>
                                         <div class="d-flex flex-column">
                                             <x-anchor-tag href="{{ route('dashboard.users.profile', $user->id) }}" class="user_name text-truncate text-body">
-                                                <span class="fw-bolder">{{ $user?->getFullName() }}</span>
+                                                <span class="fw-bolder">{{ $user?->fullName }}</span>
                                             </x-anchor-tag>
                                             <small class="emp_post text-muted">{{ $user?->email }}</small>
                                         </div>
