@@ -233,7 +233,7 @@ class ProjectComponent extends Component
             DB::commit();
             $this->dispatch('alert', [
                 'type' => 'success',
-                'message' => 'Knowledge base category deleted successfully.']);
+                'message' => 'Project deleted successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while delete project: ' . $exception->getMessage());
