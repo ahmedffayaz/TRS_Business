@@ -51,12 +51,14 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                <li class=" nav-item">
-                    <a class="d-flex align-items-center" href="#">
-                        <i data-feather="check-circle"></i>
-                        <span class="menu-title text-truncate" data-i18n="Tasks">Tasks</span>
-                    </a>
-                </li>
+                @can('view_tasks')
+                    <x-nav class="{{ request()->routeIs('dashboard.tasks.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.tasks.index') }}">
+                            <i data-feather="check-circle"></i>
+                            <span class="menu-title text-truncate" data-i18n="Tasks">Tasks</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 <li class=" nav-item">
                     <a class="d-flex align-items-center" href="#">
                         <i data-feather="clipboard"></i>

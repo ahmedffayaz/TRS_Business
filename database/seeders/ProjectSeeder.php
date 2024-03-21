@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Seeders;
+use App\Models\User;
 use App\Models\Project;
 use Illuminate\Database\Seeder;
 use Database\Factories\ProjectFactory;
@@ -19,14 +20,15 @@ class ProjectSeeder extends Seeder
         Project::truncate();
         Schema::enableForeignKeyConstraints();
 
-        ProjectFactory::new()->count(300)->create()->each(function ($project) {
-            $itrations = mt_rand(0, 2);
-            $ids = [];
-            for ($i = 0; $i < $itrations; $i++) {
-                $ids = mt_rand(1, 11);
-            }
+        // Get all user IDs
+        $userIds = User::pluck('id')->toArray();
 
-            $project->members()->sync($ids);
-        });
+
+        // Create projects
+        ProjectFactory::new()->count(300)->create()->each(function ($project) use ($userIds) {
+            $randomUserIds = mt_rand(1, count($userIds));
+            // Attach users as members to the project
+            $project->members()->attach($randomUserIds);
+       });
     }
 }

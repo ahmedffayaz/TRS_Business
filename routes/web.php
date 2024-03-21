@@ -16,7 +16,7 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-use App\Livewire\Backend\User\UserComponent;
+use App\Livewire\Backend\Task\TaskComponent;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,29 +29,30 @@ use App\Livewire\Backend\User\UserComponent;
 |
 */
 
+use App\Livewire\Backend\User\UserComponent;
 use App\Http\Controllers\CompaniesController;
 use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
 use App\Livewire\Auth\ForgotPasswordComponent;
 use App\Http\Controllers\AttachmentsController;
+use App\Livewire\Backend\User\ProfileComponent;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
+use App\Livewire\Backend\Project\ProjectComponent;
 use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
+use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
-use App\Livewire\Backend\Project\ProjectComponent;
-use App\Livewire\Backend\Project\ProjectDetailComponent;
-use App\Livewire\Backend\User\ProfileComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -106,6 +107,11 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('projects')->name('projects.')->group(function () {
                 Route::get('/', ProjectComponent::class)->name('index')->middleware('permission:view_projects');
                 Route::get('{slug}', ProjectDetailComponent::class)->name('detail')->middleware('permission:view_users');
+            });
+
+            // Tasks routes
+            Route::prefix('tasks')->name('tasks.')->group(function () {
+                Route::get('/', TaskComponent::class)->name('index')->middleware('permission:view_tasks');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');

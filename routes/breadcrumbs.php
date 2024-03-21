@@ -75,6 +75,12 @@ Breadcrumbs::for('project_details', function (BreadcrumbTrail $trail, Project $p
     $trail->push('Project Details', route('dashboard.projects.detail', $project->slug));
 });
 
+// Tasks
+Breadcrumbs::for('tasks', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Tasks', route('dashboard.tasks.index'));
+});
+
 // Terms & Conditions
 Breadcrumbs::for('terms_conditions', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

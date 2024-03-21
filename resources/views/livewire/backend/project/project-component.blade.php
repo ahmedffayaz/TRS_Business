@@ -21,7 +21,7 @@
 
             <x-table-search :dataCounter="$dataCount" />
 
-            <div class="table-responsive overflow-visible">
+            <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -97,6 +97,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                {{ $projects->links('components.pagination') }}
             </div>
         </div>
 

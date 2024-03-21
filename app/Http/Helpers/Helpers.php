@@ -91,7 +91,7 @@ function currencyToShortName($currency = null)
     return $currency;
 }
 
-function formatCurrency($amount, $currency = "EUR")
+function formatCurrency($amount, $currency = "EURO")
 {
     if ($amount == 0) {
         return '-';
@@ -135,4 +135,25 @@ function getGroupPermissions()
     }
 
     return $permissionArray;
+}
+
+function priorityToIcon($priority)
+{
+    if ($priority == 'high') {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="1" data-feather="arrow-up" class="text-success"></i>';
+    } else if ($priority === 'medium') {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="2" data-feather="arrow-up" class="text-warning"></i>';
+    } else {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="3" data-feather="arrow-down" class="text-danger"></i>';
+    }
+}
+
+function priorityToNum($priority)
+{
+    $priorities = [
+        'high' => 1,
+        'medium' => 2,
+        'low' => 3
+    ];
+    return $priorities[$priority];
 }

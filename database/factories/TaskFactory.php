@@ -23,11 +23,12 @@ class TaskFactory extends Factory
 
         // Retrieve a random project along with a random user associated with that project
         $project = Project::inRandomOrder()->with('members')->first();
+        $projectMembersIds = $project?->members->pluck('id')->toArray();
 
         return [
             'name' => $faker->sentence($faker->numberBetween(3, 6)),
             'description' => $faker->realText(150),
-            'user_id' => $project->members->isNotEmpty() ? $project->members->random()->user_id : null,
+            'user_id' => $faker->randomElement($projectMembersIds),
             'project_id' => $project->id,
             'priority' => $faker->randomElement([
                 TaskPriority::LOW->value,
