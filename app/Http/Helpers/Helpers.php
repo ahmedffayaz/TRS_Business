@@ -162,3 +162,24 @@ function slugToName($slug) : string
 {
     return ucwords(preg_replace('/[-_]/', ' ', $slug));
 }
+
+function formatTime($time) : string
+{
+    if (!empty($time)) {
+        if ($time >= 60) {
+            $minutes = $time % 60;
+            if ($minutes > 0) {
+                return ($time - $minutes) / 60 . ' hrs ' . $minutes . ' mins';
+            }
+            return $time / 60 . ' hrs';
+        }
+        return $time . ' mins';
+    }
+    return '-';
+}
+
+function timeSpent($comments)
+{
+    $time = array_sum(array_column($comments, 'time'));
+    return formatTime($time);
+}

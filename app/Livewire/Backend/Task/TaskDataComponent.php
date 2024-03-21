@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Task;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Task;
 use App\Models\User;
 use App\Models\Project;
@@ -203,6 +204,32 @@ class TaskDataComponent extends Component
         }
     }
 
+    public function markComplete($id)
+    {
+        try {
+            $task = Task::select('id', 'project_id')->findOrFail($id);
+            $verifiedTask = Task::whereHas('project', function ($query) use ($task) {
+                $query->sessionBusiness()->whereId($task->project_id);
+            })->findOrFail($id);
+
+            DB::beginTransaction();
+            $verifiedTask->update(['completed_at' => now()]);
+            // Update project last updated at
+            $task->project()->update(['last_updated_at' => now()]);
+            DB::commit();
+            $this->closeModal();
+            $this->dispatch('alert', ['type' => 'success',  'message' => 'Task marked as completed successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error while task mark as completed and task id is, ' . $id . ' error: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while task mark as completed and task id is, ' . $id . ' error: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
     public function archiveConfirmation($id)
     {
         $this->dispatch('swal-alert', [
@@ -255,8 +282,8 @@ class TaskDataComponent extends Component
     {
         try {
             DB::beginTransaction();
-            $task = Task::select('id', 'project_id')->findOrFail($id);
-            $verifiedTask = Task::whereHas('project', function ($query) use ($task) {
+            $task = Task::select('id', 'project_id', 'deleted_at')->onlyTrashed()->findOrFail($id);
+            $verifiedTask = Task::onlyTrashed()->whereHas('project', function ($query) use ($task) {
                 $query->sessionBusiness()->whereId($task->project_id);
             })->findOrFail($id);
             $verifiedTask->delete();

@@ -53,6 +53,7 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\Task\ViewTaskComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -112,6 +113,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             // Tasks routes
             Route::prefix('tasks')->name('tasks.')->group(function () {
                 Route::get('/', TaskComponent::class)->name('index')->middleware('permission:view_tasks');
+                Route::get('{id}', ViewTaskComponent::class)->name('view');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');

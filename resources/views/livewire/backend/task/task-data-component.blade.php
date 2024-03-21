@@ -45,9 +45,13 @@
                                 <td>{!! priorityToIcon($task?->priority) !!}</td>
                                 <td>
                                     <div class="d-flex flex-column">
-                                        <x-anchor-tag href="#" class="user_name text-truncate text-body">
+                                        @if (is_null($task?->deleted_at))
+                                            <x-anchor-tag href="{{ route('dashboard.tasks.view', $task->id) }}" class="user_name text-truncate text-body">
+                                                <span class="fw-bolder">{{ $task?->name }}</span>
+                                            </x-anchor-tag>
+                                        @else
                                             <span class="fw-bolder">{{ $task?->name }}</span>
-                                        </x-anchor-tag>
+                                        @endif
                                     </div>
                                 </td>
                                 <td>{{ formatDate($task?->end_date) }}</td>
@@ -63,7 +67,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>Time Spent</td>
+                                <td>{{ formatTime($task?->comment?->sum('time')) }}</td>
                                 <td>
                                     @if ($task?->completed_at)
                                         <i data-feather="check-square" class="text-success"></i>
@@ -71,7 +75,9 @@
                                 </td>
                                 <td>
                                     <div class="dropdown">
-                                        @can('edit_tasks', 'delete_tasks')
+                                        @if ((auth()->user()->hasPermissionTo('edit_tasks') || auth()->user()->hasPermissionTo('delete_tasks')
+                                            || auth()->user()->hasPermissionTo('view_tasks') || auth()->user()->hasPermissionTo('add_comments')
+                                            || auth()->user()->hasPermissionTo('mark_completed')) && is_null($task?->deleted_at))
                                             <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                 data-bs-toggle="dropdown">
                                                 <span wire:ignore><i data-feather="more-vertical">open</i></span>
@@ -79,13 +85,13 @@
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 @can('edit_tasks')
                                                     <x-anchor-tag class="dropdown-item" href="#"
-                                                        wire:click="edit({{ $task->id }})">
+                                                        wire:click="edit({{ $task?->id }})">
                                                         <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                         <span>Edit</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('view_tasks')
-                                                    <x-anchor-tag class="dropdown-item" href="#">
+                                                    <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.tasks.view', $task?->id) }}">
                                                         <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
                                                         <span>View</span>
                                                     </x-anchor-tag>
@@ -97,21 +103,21 @@
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('mark_completed')
-                                                    <x-anchor-tag class="dropdown-item" href="#">
+                                                    <x-anchor-tag class="dropdown-item" href="#" wire:click="markComplete({{ $task?->id }})">
                                                         <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                         <span>Mark Complete</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('delete_tasks')
                                                     <x-anchor-tag class="dropdown-item" href="#"
-                                                        wire:click="archiveConfirmation({{ $task->id }})">
+                                                        wire:click="archiveConfirmation({{ $task?->id }})">
                                                         <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
                                                         <span>Archive</span>
                                                     </x-anchor-tag>
                                                 @endcan
-                                                @if (auth()->user()->hasPermissionTo('delete_tasks') && empty($task->user_id) && empty($task->completed_at))
+                                                @if (auth()->user()->hasPermissionTo('delete_tasks') && empty($task?->user_id) && empty($task?->completed_at))
                                                     <x-anchor-tag class="dropdown-item" href="#"
-                                                        wire:click="deleteConfirmation({{ $task->id }})">
+                                                        wire:click="deleteConfirmation({{ $task?->id }})">
                                                         <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
                                                         <span>Delete</span>
                                                     </x-anchor-tag>
@@ -124,7 +130,7 @@
                                                     <i data-feather='lock'></i>
                                                 </span>
                                             </button>
-                                        @endcan
+                                        @endif
                                     </div>
                                 </td>
                             </tr>

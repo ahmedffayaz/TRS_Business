@@ -2,12 +2,13 @@
 
 // Note: Laravel will automatically resolve `Breadcrumbs::` without
 // this import. This is nice for IDE syntax and refactoring.
+use App\Models\Task;
 use App\Models\User;
-use App\Models\Client;
 // This import is also not required, and you could replace `BreadcrumbTrail $trail`
 //  with `$trail`. This is nice for IDE type checking and completion.
-use App\Models\Business;
+use App\Models\Client;
 use App\Models\Project;
+use App\Models\Business;
 use Diglactic\Breadcrumbs\Breadcrumbs;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
@@ -79,6 +80,12 @@ Breadcrumbs::for('project_details', function (BreadcrumbTrail $trail, Project $p
 Breadcrumbs::for('tasks', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Tasks', route('dashboard.tasks.index'));
+});
+
+Breadcrumbs::for('task_details', function (BreadcrumbTrail $trail, Task $task) {
+    $trail->parent('dashboard');
+    $trail->push($task?->project?->name, route('dashboard.projects.detail', $task?->project?->slug));
+    $trail->push($task?->name, route('dashboard.tasks.view', $task->id));
 });
 
 // Terms & Conditions
