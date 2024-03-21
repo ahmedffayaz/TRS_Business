@@ -26,7 +26,8 @@ class Task extends Model
 		'priority',
 		'start_date',
 		'end_date',
-		'completed_at'
+		'completed_at',
+        'billed_at'
 	];
 
 	protected $casts = [

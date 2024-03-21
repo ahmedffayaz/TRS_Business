@@ -43,14 +43,14 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                @can('view_projects')
+                @if (auth()->user()->can('view_projects') || auth()->user()->can('view_associated_projects'))
                     <x-nav class="{{ request()->routeIs('dashboard.projects.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.projects.index') }}">
                             <i data-feather="file-text"></i>
                             <span class="menu-title text-truncate" data-i18n="Projects">Projects</span>
                         </x-anchor-tag>
                     </x-nav>
-                @endcan
+                @endif
                 @can('view_tasks')
                     <x-nav class="{{ request()->routeIs('dashboard.tasks.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.tasks.index') }}">

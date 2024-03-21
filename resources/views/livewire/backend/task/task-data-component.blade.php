@@ -5,7 +5,7 @@
             @can('add_tasks')
                 <div>
                     <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
-                        type="button" wire:click="openMainModal" value="Add Task" />
+                        type="button" wire:click="openModal" value="Add Task" />
                 </div>
             @endcan
         </div>
@@ -104,11 +104,18 @@
                                                 @endcan
                                                 @can('delete_tasks')
                                                     <x-anchor-tag class="dropdown-item" href="#"
+                                                        wire:click="archiveConfirmation({{ $task->id }})">
+                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                        <span>Archive</span>
+                                                    </x-anchor-tag>
+                                                @endcan
+                                                @if (auth()->user()->hasPermissionTo('delete_tasks') && empty($task->user_id) && empty($task->completed_at))
+                                                    <x-anchor-tag class="dropdown-item" href="#"
                                                         wire:click="deleteConfirmation({{ $task->id }})">
                                                         <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
                                                         <span>Delete</span>
                                                     </x-anchor-tag>
-                                                @endcan
+                                                @endif
                                             </div>
                                         @else
                                             <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
@@ -128,4 +135,21 @@
             </div>
         </div>
     </div>
+
+    @can('add_tasks')
+    <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        @include('livewire.backend.task.form')
+    </x-main-modal>
+    @endcan
 </div>
+
+@script
+    <script type="module">
+        $(document).ready(function () {
+            // Reinitialize icons
+            Livewire.on('reinitialize-icons', () => {
+                Livewire.dispatch('feather-icons');
+            });
+        });
+    </script>
+@endscript

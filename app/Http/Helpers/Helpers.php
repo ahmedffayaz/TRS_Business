@@ -75,7 +75,7 @@ function formatDate($date, $format = 'd M y')
 // Currencies
 function currencies($currency = null) : array
 {
-    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'CAD' => 'CAD'];
+    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'GBP' => '£', 'CAD' => 'CAD'];
     if ($currency) {
         return $currencies[$currency];
     }
@@ -156,4 +156,9 @@ function priorityToNum($priority)
         'low' => 3
     ];
     return $priorities[$priority];
+}
+
+function slugToName($slug) : string
+{
+    return ucwords(preg_replace('/[-_]/', ' ', $slug));
 }
