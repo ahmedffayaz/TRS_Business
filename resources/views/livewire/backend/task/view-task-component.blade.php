@@ -1,18 +1,12 @@
 <div>
     @section('breadcrumbs', Breadcrumbs::render('task_details', $task))
-    <div class="card card-apply-job">
-        <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-1">
-                <h5 class="mb-0">{{ $task?->name }} : Detail</h5>
-                @can('view_comments')
-                    <div>
-                        <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
-                            type="button" wire:click="openModal" value="Comment" />
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card card-apply-job">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <h5 class="mb-0">{{ $task?->name }} : Detail</h5>
                     </div>
-                @endcan
-            </div>
-            <div class="row">
-                <div class="col-md-6">
                     <div class="table-responsive">
                         <table class="table">
                             <tbody>
@@ -60,13 +54,31 @@
                         </table>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card border border-1">
-                        <div class="card-body"></div>
-                    </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    @can('view_comments')
+                        <div>
+                            <x-anchor-tag href="#" class="btn btn-primary float-end" tabindex="0" aria-controls="table-hover"
+                                type="button" wire:click="openModal" value="Comment" />
+                        </div>
+                    @endcan
                 </div>
             </div>
-            <div class="row"></div>
         </div>
     </div>
+    @livewire('backend.comment.comment-component', ['taskId' => $task->id])
 </div>
+
+@script
+    <script type="module">
+        $(document).ready(function () {
+            // Reinitialize icons
+            Livewire.on('reinitialize-icons', () => {
+                Livewire.dispatch('feather-icons');
+            });
+        });
+    </script>
+@endscript

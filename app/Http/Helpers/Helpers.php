@@ -183,3 +183,8 @@ function timeSpent($comments)
     $time = array_sum(array_column($comments, 'time'));
     return formatTime($time);
 }
+
+function convertMinutesToHours($minutes)
+{
+    return !empty($minutes) ? ($minutes / 60) : 0;
+}

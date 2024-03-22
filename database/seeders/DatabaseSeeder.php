@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
 			CurrencySeeder::class,
 			ProjectSeeder::class,
 			TaskSeeder::class,
-			CommentsTableSeeder::class,
+			CommentSeeder::class,
         ]);
 	}
 }

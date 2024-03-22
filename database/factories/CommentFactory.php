@@ -2,11 +2,14 @@
 
 namespace Database\Factories;
 
-use App\Models\Comment;
 use Carbon\Carbon;
-use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Task;
+use App\Models\User;
 
+use App\Models\Comment;
 use Faker\Factory as Faker;
+use App\Enums\Comment\CommentType;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 
 class CommentFactory extends Factory
@@ -17,15 +20,24 @@ class CommentFactory extends Factory
     {
         $faker = Faker::create();
         $isToday = $faker->boolean(60);
+        $type = [
+            CommentType::ASSIGNED->value,
+            CommentType::ATTACHMENT->value,
+            CommentType::COMMENT->value,
+            CommentType::REMOVED->value,
+            CommentType::TIME->value
+        ];
+
         return [
             'description' => $faker->realText(150),
             'time' => $faker->numberBetween(3, 5) * 60,
-            'type' => $faker->boolean(40) ? 'time' : 'comment',
-            'task_id' => $faker->numberBetween(1, 4),
-            'from' => $faker->numberBetween(1, 11),
+            'type' => $faker->randomElement($type),
+            'task_id' => $faker->randomElement(Task::pluck('id')->toArray()),
+            'from' => $faker->randomElement(User::pluck('id')->toArray()),
             'dated' => $isToday
                 ? Carbon::now()->format('Y-m-d')
                 : Carbon::now()->subDays($faker->numberBetween(0, 3))->format('Y-m-d'),
+            'is_billable' => $faker->randomElement([0, 1])
         ];
     }
 }

@@ -4,7 +4,7 @@ use App\Models\Comment;
 use Database\Factories\CommentFactory;
 use Illuminate\Database\Seeder;
 
-class CommentsTableSeeder extends Seeder
+class CommentSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -13,6 +13,6 @@ class CommentsTableSeeder extends Seeder
      */
     public function run()
     {
-        CommentFactory::new()->count(5)->create();
+        CommentFactory::new()->count(4000)->create();
     }
 }

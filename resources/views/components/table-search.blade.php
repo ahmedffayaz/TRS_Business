@@ -17,14 +17,16 @@
             <option value="35">35</option>
         </select>
     </div>
-    <div class="col-md-6 col-sm-12 text-end">
-        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            @foreach($dataCounter as $key => $value)
-                <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
-                    wire:click="$set('dataCountType', '{{ $key }}')">{{ $key }} <span
-                    class="badge rounded-pill bg-light-primary">{{ $value }}</span>
-                </x-anchor-tag>
-            @endforeach
+    @if (!empty($dataCounter))
+        <div class="col-md-6 col-sm-12 text-end">
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                @foreach($dataCounter as $key => $value)
+                    <x-anchor-tag href="javascript:void(0)" class="btn btn-sm btn-outline-primary"
+                        wire:click="$set('dataCountType', '{{ $key }}')">{{ $key }} <span
+                        class="badge rounded-pill bg-light-primary">{{ $value }}</span>
+                    </x-anchor-tag>
+                @endforeach
+            </div>
         </div>
-    </div>
+    @endif
 </div>
