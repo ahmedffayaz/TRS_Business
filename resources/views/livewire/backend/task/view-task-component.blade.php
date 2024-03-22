@@ -1,6 +1,6 @@
 <div>
     @section('breadcrumbs', Breadcrumbs::render('task_details', $task))
-    <div class="row">
+    <div class="row mb-2">
         <div class="col-md-6">
             <div class="card card-apply-job">
                 <div class="card-body">
@@ -57,16 +57,7 @@
             </div>
         </div>
         <div class="col-md-6">
-            <div class="card">
-                <div class="card-body">
-                    @can('view_comments')
-                        <div>
-                            <x-anchor-tag href="#" class="btn btn-primary float-end" tabindex="0" aria-controls="table-hover"
-                                type="button" wire:click="openModal" value="Comment" />
-                        </div>
-                    @endcan
-                </div>
-            </div>
+            @livewire('backend.comment.chat-component', ['taskId' => $task->id])
         </div>
     </div>
     @livewire('backend.comment.comment-component', ['taskId' => $task->id])

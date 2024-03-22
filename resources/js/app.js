@@ -14,6 +14,7 @@ import 'toastr'
 import '../assets/vendors/editors/markdown-text-editor-master/js/editor.min'
 import MTE from '../assets/vendors/editors/markdown-text-editor-master/js/mte'
 import flatpickr from 'flatpickr'
+import '../assets/js/app-chat'
 import '../assets/js/script'
 
 document.addEventListener('DOMContentLoaded', () => {
