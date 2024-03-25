@@ -29,12 +29,17 @@ class TaskDataComponent extends Component
     public int $limitPerPage = 20;
 
     public ?int $projectId;
+    public ?string $projectSlug;
 
     public TaskForm $form;
 
-    public function mount($project = null)
+    public bool $isTaskModalOpen = false;
+    public bool $isRevenueModalOpen = false;
+
+    public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
+        $this->projectSlug = $projectSlug ?? null;
     }
 
     private function getTasksQuery()
@@ -97,11 +102,13 @@ class TaskDataComponent extends Component
 
         $this->dispatch('reinitialize-icons');
 
-        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members'));
+        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId'));
     }
 
     public function openModal()
     {
+        $this->isTaskModalOpen = true;
+        $this->isRevenueModalOpen = false;
         $this->openMainModal();
     }
 
@@ -110,6 +117,8 @@ class TaskDataComponent extends Component
         $this->closeMainModal();
         $this->dispatch('project-select', ['formProject' => []]);
         $this->dispatch('assigned-member-select', ['formUser' => []]);
+        $this->isTaskModalOpen = false;
+        $this->isRevenueModalOpen = false;
     }
 
     public function store()

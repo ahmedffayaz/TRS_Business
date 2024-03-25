@@ -252,17 +252,11 @@
     @endcan
 
     <section class="mt-3">
-        @livewire('backend.task.task-data-component', ['project' => $project->id])
+        @livewire('backend.task.task-data-component', ['project' => $project?->id, 'projectSlug' => $project?->slug])
     </section>
-    @can('add_tasks')
-        @if ($isTaskModalOpen)
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-            </x-main-modal>
-        @endif
-    @endcan
 
     @if ($isRevenueModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm" closeModal="closeRevenueModal">
             <div class="mb-2">
                 <h1 class="mb-1">Project Revenue</h1>
             </div>

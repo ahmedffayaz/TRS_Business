@@ -24,7 +24,7 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            @if (!request()->routeIs('dashboard.projects.detail', $projectId))
+                            @if (!$projectId)
                                 <th>Project</th>
                             @endif
                             <th>p</th>
@@ -39,10 +39,10 @@
                     <tbody>
                         @foreach ($tasks as $task)
                             <tr>
-                                @if (!request()->routeIs('dashboard.projects.detail', $projectId))
+                                @if (!$projectId)
                                     <td>{{ $task?->project?->name }}</td>
                                 @endif
-                                <td>{!! priorityToIcon($task?->priority) !!}</td>
+                                <td><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
                                 <td>
                                     <div class="d-flex flex-column">
                                         @if (is_null($task?->deleted_at))
@@ -70,7 +70,7 @@
                                 <td>{{ formatTime($task?->comment?->sum('time')) }}</td>
                                 <td>
                                     @if ($task?->completed_at)
-                                        <i data-feather="check-square" class="text-success"></i>
+                                    <span wire:ignore><i data-feather="check-square" class="text-success"></i></span>
                                     @endif
                                 </td>
                                 <td>
@@ -142,11 +142,16 @@
         </div>
     </div>
 
-    @can('add_tasks')
-    <x-main-modal wireIgnoreSelf="wire:ignore.self">
-        @include('livewire.backend.task.form')
-    </x-main-modal>
-    @endcan
+    @if ($isTaskModalOpen)
+        @can('add_tasks')
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+                @include('livewire.backend.task.form')
+            </x-main-modal>
+        @endcan
+    @else
+        <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        </x-main-modal>
+    @endif
 </div>
 
 @script
