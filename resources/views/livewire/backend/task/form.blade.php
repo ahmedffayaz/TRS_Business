@@ -7,8 +7,8 @@
             @if (!$projectId)
                 <div class="col-md-6">
                     <span wire:ignore.>
-                        <x-input-label for="project-select" class="required" value="Project" />
-                        <x-select-input id="project-select" wire:model="form.project_id"
+                        <x-input-label for="select-project" class="required" value="Project" />
+                        <x-select-input id="select-project" wire:model="form.project_id"
                             :class="$errors->has('form.project_id') ? 'error select2' : 'select2'">
                             @isset($projects)
                                 <option value="">--Select Project--</option>
@@ -162,16 +162,22 @@
 @script
     <script type="module">
         $(document).ready(function () {
+            Livewire.dispatch('select-container');
+            Livewire.on('resetSelectInput', () => {
+                $(document).ready(function () {
+                    Livewire.dispatch('select-container');
+                });
+            });
             // Reinitialize select2 on project dropdown
             Livewire.on('project-select', (data) => {
-                var $select = $('#project-select');
+                var $select = $('#select-project');
                 // Clear existing selections
                 $select.val(null).trigger('change');
                 // Set the new selections
                 $select.val(data[0].formProject).trigger('change');
             });
 
-            $('#project-select').on('change', function(event) {
+            $('#select-project').on('change', function(event) {
                 @this.set('form.project_id', $(this).val());
             });
 
