@@ -26,21 +26,52 @@ class Task extends Model
 		'priority',
 		'start_date',
 		'end_date',
-		'completed_at'
+		'completed_at',
+        'billed_at'
 	];
 
 	protected $casts = [
         'completed_at' => 'datetime',
         'billed_at' => 'datetime',
     ];
-	
+
+    public function scopeGetList($query, $search, $columnName, $sortDirection) {
+        if (!empty($search)) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('name', 'LIKE', '%' . $search . '%')
+                    ->orWhere('status', 'LIKE', '%' . $search . '%')
+                    ->orWhere('description', 'LIKE', '%' . $search . '%')
+                    ->orWhere('priority', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy($columnName, $sortDirection);
+    }
+
 	/**
 	 * @return BelongsTo
 	 */
 	public function project(): BelongsTo
 	{
-		return $this->belongsTo(Project::class)->withTrashed();
+		return $this->belongsTo(Project::class);
 	}
+
+    public function scopeHasProject($query, $projectId = null)
+    {
+        return $query->when($projectId, function ($query) use ($projectId) {
+            $query->whereHas('project', function ($query) use ($projectId) {
+                $query->sessionBusiness()->whereId($projectId);
+            });
+        })->whereHas('project', function ($query) {
+            if (!auth()->user()->hasRole('super-admin')) {
+                $query->sessionBusiness()->whereHas('members', function ($query) {
+                    $query->where('user_id', auth()->user()->id);
+                });
+            } else {
+                $query->sessionBusiness();
+            }
+        });
+    }
 
 	/**
 	 * @return BelongsTo

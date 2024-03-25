@@ -84,7 +84,7 @@ class ProjectComponent extends Component
         $activeProjects = Project::sessionBusiness()->count();
         $archivedProjects = Project::sessionBusiness()->onlyTrashed()->count();
         $clients = Client::select('id', 'business_id', 'name')->sessionBusiness()->get();
-        $members = User::sessionBusiness()->usersWithoutClientRole()->get();
+        $members = User::sessionBusiness()->get();
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.project.project-component', compact('projects', 'totalProjects', 'activeProjects', 'archivedProjects', 'clients', 'members'));
     }
@@ -233,7 +233,7 @@ class ProjectComponent extends Component
             DB::commit();
             $this->dispatch('alert', [
                 'type' => 'success',
-                'message' => 'Knowledge base category deleted successfully.']);
+                'message' => 'Project deleted successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while delete project: ' . $exception->getMessage());

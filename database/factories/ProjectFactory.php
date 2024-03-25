@@ -57,7 +57,7 @@ class ProjectFactory extends Factory
             'status' => $faker->randomElement($statuses)->value,
             'description' => $faker->text(100),
             'budget' => $isFixed ? $faker->numberBetween(300.0, 10000.0) : null,
-            'currency' => $faker->randomElement(['USD', 'EURO']),
+            'currency' => $faker->randomElement(['EURO', 'USD', 'PKR', 'Pound', 'GBP', 'CAD']),
             'hourly_rate' => $isFixed ? null : $faker->numberBetween(8.0, 14.0),
             'type' => $isFixed ? ProjectType::FIXED->value : ProjectType::HOURLY->value,
             'nature' => $faker->randomElement($natures)->value,

@@ -17,7 +17,6 @@ use App\Enums\User\AccountType;
 use App\Livewire\Forms\ClientForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 #[Title('Add Client')]
@@ -115,7 +114,7 @@ class CreateClientComponent extends Component
                     'last_name' => $this->form->last_name[$index],
                     'email' => $this->form->email[$index],
                     'phone' => $this->form->phone[$index],
-                    'password' => Hash::make($this->form->password[$index]),
+                    'password' => $this->form->password[$index],
                     'account_type' => AccountType::CLIENT->value,
                     'business_id' => $this->form->business_id,
                     'client_id' => $client->id,

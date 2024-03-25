@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\KnowledgeBaseCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +17,12 @@ class KnowledgeBaseFactory extends Factory
      */
     public function definition(): array
     {
+        $knowledgeBaseCategories = KnowledgeBaseCategory::pluck('id')->toArray();
+
         return [
-            //
+            'knowledge_base_category_id' => fake()->randomElement($knowledgeBaseCategories),
+            'question' => fake()->sentence(),
+            'answer' => fake()->paragraph(),
         ];
     }
 }

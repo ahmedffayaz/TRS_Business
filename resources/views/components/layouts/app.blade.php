@@ -16,7 +16,7 @@
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
-        let _business_logo = (e) => e.src = `{{ asset('assets/images/company-default-logo.png') }}`;
+        var _business_logo = (e) => e.src = `{{ asset('assets/images/company-default-logo.png') }}`;
     </script>
     @livewireStyles
 </head>

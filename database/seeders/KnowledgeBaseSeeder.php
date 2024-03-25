@@ -33,7 +33,7 @@ class KnowledgeBaseSeeder extends Seeder
     public function run()
     {
         Schema::disableForeignKeyConstraints();
-        $this->truncateTables(['knowledge_bases', 'knowledge_base_topics', 'knowledge_base_qas']);
+        $this->truncateTables(['knowledge_bases', 'knowledge_base_categories', 'knowledge_base_category_role', 'keyword_knowledge_base']);
         Schema::enableForeignKeyConstraints();
 
         $roles = Role::pluck('id')->toArray();

@@ -24,7 +24,7 @@ class ClientFactory extends Factory
         shuffle($currencyKeys); // Shuffle the currency keys array to randomize the order
         $randomCurrency = $currencyKeys[0]; // Select the first currency key after shuffling
 
-        $name = $this->faker->name();
+        $name = $this->faker->unique()->company();
         $slug = Str::slug($name);
 
         return [
