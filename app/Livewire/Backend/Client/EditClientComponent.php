@@ -17,7 +17,6 @@ use App\Enums\User\AccountType;
 use App\Livewire\Forms\ClientForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 #[Title('Edit Client')]

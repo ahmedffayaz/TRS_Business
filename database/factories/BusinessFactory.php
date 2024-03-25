@@ -20,7 +20,7 @@ class BusinessFactory extends Factory
      */
     public function definition(): array
     {
-        $name = $this->faker->name();
+        $name = $this->faker->unique()->company();
         $slug = Str::slug($name);
         return [
             'name' => $name,
