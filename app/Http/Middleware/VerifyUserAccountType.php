@@ -20,10 +20,16 @@ class VerifyUserAccountType
         $user = Auth::user();
         if ($user->hasRole(['super-admin', 'admin']) && !request()->routeIs('select-business') && !$request->session()->has('business')) {
             return redirect()->route('select-business');
-        } else if ($user->account_type === AccountType::CLIENT->value) {
-            $userBusiness = $user->client->business;
-            session(['business' => $userBusiness->name]);
-            return redirect()->route('dashboard.home');
+        } else if ($user->account_type->value === AccountType::CLIENT->value && !$request->session()->has('business')) {
+            if ($user?->client) {
+                $userBusiness = $user->client->business;
+                session(['business' => $userBusiness->name]);
+            } else if ($user->hasRole(['super-admin', 'admin'])) {
+                return redirect()->route('dashboard.home');
+            } else {
+                session(['business' => $user->business->name]);
+                return redirect()->route('dashboard.home');
+            }
         }
 
         return $next($request);
