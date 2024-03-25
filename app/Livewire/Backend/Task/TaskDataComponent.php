@@ -83,18 +83,12 @@ class TaskDataComponent extends Component
         $totalArchivedTasks = Task::hasProject($projectId)->onlyTrashed()->count();
 
         $projects = null;
-        if(auth()->user()->hasRole('super-admin')){
-            $projects = Project::sessionBusiness()->pluck('name', 'id')->all();
-        } else {
-            if (auth()->user()->hasPermissionTo('view_projects')) {
-                $projects = Project::sessionBusiness()->pluck('name', 'id')->all();
-            } else if (auth()->user()->hasPermissionTo('view_associated_projects')) {
-                $projects = Project::sessionBusiness()->whereHas('members', function($query)
-                {
-                  $query->where('user_id','=', auth()->user()->id);
-                 })->pluck('name', 'id')->all();
-            }
-        }
+        $user = auth()->user();
+        $projects = Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->pluck('name', 'id')->all();
 
         $members = User::sessionBusiness()->whereHas('roles', function ($query) {
                     $query->where('name', '!=', 'client');
@@ -109,6 +103,7 @@ class TaskDataComponent extends Component
     {
         $this->isTaskModalOpen = true;
         $this->isRevenueModalOpen = false;
+        $this->dispatch('resetSelectInput');
         $this->openMainModal();
     }
 
