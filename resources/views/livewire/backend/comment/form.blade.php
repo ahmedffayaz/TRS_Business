@@ -62,7 +62,7 @@
 
         <div class="row mb-1">
             <div class="col-md-12">
-                <x-input-label for="reports" class="required" value="Is Billable" />
+                <x-input-label for="reports" value="Is Billable" />
                 <div class="demo-inline-spacing">
                     <x-input-checkbox type="checkbox" id="is-billable" name="is_billable" wire:model="form.is_billable"
                         statusClass="form-check-success" :labelValue="__('Is Billable')" />
