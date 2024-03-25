@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             ClientSeeder::class,
             UserSeeder::class,
 			CurrencySeeder::class,
+            KnowledgeBaseCategorySeeder::class,
 			ProjectSeeder::class,
 			TaskSeeder::class,
 			CommentSeeder::class,
