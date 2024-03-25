@@ -75,7 +75,7 @@ function formatDate($date, $format = 'd M y')
 // Currencies
 function currencies($currency = null) : array
 {
-    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'CAD' => 'CAD'];
+    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'GBP' => '£', 'CAD' => 'CAD'];
     if ($currency) {
         return $currencies[$currency];
     }
@@ -91,7 +91,7 @@ function currencyToShortName($currency = null)
     return $currency;
 }
 
-function formatCurrency($amount, $currency = "EUR")
+function formatCurrency($amount, $currency = "EURO")
 {
     if ($amount == 0) {
         return '-';
@@ -135,4 +135,56 @@ function getGroupPermissions()
     }
 
     return $permissionArray;
+}
+
+function priorityToIcon($priority)
+{
+    if ($priority == 'high') {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="1" data-feather="arrow-up" class="text-success"></i>';
+    } else if ($priority === 'medium') {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="2" data-feather="arrow-up" class="text-warning"></i>';
+    } else {
+        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="3" data-feather="arrow-down" class="text-danger"></i>';
+    }
+}
+
+function priorityToNum($priority)
+{
+    $priorities = [
+        'high' => 1,
+        'medium' => 2,
+        'low' => 3
+    ];
+    return $priorities[$priority];
+}
+
+function slugToName($slug) : string
+{
+    return ucwords(preg_replace('/[-_]/', ' ', $slug));
+}
+
+function formatTime($time) : string
+{
+    if (!empty($time)) {
+        if ($time >= 60) {
+            $minutes = $time % 60;
+            if ($minutes > 0) {
+                return ($time - $minutes) / 60 . ' hrs ' . $minutes . ' mins';
+            }
+            return $time / 60 . ' hrs';
+        }
+        return $time . ' mins';
+    }
+    return '-';
+}
+
+function timeSpent($comments)
+{
+    $time = array_sum(array_column($comments, 'time'));
+    return formatTime($time);
+}
+
+function convertMinutesToHours($minutes)
+{
+    return !empty($minutes) ? ($minutes / 60) : 0;
 }

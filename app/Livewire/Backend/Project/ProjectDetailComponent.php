@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Backend\Project;
 
-use App\Models\Project;
-use App\Traits\WithMainModal;
 use Exception;
-use Illuminate\Support\Facades\Log;
-use Livewire\Attributes\Title;
+use App\Models\Project;
 use Livewire\Component;
+use Livewire\Attributes\On;
+use App\Traits\WithMainModal;
+use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Log;
 
 #[Title('Project Details')]
 class ProjectDetailComponent extends Component
@@ -16,7 +17,6 @@ class ProjectDetailComponent extends Component
 
     public string $slug;
     public bool $isRevenueModalOpen = false;
-    public bool $isTaskModalOpen = false;
 
     public function mount($slug)
     {
@@ -40,15 +40,20 @@ class ProjectDetailComponent extends Component
     public function showRevenueModal()
     {
         $this->isRevenueModalOpen = true;
-
         try {
             $projectRevenue = Project::sessionBusiness()->whereSlug($this->slug)->withTrashed()
-                ->with(['members'])->firstOrFail();
+            ->with(['members'])->firstOrFail();
 
             $this->openMainModal();
         } catch (Exception $exception) {
             Log::error('Get error while get project revenue: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+
+    public function closeRevenueModal()
+    {
+        $this->isRevenueModalOpen = false;
+        $this->closeMainModal();
     }
 }

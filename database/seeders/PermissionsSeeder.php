@@ -60,6 +60,7 @@ class PermissionsSeeder extends Seeder
 	    Permission::create(['group' => 'project', 'name' => 'deliver_project', 'title' => 'Deliver project']);
 	    Permission::create(['group' => 'project', 'name' => 'view_revenue', 'title' => 'View revenue']);
 		Permission::create(['group' => 'project', 'name' => 'view_archived', 'title' => 'View archived']);
+		Permission::create(['group' => 'project', 'name' => 'view_associated_projects', 'title' => 'View Associated Projects']);
 
 	    // Tasks
 	    Permission::create(['group' => 'task', 'name' => 'add_tasks', 'title' => 'Add tasks']);
@@ -110,7 +111,6 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'leave', 'name' => 'view_leaves', 'title' => 'View leave']);
         // project new field add
         Permission::create(['group' => 'project', 'name' => 'view_statistics', 'title' => 'View Statistics']);
-		Permission::create(['group' => 'project', 'name' => 'view_associated_projects', 'title' => 'View Associated Projects']);
 		Permission::create(['group' => 'leave', 'name' => 'add_employees_leaves', 'title' => 'Add Employees Leaves']);
 
         // Email permissions

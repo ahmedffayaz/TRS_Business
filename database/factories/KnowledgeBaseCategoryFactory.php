@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Role;
+use App\Models\User;
+use App\Models\Business;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -16,8 +19,17 @@ class KnowledgeBaseCategoryFactory extends Factory
      */
     public function definition(): array
     {
+        $businessIds = Business::pluck('id')->toArray(); // Adjust the number of businesses as needed
+        $businessId = $this->faker->randomElement($businessIds);
+        $name = substr(fake()->unique()->sentence(), 0, 60);
+        // Get a user associated with the business
+        $user = User::where('business_id', $businessId)->where('business_id', '!=', null)->inRandomOrder()->first();
+
         return [
-            //
+            'business_id' => $businessId,
+            'name' => $name,
+            'created_by' => $user->id,
+            'updated_by' => $user->id
         ];
     }
 }

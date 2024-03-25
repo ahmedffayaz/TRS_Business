@@ -25,9 +25,6 @@ class CreateTasksTable extends Migration
 			$table->unsignedBigInteger('project_id');
             $table->foreign('project_id')->references('id')->on('projects')->onDelete('restrict');
 
-			$table->unsignedBigInteger('task_type_id')->nullable();
-			$table->foreign('task_type_id')->references('id')->on('task_types')->onDelete('restrict');
-
             $table->string('priority')->default(TaskPriority::MEDIUM->value);
 			$table->date('start_date')->nullable();
 			$table->date('end_date')->nullable();
