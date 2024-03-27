@@ -3,9 +3,10 @@
 namespace App\Livewire\Backend\Task;
 
 use Exception;
-use Carbon\Carbon;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Comment;
+use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
 use Livewire\Attributes\On;
@@ -13,7 +14,9 @@ use Livewire\WithPagination;
 use App\Traits\WithMainModal;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\Log;
+use App\Enums\Invoice\InvoiceStatus;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -32,9 +35,12 @@ class TaskDataComponent extends Component
     public ?string $projectSlug;
 
     public TaskForm $form;
+    public InvoiceForm $invoiceForm;
 
     public bool $isTaskModalOpen = false;
     public bool $isRevenueModalOpen = false;
+    public bool $isAddInvoiceModalOpen = false;
+    public $project = null;
 
     public function mount($project = null, $projectSlug = null)
     {
@@ -304,5 +310,87 @@ class TaskDataComponent extends Component
             Log::error('Get error while task delete and task id is ' . $id . ' ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+
+    public function openInvoiceModal()
+    {
+        $this->isAddInvoiceModalOpen = true;
+        if (!empty($this->project)) {
+            $this->project = Project::sessionBusiness()->whereId($this->projectId)->first();
+        }
+        $this->openMainModal();
+    }
+
+    public function closeInvoiceModal()
+    {
+        $this->isAddInvoiceModalOpen = false;
+        $this->closeMainModal();
+    }
+
+    public function createInvoice()
+    {
+        $this->invoiceForm->project_id = $this?->project?->id;
+        $validated = $this->invoiceForm->validate();
+
+        try {
+            DB::beginTransaction();
+            $invoiceNumber = $this->generateUniqueInvoiceNumber();
+            $invoice = Invoice::create([
+                'project_id' => $validated['project_id'],
+                'invoice_number' => $invoiceNumber,
+                'deduction' => $validated['deduction'],
+                'notes' => $validated['notes'],
+                'currency' => $this?->project?->currency,
+                'due_at' => $validated['due_at'],
+                'send_emails' => isset($validated['isEmail']) ? $validated['isEmail'] : false,
+            ]);
+
+            $projectCost = 0;
+
+            $deduction = ($projectCost === 0) ? 0 : $validated['deduction'];
+            $invoice->update([
+                'total' => $projectCost + ($projectCost === 0 && $validated['deduction'] > 0 ? $validated['deduction'] : 0),
+                'deduction' => $deduction,
+            ]);
+
+            // generate Invoice
+            $invoice->update(['status' => InvoiceStatus::PROCESSING->value]);
+            $invoice = $invoice->with(['invoiceData.task'])->find($invoice->id);
+            foreach ($invoice->invoiceData as $key => $record) {
+                $comments = Comment::whereIn('id', explode(',', $record->comments))->get();
+                if ($record->task) {
+                    $record->task->setRelation('comments', $comments);
+                }
+            }
+
+            // $this->generateInvoice($invoice);
+
+            DB::commit();
+            $this->closeInvoiceModal();
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Invoice created successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error while create invoice: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while create invoice: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    private function generateUniqueInvoiceNumber()
+    {
+        $business = $this?->project?->client?->business;
+        $invoiceNumber = $business?->invoice_prefix . $business?->invoice_serial;
+        $serialLength = strlen($business?->invoice_serial);
+        $serial = (int) $business?->invoice_serial + 1;
+        $newSerial = str_pad($serial, $serialLength, '0', STR_PAD_LEFT);
+        $business->update([
+            'invoice_serial' => $newSerial,
+        ]);
+        return $invoiceNumber;
     }
 }

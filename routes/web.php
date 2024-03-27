@@ -49,6 +49,7 @@ use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
+use App\Livewire\Backend\Invoice\InvoiceComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
@@ -114,6 +115,10 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('tasks')->name('tasks.')->group(function () {
                 Route::get('/', TaskComponent::class)->name('index')->middleware('permission:view_tasks');
                 Route::get('{id}', ViewTaskComponent::class)->name('view');
+            });
+
+            Route::prefix('invoices')->name('invoices.')->group(function () {
+                Route::get('/', InvoiceComponent::class)->name('index');
             });
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');

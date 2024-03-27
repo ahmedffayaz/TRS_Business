@@ -188,3 +188,25 @@ function convertMinutesToHours($minutes)
 {
     return !empty($minutes) ? ($minutes / 60) : 0;
 }
+
+function formatInvoiceStatus($status)
+{
+    $formattedStatus = '';
+    $s = slugToName($status);
+    switch ($status) {
+        case 'pending':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-danger'>{$s}</span>";
+            break;
+        case 'processing':
+        case 'processed':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-info'>{$s}</span>";
+            break;
+        case 'partially_paid':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-warning'>{$s}</span>";
+            break;
+        case 'paid':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-success'>{$s}</span>";
+            break;
+    }
+    return $formattedStatus;
+}

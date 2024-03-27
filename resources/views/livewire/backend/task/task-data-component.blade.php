@@ -2,12 +2,16 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Tasks</h4>
-            @can('add_tasks')
-                <div>
+            <div>
+                @can('add_invoices')
+                    <x-anchor-tag href="#" class="btn btn-primary me-1" tabindex="0" aria-controls="table-hover"
+                        type="button" wire:click="openInvoiceModal" value="Create Invoice" />
+                @endcan
+                @can('add_tasks')
                     <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
                         type="button" wire:click="openModal" value="Add Task" />
-                </div>
-            @endcan
+                @endcan
+            </div>
         </div>
         <div class="card-body">
             @php
@@ -146,6 +150,12 @@
         @can('add_tasks')
             <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
                 @include('livewire.backend.task.form')
+            </x-main-modal>
+        @endcan
+    @elseif($isAddInvoiceModalOpen)
+        @can('add_invoices')
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+                @include('livewire.backend.invoice.form')
             </x-main-modal>
         @endcan
     @else

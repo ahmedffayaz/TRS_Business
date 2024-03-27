@@ -10,3 +10,7 @@
         width: 150px;
     }
 }
+
+.card-min-height {
+    min-height: 280px;
+}

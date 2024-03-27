@@ -59,12 +59,14 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                <li class=" nav-item">
-                    <a class="d-flex align-items-center" href="#">
-                        <i data-feather="clipboard"></i>
-                        <span class="menu-title text-truncate" data-i18n="Invoices">Invoices</span>
-                    </a>
-                </li>
+                @can('view_invoices')
+                    <x-nav class="{{ request()->routeIs('dashboard.invoices.index') ? 'active' : '' }} nav-item">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.invoices.index') }}">
+                            <i data-feather="clipboard"></i>
+                            <span class="menu-title text-truncate" data-i18n="Tasks">Invoices</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
                 @can('view_terms_conditions')
                     <x-nav class="{{ request()->routeIs('dashboard.terms-conditions.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.terms-conditions.index') }}">
