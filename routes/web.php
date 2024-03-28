@@ -128,6 +128,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
         });
+        Route::post('upload-digital-image', [TermsConditionAcceptComponent::class , 'uploadDigitalImage'])->name('upload-digital-image');
     });
 });
 

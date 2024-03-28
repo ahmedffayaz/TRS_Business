@@ -210,3 +210,23 @@ function formatInvoiceStatus($status)
     }
     return $formattedStatus;
 }
+
+function getStoragePath(string $type): string
+{
+    $path = '';
+    switch ($type) {
+        case 'users':
+            $path = 'images/users/';
+            break;
+        case 'client':
+            $path = 'images/client/';
+            break;
+        case 'business':
+            $path = 'images/business/';
+            break;
+        case 'invoice':
+            $path = 'invoices';
+            break;
+    }
+    return $path;
+}
