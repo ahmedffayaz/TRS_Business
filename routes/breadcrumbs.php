@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\Project;
 use App\Models\Business;
 use Diglactic\Breadcrumbs\Breadcrumbs;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Diglactic\Breadcrumbs\Generator as BreadcrumbTrail;
 
 // Home
@@ -117,9 +118,9 @@ Breadcrumbs::for('update_password', function (BreadcrumbTrail $trail) {
     $trail->push('Update Password', route('dashboard.update-password'));
 });
 
-Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail) {
+Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail, Authenticatable $user) {
     $trail->parent('dashboard');
-    $trail->push('Profile', route('user-profile'));
+    $trail->push('Profile', route('dashboard.users.profile', $user->id));
     $trail->push('My Contracts', route('dashboard.users.contracts'));
 });
 

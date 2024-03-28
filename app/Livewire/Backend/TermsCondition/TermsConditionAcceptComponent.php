@@ -4,9 +4,13 @@ namespace App\Livewire\Backend\TermsCondition;
 
 use Exception;
 use Livewire\Component;
+use Illuminate\Http\Request;
+use App\Traits\WithMainModal;
 use Livewire\WithFileUploads;
 use App\Models\TermsCondition;
+use Livewire\Attributes\Title;
 use App\Libraries\ImageManager;
+use Illuminate\Http\JsonResponse;
 use App\Models\TermsConditionUser;
 use App\Traits\UserTermsCondition;
 use Illuminate\Support\Facades\DB;
@@ -14,12 +18,11 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Forms\TermsConditionAcceptForm;
-use Livewire\Attributes\Title;
 
 #[Title('Accept Terms & Conditions')]
 class TermsConditionAcceptComponent extends Component
 {
-    use UserTermsCondition, WithFileUploads;
+    use UserTermsCondition, WithFileUploads, WithMainModal;
 
     public TermsConditionAcceptForm $form;
     public string $userTermsConditionPath = 'user-terms-conditions';
@@ -60,7 +63,7 @@ class TermsConditionAcceptComponent extends Component
                 'terms_condition_id' => $id
             ], [
                 'uuid' => getUuid(),
-                'signature_url' => $validated['signature_file'],
+                'signature_url' => $validated['signature_file'] ?? $validated['digital_signature_pad'],
                 'pdf_url' => 'storage/' . getStoragePath('user-terms-condition') . '/' . $file_name
             ]);
 
@@ -70,9 +73,31 @@ class TermsConditionAcceptComponent extends Component
 
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Terms accepted successfully.']);
             return redirect()->route('dashboard.home');
-        } catch (Exception $excpetion) {
+        } catch (Exception $exception) {
             DB::rollBack();
-            Log::error('Get error on accept terms and conditions from user: ' . $excpetion->getMessage());
+            Log::error('Get error on accept terms and conditions from user: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
+        }
+    }
+
+    public function uploadDigitalImage(Request $request)
+    {
+        try {
+            $dir = getStoragePath('users');
+            // Upload file if exists
+            if ($request->file('digital_signature')) {
+                $now = now()->timestamp;
+                $digital_signature = 'signature_' . $now . '.png';
+                $request->file('digital_signature')->storeAs($dir, $digital_signature, 'public');
+                $inputs['digital_signature'] = $digital_signature;
+            }
+            return response()->json([
+                'success' => JsonResponse::HTTP_OK,
+                'message' => 'Contract saved successfully',
+                'data' => ['signature' => 'images/users/' . $digital_signature],
+            ], JsonResponse::HTTP_OK);
+        } catch (Exception $exception) {
+            Log::error('Get error on accept terms and conditions from user: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error',  'message' => 'Something went wrong.']);
         }
     }
