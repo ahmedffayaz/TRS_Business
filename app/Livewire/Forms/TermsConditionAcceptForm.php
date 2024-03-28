@@ -10,14 +10,15 @@ class TermsConditionAcceptForm extends Form
 {
     use WithFileUploads;
 
-    public $id, $is_accept, $signature_file;
+    public $id, $is_accept, $signature_file, $digital_signature_pad;
 
     public function rules(): array
     {
         return [
             'id' => 'required',
             'is_accept' => 'accepted',
-            'signature_file' => 'required|mimes:jpg,png,jpeg'
+            'digital_signature_pad' => 'nullable|string',
+            'signature_file' => 'nullable|required_if:digital_signature_pad,null|mimes:jpg,png,jpeg'
         ];
     }
 
@@ -26,7 +27,15 @@ class TermsConditionAcceptForm extends Form
         return [
             'id' => 'id',
             'is_accept' => 'accept terms & conditions',
-            'signature_file' => 'signature'
+            'signature_file' => 'signature',
+            'digital_signature_pad' => 'signature'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'signature_file.required_if' => 'Signature field is required.',
         ];
     }
 }

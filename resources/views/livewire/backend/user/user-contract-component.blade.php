@@ -1,5 +1,5 @@
 <div>
-    @section('breadcrumbs', Breadcrumbs::render('user_contracts'))
+    @section('breadcrumbs', Breadcrumbs::render('user_contracts', $user))
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">My Contracts</h4>
