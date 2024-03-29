@@ -26,7 +26,10 @@ class InvoiceComponent extends Component
     private function getInvoiceQuery()
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return Invoice::getList($this->search, $this->columnName, $this->sortDirection);
+
+        return Invoice::whereHas('project', function ($query) {
+            $query->sessionBusiness();
+        })->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
     private function getTotalInvoices(): LengthAwarePaginator
