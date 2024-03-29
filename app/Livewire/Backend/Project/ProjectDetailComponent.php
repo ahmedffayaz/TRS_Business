@@ -28,7 +28,7 @@ class ProjectDetailComponent extends Component
         return Project::sessionBusiness()->whereSlug($this->slug)
             ->with(['tasks', 'client', 'members' => function ($query) {
                 $query->with(['roles']);
-            }])->withCount(['tasks', 'members'])->firstOrFail();
+            }, 'invoices'])->withCount(['tasks', 'members'])->firstOrFail();
     }
 
     public function render()
