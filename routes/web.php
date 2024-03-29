@@ -54,6 +54,7 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Livewire\Backend\Task\TaskDataComponent;
 use App\Livewire\Backend\Task\ViewTaskComponent;
 
 Route::middleware(['guest'])->group(function () {
@@ -115,6 +116,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('tasks')->name('tasks.')->group(function () {
                 Route::get('/', TaskComponent::class)->name('index')->middleware('permission:view_tasks');
                 Route::get('{id}', ViewTaskComponent::class)->name('view');
+                Route::post('list-with-billable-comments', [TaskDataComponent::class, 'listWithBillableComments'])->name('list-with-billable-comments');
             });
 
             Route::prefix('invoices')->name('invoices.')->group(function () {

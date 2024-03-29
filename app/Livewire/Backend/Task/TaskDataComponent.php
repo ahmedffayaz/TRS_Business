@@ -10,9 +10,11 @@ use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
 use App\Livewire\Forms\TaskForm;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\Log;
@@ -41,17 +43,21 @@ class TaskDataComponent extends Component
     public bool $isRevenueModalOpen = false;
     public bool $isAddInvoiceModalOpen = false;
     public $project = null;
+    public $tasksList = null;
+    public $inputs, $i;
 
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
         $this->projectSlug = $projectSlug ?? null;
+        $this->inputs = [];
+        $this->i = 1;
     }
 
     private function getTasksQuery()
     {
         $projectId = isset($this->projectId) ? $this->projectId : null;
-        return Task::hasProject($projectId)->with(['project'])
+        return Task::hasProject($projectId)->with(['project', 'comments'])
             ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
@@ -109,6 +115,7 @@ class TaskDataComponent extends Component
     {
         $this->isTaskModalOpen = true;
         $this->isRevenueModalOpen = false;
+        $this->dispatch('reinitialize-dispatcher');
         $this->dispatch('resetSelectInput');
         $this->openMainModal();
     }
@@ -168,7 +175,7 @@ class TaskDataComponent extends Component
             $this->dispatch('project-select', ['formProject' => $verifiedTask->project_id]);
             $this->dispatch('assigned-member-select', ['formUser' => $verifiedTask->user_id]);
 
-            $this->openMainModal();
+            $this->openModal();
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while edit task and task id is, ' . $id . ' error: ' . $exception->getMessage());
@@ -312,9 +319,11 @@ class TaskDataComponent extends Component
         }
     }
 
-    public function openInvoiceModal()
+    #[On('open-invoice-modal')]
+    public function openInvoiceModal($tasks)
     {
         $this->isAddInvoiceModalOpen = true;
+        $this->tasksList = $this->listWithBillableComments($tasks);
         if (!empty($this->project)) {
             $this->project = Project::sessionBusiness()->whereId($this->projectId)->first();
         }
@@ -324,6 +333,7 @@ class TaskDataComponent extends Component
     public function closeInvoiceModal()
     {
         $this->isAddInvoiceModalOpen = false;
+        $this->invoiceForm->total_amount = null;
         $this->closeMainModal();
     }
 
@@ -346,6 +356,46 @@ class TaskDataComponent extends Component
             ]);
 
             $projectCost = 0;
+            if (isset($validated['task'])) {
+                foreach ($validated['task'] as $key => $task) {
+                    $time = 0;
+                    $comments = [];
+                    foreach ($task['comments'] as $commentId => $value) {
+                        $time = floatval($task['time'][$commentId]);
+                        $comment = Comment::findOrFail($commentId);
+                        $comment->update(['invoiced_at' => now()]);
+                        $comments[] = $comment->id;
+                    }
+                    $ratePerHour = '';
+                    $totalCost = 0;
+                    if ($this?->project?->type->value === 'hourly') {
+                        $totalCost = $task['rate_per_hour'] * ($time / 60);
+                        $ratePerHour = $task['rate_per_hour'];
+                    } else if ($this?->project?->type?->value === 'fixed') {
+                        $totalCost = $task['task_amount'];
+                    }
+
+                    $projectCost += $totalCost;
+                    $invoice->invoiceData()->create([
+                        'task_id' => $key,
+                        'time' => $time,
+                        'rate_per_hour' => $ratePerHour,
+                        'amount' => $totalCost,
+                        'comments' => implode(',', $comments)
+                    ]);
+                }
+            }
+
+            if (isset($validated['generic_comments'])) {
+                foreach($validated['generic_comments'] as $comment) {
+                    $invoice->invoiceData()->create([
+                        'time' => $comment['quantity'] ? $comment['quantity'] * 60 : 0,
+                        'rate_per_hour' => $comment['rate'],
+                        'amount' => $comment['amount'],
+                        'comments' => $comment['description']
+                    ]);
+                }
+            }
 
             $deduction = ($projectCost === 0) ? 0 : $validated['deduction'];
             $invoice->update([
@@ -392,5 +442,64 @@ class TaskDataComponent extends Component
             'invoice_serial' => $newSerial,
         ]);
         return $invoiceNumber;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|JsonResponse|View
+     */
+    private function listWithBillableComments($tasks)
+    {
+        try {
+            if(!empty($tasks)) {
+                $this->invoiceForm->total_amount = 0;
+            } else {
+                $this->invoiceForm->total_amount = null;
+            }
+            $tasks = Task::whereHas('project' , function ($query) {
+                $query->sessionBusiness()->with('client');
+            })->with(['project' => function ($query) {
+                $query->sessionBusiness()->with('client');
+            }, 'billableComments'])
+                ->whereIn('id', $tasks)->get();
+
+            foreach ($tasks as $task) {
+                if ($task->billableComments) {
+                    foreach ($task->billableComments as $comment) {
+                        $this->invoiceForm->task[$task->id]['unit'] = $task?->project?->currency;
+                        if ($task?->type?->value === 'fixed') {
+                            $this->invoiceForm->task[$task->id]['task_amount'] = $task?->project?->hourly_rate;
+                        } else {
+                            $this->invoiceForm->task[$task->id]['rate_per_hour'] = $task?->project?->hourly_rate;
+                        }
+                        $this->invoiceForm->task[$task->id]['time'][$comment?->id] = $comment?->time;
+                    }
+                }
+            }
+
+            return $tasks;
+        } catch (Exception $exception) {
+            Log::error('Get error on get selected tasks with billable comments on create invoices: ' . $exception->getMessage());
+
+            return response()->json([
+                'status_code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => $exception->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function addGenericCommentsFields($i)
+    {
+        $this->i = $i + 1;
+        array_push($this->inputs, 1);
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
+    }
+
+    public function removeGenericCommentsFields($key)
+    {
+        unset($this->inputs[$key]);
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
     }
 }

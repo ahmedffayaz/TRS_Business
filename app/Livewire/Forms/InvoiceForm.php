@@ -11,11 +11,14 @@ class InvoiceForm extends Form
     public bool $isUpdate = false;
 
     public ?int $project_id;
-    public $due_at;
-    public $notes;
     public ?bool $isEmail = false;
     public ?bool $all_comments = false;
+    public $total_amount;
+    public ?array $task;
+    public ?array $generic_comments;
+    public ?string $due_at;
     public $deduction;
+    public $notes;
 
     public ?array $description;
     public ?array $quantity;
@@ -24,23 +27,46 @@ class InvoiceForm extends Form
 
     public function rules(): array
     {
-        return [
+        $rules = [
             'project_id' => 'required|int',
+            'isEmail' => 'nullable|bool',
+            'all_comments' => 'nullable|bool',
+            'task' => 'nullable|array',
+            'generic_comments' => 'nullable|array',
             'due_at' => 'required|date',
             'deduction' => 'nullable|numeric',
-            'notes' => 'nullable|string',
-            'isEmail' => 'nullable|bool',
-            'all_comments' => 'nullable|bool'
+            'notes' => 'nullable|string'
         ];
+
+        // Add custom validation rule for total_amount
+        if (!is_null($this->total_amount)) {
+            $rules['total_amount'] = 'required|numeric|min:0.01'; // Adjust min value as needed
+        } else {
+            $rules['total_amount'] = 'nullable'; // Adjust min value as needed
+        }
+
+        return $rules;
     }
 
     public function validationAttributes(): array
     {
         return [
             'project_id' => 'project',
-            'due_at' => 'due date',
             'isEmail' => 'send email',
-            'all_comments' => 'Select/De-select all comments '
+            'all_comments' => 'Select/De-select all comments',
+            'total_amount' => 'task comment',
+            'due_at' => 'due date',
+            'deduction' => 'adjustment amount',
+            'notes' => 'notes'
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'total_amount.required' => 'Must select atleast one billable task comment',
+            'total_amount.numeric' => 'Must select atleast one billable task comment',
+            'total_amount.min' => 'Must select atleast one billable task comment',
         ];
     }
 }
