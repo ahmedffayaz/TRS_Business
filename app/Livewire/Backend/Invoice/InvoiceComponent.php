@@ -137,7 +137,7 @@ class InvoiceComponent extends Component
                 'description' => $validated['notes']
             ];
 
-            $status = ($remainingAmount === 0 || $remainingAmount === '0.0' || $remainingAmount === '0.00')
+            $status = ($remainingAmount === 0 || $remainingAmount === 0.0 || $remainingAmount === 0.00)
                 ? InvoiceStatus::PAID->value : InvoiceStatus::PARTIALLYPAID->value;
 
             DB::beginTransaction();
