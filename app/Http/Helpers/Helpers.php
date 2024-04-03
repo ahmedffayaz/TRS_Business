@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use App\Models\Invoice;
 use App\Models\Setting;
 use App\Models\Business;
 use Illuminate\Support\Str;
@@ -226,6 +227,7 @@ function formatTaskCompletedStatus($status) : string
     return $formattedStatus;
 }
 
+// Storage path
 function getStoragePath(string $type): string
 {
     $path = '';
@@ -244,4 +246,11 @@ function getStoragePath(string $type): string
             break;
     }
     return $path;
+}
+
+
+function getInvoiceRecord($invoice_id)
+{
+    $invoice = Invoice::find($invoice_id);
+    return  $invoice;
 }

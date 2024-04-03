@@ -31,6 +31,14 @@
                     </thead>
                     <tbody>
                         @isset($invoices)
+                        @php
+                            $pendingStatus = \App\Enums\Invoice\InvoiceStatus::PENDING->value;
+                            $processingStatus = \App\Enums\Invoice\InvoiceStatus::PROCESSING->value;
+                            $processedStatus = \App\Enums\Invoice\InvoiceStatus::PROCESSED->value;
+                            $partiallyPaidStatus = \App\Enums\Invoice\InvoiceStatus::PARTIALLYPAID->value;
+                            $paidStatus = \App\Enums\Invoice\InvoiceStatus::PAID->value;
+                            $approvedStatus = \App\Enums\Invoice\InvoiceStatus::APPROVED->value;
+                        @endphp
                             @foreach ($invoices as $invoice)
                                 <tr>
                                     <td class="sorting_1">
@@ -57,35 +65,43 @@
                                                 <span wire:ignore><i data-feather="more-vertical">open</i></span>
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-end">
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                <x-anchor-tag class="dropdown-item" href="{{ asset($invoice?->file) }}" target="_blank">
                                                     <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
                                                     <span>View Invoice</span>
                                                 </x-anchor-tag>
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
-                                                    <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
-                                                    <span>Resend Email</span>
-                                                </x-anchor-tag>
+                                                @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                        <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
+                                                        <span>Resend Email</span>
+                                                    </x-anchor-tag>
+                                                @endif
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus  && auth()->user()->hasPermissionTo('bill_invoices') && is_null($invoice?->billed_at))
+                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="openAddPaymentModal({{ $invoice?->id }})">
                                                     <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                     <span>Add Payment</span>
                                                 </x-anchor-tag>
+                                                @endif
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
-                                                    <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
-                                                    <span>Referesh Invoice</span>
-                                                </x-anchor-tag>
+                                                @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('add_invoices'))
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                        <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
+                                                        <span>Referesh Invoice</span>
+                                                    </x-anchor-tag>
+                                                @endif
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="showPayments({{ $invoice?->id }})">
                                                     <span wire:ignore><i data-feather="dollar-sign" class="me-50"></i></span>
                                                     <span>Payments</span>
                                                 </x-anchor-tag>
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
-                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                    <span>Delete Invoice</span>
-                                                </x-anchor-tag>
+                                                @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('bill_invoices'))
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                        <span>Delete Invoice</span>
+                                                    </x-anchor-tag>
+                                                @endif
                                             </div>
                                         </div>
                                     </td>
@@ -98,6 +114,19 @@
             </div>
         </div>
     </div>
+
+    @if ($invoiceAddPayment)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-md" closeModal="closeModal">
+            @include('livewire.backend.invoice.add-payment-form')
+        </x-main-modal>
+    @elseif ($invoicePaymentDetail)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            @include('livewire.backend.invoice.payment-detail')
+        </x-main-modal>
+    @else
+        <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        </x-main-modal>
+    @endif
 </div>
 
 @script

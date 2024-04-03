@@ -17,8 +17,11 @@ use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Livewire\Forms\InvoiceForm;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -366,7 +369,7 @@ class TaskDataComponent extends Component
                         $comment->update(['invoiced_at' => now()]);
                         $comments[] = $comment->id;
                     }
-                    $ratePerHour = '';
+                    $ratePerHour = null;
                     $totalCost = 0;
                     if ($this?->project?->type->value === 'hourly') {
                         $totalCost = $task['rate_per_hour'] * ($time / 60);
@@ -413,7 +416,7 @@ class TaskDataComponent extends Component
                 }
             }
 
-            // $this->generateInvoice($invoice);
+            $this->generateInvoice($invoice);
 
             DB::commit();
             $this->closeInvoiceModal();
@@ -501,5 +504,66 @@ class TaskDataComponent extends Component
         unset($this->inputs[$key]);
         $this->dispatch('feather-icons');
         $this->dispatch('reinitialize-feather-icons');
+    }
+
+    private function generateInvoice($data, $isEmails = true)
+    {
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+        $fileName = $data->invoice_number . '.pdf';
+
+        if (!Storage::disk('public')->exists(getStoragePath('invoice'))) {
+            Storage::disk('public')->makeDirectory(getStoragePath('invoice'));
+        }
+
+        $invoicePdfFile = public_path('storage/' . getStoragePath('invoice')) . '/' . $fileName;
+        $view = 'livewire.backend.invoice.invoice-pdf';
+        $pdf->loadView($view, compact('data'))->save($invoicePdfFile);
+
+        $invoice = $data;
+        $data->update([
+            'status' => 'processed',
+            'file' => 'storage/' . getStoragePath('invoice') . '/' . $fileName,
+        ]);
+
+        if ($data->send_emails && $isEmails) {
+            $invoiceNumber = $data->invoice_number;
+            $user = User::where('id', $data->project->client_id)->first();
+            $uEmail = $user->email;
+
+            $data = [
+                'first_name' => $user->first_name,
+                'invoice_number' => $invoiceNumber,
+            ];
+
+            // get super and and admin users
+            $users = User::whereHas('roles', function ($query) {
+                $query->where('name', 'super-admin')
+                ->orWhere('name', 'admin');
+            })->get();
+
+            $userEmail = array();
+            foreach ($users as $user) {
+                $temp = $user->email;
+                array_push($userEmail, $temp);
+            }
+            array_push($userEmail, $uEmail);
+            throw new Exception(json_encode($userEmail));
+
+            // Get business name
+            $businessName = $invoice?->project?->client?->business?->name;
+
+            // Send email
+            Mail::send('emails.invoice', $data, function ($message) use ($invoice, $fileName, $userEmail, $businessName) {
+                $message->attach($invoice, [
+                    'as' => $fileName, // name to client name
+                    'mime' => 'application/pdf',
+                ]);
+                $message->from(env('MAIL_USERNAME'), $businessName);
+
+                $message->to($userEmail)->subject('Invoice creation of project');
+            });
+        }
+        return redirect()->back();
     }
 }

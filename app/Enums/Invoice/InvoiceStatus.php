@@ -9,4 +9,5 @@ enum InvoiceStatus : string
     case PROCESSED = 'processed';
     case PARTIALLYPAID = 'partially_paid';
     case PAID = 'paid';
+    case APPROVED = 'approved';
 }

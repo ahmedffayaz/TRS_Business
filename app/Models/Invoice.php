@@ -75,7 +75,7 @@ class Invoice extends Model
     /**
      * @return HasMany
      */
-    public function invoice_payments() : HasMany
+    public function invoicePayments() : HasMany
 	{
 		return $this->hasMany(InvoicePayment::class);
 	}
