@@ -85,7 +85,7 @@
                                                 @endif
 
                                                 @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('add_invoices'))
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="regenerateInvoice({{ $invoice?->id }})">
                                                         <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
                                                         <span>Referesh Invoice</span>
                                                     </x-anchor-tag>

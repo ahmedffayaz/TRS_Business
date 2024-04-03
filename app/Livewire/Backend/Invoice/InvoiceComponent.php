@@ -4,6 +4,7 @@ namespace App\Livewire\Backend\Invoice;
 
 use Exception;
 use App\Models\User;
+use App\Models\Comment;
 use App\Models\Invoice;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,6 +18,7 @@ use App\Enums\Invoice\InvoiceStatus;
 use Illuminate\Support\Facades\Storage;
 use App\Livewire\Forms\InvoicePaymentForm;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 #[Title('Invoices')]
 class InvoiceComponent extends Component
@@ -189,7 +191,7 @@ class InvoiceComponent extends Component
         }
     }
 
-    public function generatePaymentPdf($data, $issueDate, $invoicePayment = null)
+    private function generatePaymentPdf($data, $issueDate, $invoicePayment = null)
     {
         $invoice = getInvoiceRecord($data['invoice_id']);
         $pdf = App::make('dompdf.wrapper');
@@ -220,6 +222,63 @@ class InvoiceComponent extends Component
             Log::error('Get error on open show invoice payments: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+
+    public function regenerateInvoice($id)
+    {
+        try {
+            $invoice = Invoice::whereHas('project', function ($query) {
+                $query->sessionBusiness();
+            })->with(['invoiceData.task'])->findOrFail($id);
+
+            foreach ($invoice->invoiceData as $key => $record) {
+                $comments = Comment::whereIn('id', explode(',', $record->comments))->get();
+                if ($record->task) {
+                    $record->task->setRelation('comments', $comments);
+                }
+            }
+
+            if ($invoice->total == 0) {
+                // Recalculate total
+                $total = 0;
+                foreach ($invoice->invoiceData as $data) {
+                    $total += $data->amount;
+                }
+                // Update invoice total
+                $invoice->update([
+                    'total' => $total,
+                ]);
+            }
+
+            // Generate invoice pdf
+            $this->generateInvoice($invoice, false);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'Invoice refreshed successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Invoice data does not exist.']);
+        } catch (Exception $exception) {
+            Log::error('Get error n refresh invoice: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    private function generateInvoice($data, $isEmails = true)
+    {
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+        $fileName = $data->invoice_number . '.pdf';
+
+        if (!Storage::disk('public')->exists(getStoragePath('invoice'))) {
+            Storage::disk('public')->makeDirectory(getStoragePath('invoice'));
+        }
+
+        $invoicePdfFile = public_path('storage/' . getStoragePath('invoice')) . '/' . $fileName;
+        $view = 'livewire.backend.invoice.invoice-pdf';
+        $pdf->loadView($view, compact('data'))->save($invoicePdfFile);
+
+        $data->update([
+            'status' => 'processed',
+            'file' => 'storage/' . getStoragePath('invoice') . '/' . $fileName,
+        ]);
     }
 
     public function render()
