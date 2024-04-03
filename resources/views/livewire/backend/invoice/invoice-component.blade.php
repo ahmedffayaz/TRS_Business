@@ -60,47 +60,56 @@
                                     <td>{{ formatDate($invoice?->due_at) }}</td>
                                     <td>
                                         <div class="dropdown position-static">
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
-                                                data-bs-toggle="dropdown">
-                                                <span wire:ignore><i data-feather="more-vertical">open</i></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <x-anchor-tag class="dropdown-item" href="{{ asset($invoice?->file) }}" target="_blank">
-                                                    <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
-                                                    <span>View Invoice</span>
-                                                </x-anchor-tag>
-
-                                                @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
-                                                        <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
-                                                        <span>Resend Email</span>
+                                            @if (empty($invoice?->deleted_at))
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                    data-bs-toggle="dropdown">
+                                                    <span wire:ignore><i data-feather="more-vertical">open</i></span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    <x-anchor-tag class="dropdown-item" href="{{ asset($invoice?->file) }}" target="_blank">
+                                                        <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
+                                                        <span>View Invoice</span>
                                                     </x-anchor-tag>
-                                                @endif
 
-                                                @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus  && auth()->user()->hasPermissionTo('bill_invoices') && is_null($invoice?->billed_at))
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="openAddPaymentModal({{ $invoice?->id }})">
-                                                    <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                    <span>Add Payment</span>
-                                                </x-anchor-tag>
-                                                @endif
+                                                    @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                            <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
+                                                            <span>Resend Email</span>
+                                                        </x-anchor-tag>
+                                                    @endif
 
-                                                @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('add_invoices'))
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="regenerateInvoice({{ $invoice?->id }})">
-                                                        <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
-                                                        <span>Referesh Invoice</span>
+                                                    @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus  && auth()->user()->hasPermissionTo('bill_invoices') && is_null($invoice?->billed_at))
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="openAddPaymentModal({{ $invoice?->id }})">
+                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                        <span>Add Payment</span>
                                                     </x-anchor-tag>
-                                                @endif
+                                                    @endif
 
-                                                <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="showPayments({{ $invoice?->id }})">
-                                                    <span wire:ignore><i data-feather="dollar-sign" class="me-50"></i></span>
-                                                    <span>Payments</span>
-                                                </x-anchor-tag>
+                                                    @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('add_invoices'))
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="regenerateInvoice({{ $invoice?->id }})">
+                                                            <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
+                                                            <span>Referesh Invoice</span>
+                                                        </x-anchor-tag>
+                                                    @endif
 
-                                                @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('bill_invoices'))
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
-                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                        <span>Delete Invoice</span>
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="showPayments({{ $invoice?->id }})">
+                                                        <span wire:ignore><i data-feather="dollar-sign" class="me-50"></i></span>
+                                                        <span>Payments</span>
                                                     </x-anchor-tag>
+
+                                                    @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('bill_invoices'))
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation({{ $invoice?->id }})">
+                                                            <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                            <span>Delete Invoice</span>
+                                                        </x-anchor-tag>
+                                                    @endif
+                                                @else
+                                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                        data-bs-toggle="dropdown">
+                                                        <span wire:ignore.>
+                                                            <i data-feather='lock'></i>
+                                                        </span>
+                                                    </button>
                                                 @endif
                                             </div>
                                         </div>

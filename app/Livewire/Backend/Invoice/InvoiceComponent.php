@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Comment;
 use App\Models\Invoice;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
 use App\Models\InvoicePayment;
@@ -289,5 +290,62 @@ class InvoiceComponent extends Component
         $archivedInvoices = Invoice::onlyTrashed()->count();
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.invoice.invoice-component', compact('invoices', 'totalInvoices', 'activeInvoices', 'archivedInvoices'));
+    }
+
+    public function deleteConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' => $id,
+            'type' => 'delete',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You are about to delete the invoice. This action cannot be undone.',
+        ]);
+    }
+
+    #[On('delete')]
+    public function delete($id)
+    {
+        try {
+            DB::beginTransaction();
+            // Get invoice where project has selected business
+            $invoice = Invoice::whereHas('project', function ($query) {
+                $query->sessionBusiness();
+            })->with(['invoiceData', 'project'])->findOrFail($id);
+
+            // Delete invoice data first
+            foreach ($invoice->invoiceData as $data) {
+                if (!empty($data->comments)) {
+                    $comments = explode(',', $data->comments);
+                    if (count($comments)) {
+                        Comment::whereIn('id', $comments)->update([
+                            'invoiced_at' => null,
+                        ]);
+                    }
+                }
+            }
+            $invoice->invoiceData()->delete();
+
+            // Delete invoice file
+            if (!empty($invoice->file)) {
+                Storage::disk('public')->delete($invoice->file);
+            }
+
+            // Delete invoice
+            $invoice->delete();
+
+            DB::commit();
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Invoice deleted successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error while delete invoice and invoice id is ' . $id . ' ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while delete invoice and invoice id is ' . $id . ' ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
     }
 }
