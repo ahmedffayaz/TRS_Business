@@ -114,6 +114,7 @@ class PermissionsSeeder extends Seeder
 		Permission::create(['group' => 'leave', 'name' => 'add_employees_leaves', 'title' => 'Add Employees Leaves']);
 
         // Email permissions
+        Permission::create(['group' => 'email', 'name' => 'view_emails', 'title' => 'Email Reports']);
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
 
         $sudperAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);

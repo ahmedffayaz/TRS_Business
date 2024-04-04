@@ -141,3 +141,9 @@ Breadcrumbs::for('knowledge_base_keyword', function (BreadcrumbTrail $trail) {
     $trail->push('Knowledge Base', route('dashboard.knowledgebase.index'));
     $trail->push('Search Knowledge Base');
 });
+
+// Email
+Breadcrumbs::for('emails', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Emails', route('dashboard.emails'));
+});

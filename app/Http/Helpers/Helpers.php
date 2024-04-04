@@ -254,3 +254,8 @@ function getInvoiceRecord($invoice_id)
     $invoice = Invoice::find($invoice_id);
     return  $invoice;
 }
+
+function getSiteLogo($path = null)
+{
+    return !empty($path) ? asset('storage/' . $path) : asset('trs_logo.svg');
+}
