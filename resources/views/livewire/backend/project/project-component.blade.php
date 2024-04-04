@@ -53,7 +53,7 @@
                                     <span
                                         class="badge rounded-pill badge-light-{{ status($project?->status) }}">{{ ucfirst(str_replace('-', ' ', $project?->status?->value)) }}</span>
                                 </td>
-                                <td>{{ $project?->budget }}</td>
+                                <td>{{ formatCurrency($project?->budget, $project?->currency) }}</td>
                                 <td>
                                     <span class="badge rounded-pill badge-light-primary me-1">{{ $project?->members_count }}</span>
                                 </td>

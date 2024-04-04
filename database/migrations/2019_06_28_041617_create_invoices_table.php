@@ -1,8 +1,9 @@
 <?php
 
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
+use App\Enums\Invoice\InvoiceStatus;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateInvoicesTable extends Migration
 {
@@ -14,9 +15,11 @@ class CreateInvoicesTable extends Migration
 	public function up()
 	{
 		Schema::create('invoices', function (Blueprint $table) {
-			$table->engine = "InnoDB";
-			$table->bigIncrements('id');
+			$table->id();
+
 			$table->unsignedBigInteger('project_id');
+            $table->foreign('project_id')->references('id')->on('projects')->onDelete('restrict');
+
 			$table->string('invoice_number')->unique();
 			$table->string('file')->nullable();
 			$table->string('currency');
@@ -25,14 +28,11 @@ class CreateInvoicesTable extends Migration
 			$table->text('notes')->nullable();
 			$table->date('due_at');
 			$table->timestamp('billed_at')->nullable();
-			$table->enum('status', ['pending', 'processing', 'processed','partially_paid', 'paid'])->default('pending');
-            $table->addColumn('boolean', 'send_emails')->default(false);
+			$table->string('status')->default(InvoiceStatus::PENDING->value);
+            $table->boolean('send_emails')->default(false);
 			$table->decimal('paid_amount')->nullable();
 			$table->timestamps();
-		});
-
-		Schema::table('invoices', function($table) {
-		       $table->foreign('project_id')->references('id')->on('projects')->onDelete('restrict');
+            $table->softDeletes();
 		});
 	}
 

@@ -1,13 +1,6 @@
 <div class="content-header-left col-md-8 mb-2">
     <div class="row breadcrumbs-top">
         <div class="col-12">
-            <h2 class="content-header-title float-start mb-0">
-                @foreach ($breadcrumbs as $index => $breadcrumb)
-                    @if ($index === count($breadcrumbs) - 1)
-                        {{ $breadcrumb->title }}
-                    @endif
-                @endforeach
-            </h2>
             <div class="breadcrumb-wrapper">
                 @if (count($breadcrumbs))
                 <ol class="breadcrumb">

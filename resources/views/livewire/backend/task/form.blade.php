@@ -190,12 +190,17 @@
                 $select.val(data[0].formUser).trigger('change');
             });
 
-            $('#assigned-member').on('change', function(event) {
+            $(document).on('change', '#assigned-member', function(event) {
                 @this.set('form.user_id', $(this).val());
             });
 
             // Reinitialize flatpickr
             Livewire.dispatch('flatpickr');
+            Livewire.on('reinitialize-dispatcher', () => {
+                $(document).ready(function () {
+                    Livewire.dispatch('flatpickr');
+                })
+            })
         });
     </script>
 @endscript

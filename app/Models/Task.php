@@ -103,7 +103,7 @@ class Task extends Model
 	 * Return only billable comments
 	 * @return HasMany
 	 */
-	public function billable_comments(): HasMany
+	public function billableComments(): HasMany
 	{
 		return $this->hasMany(Comment::class)
 			->where('type', 'time')->whereNull('invoiced_at');

@@ -152,10 +152,12 @@ document.addEventListener("livewire:initialized", () => {
         $('.markup-preview').html(converter.makeHtml(data['value']));
     });
 
+    // dispatch flatpickr
     Livewire.on('flatpickr', function (data) {
         flatpickr('.flatpickr-basic');
     });
 
+    // Digital signature pad
     Livewire.on('digital-signature-pad', function (data) {
         window.requestAnimFrame = (function(callback) {
             return window.requestAnimationFrame ||

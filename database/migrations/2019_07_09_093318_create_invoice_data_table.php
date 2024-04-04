@@ -14,19 +14,17 @@ class CreateInvoiceDataTable extends Migration
 	public function up()
 	{
 		Schema::create('invoice_data', function (Blueprint $table) {
-			$table->engine = "InnoDB";
-			$table->bigIncrements('id');
+			$table->id('id');
 			$table->unsignedBigInteger('invoice_id');
-			$table->unsignedBigInteger('task_id');
+			$table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('restrict');
+
+			$table->unsignedBigInteger('task_id')->nullable();
+			$table->foreign('task_id')->references('id')->on('tasks')->onDelete('restrict');
+
 			$table->integer('time');
 			$table->decimal('rate_per_hour')->nullable();
 			$table->decimal('amount')->nullable();
-			// $table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('restrict');
-			// $table->foreign('task_id')->references('id')->on('tasks')->onDelete('restrict');
-			$table->foreign('invoice_id')->references('id')->on('invoices')->onDelete('restrict');
-			$table->foreign('task_id')->references('id')->on('tasks')->onDelete('restrict');
-			
-            $table->addColumn('text', 'comments');
+            $table->text('comments');
 			$table->timestamps();
 		});
 	}

@@ -17,8 +17,8 @@
                     {{-- table search section --}}
                     <x-table-search :dataCounter="[]" />
 
-                    <div class="table-responsive">
-                        <table class="table">
+                    <div class="card-table table-responsive card-min-height">
+                        <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
