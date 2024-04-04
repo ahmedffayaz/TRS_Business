@@ -11,13 +11,13 @@ class InvoicePayment extends Model
     protected $fillable = [
         'invoice_id',
         'amount',
-        'converted_amount',
+        'file',
+        'conversion_rate',
         'remaining_amount',
         'bank',
         'bank_charges',
-        'conversion_rate',
-        'billed_at',
-        'description'
+        'description',
+        'billed_at'
     ];
 
 	/**

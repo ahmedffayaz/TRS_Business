@@ -124,6 +124,12 @@ Breadcrumbs::for('user_contracts', function (BreadcrumbTrail $trail, Authenticat
     $trail->push('My Contracts', route('dashboard.users.contracts'));
 });
 
+// Imvoices
+Breadcrumbs::for('invoices', function (BreadcrumbTrail $trail) {
+    $trail->parent('dashboard');
+    $trail->push('Invoices', route('dashboard.invoices.index'));
+});
+
 // Knowledge base
 Breadcrumbs::for('knowledge_base', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');

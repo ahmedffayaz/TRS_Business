@@ -104,6 +104,14 @@
                                         </div>
                                     @endif
                                 @endcan
+                                @if (count($project?->invoices) > 0)
+                                    <div class="design_planning">
+                                        <div><b>Invoices</b></div>
+                                        @foreach ($project?->invoices as $invoice)
+                                            <p>{{ $invoice?->invoice_number . ' - ' . formatCurrency($invoice?->total, $invoice?->currency) . ' - ' . $invoice?->status->value }}</p>
+                                        @endforeach
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>

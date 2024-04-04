@@ -2,12 +2,16 @@
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Tasks</h4>
-            @can('add_tasks')
-                <div>
+            <div>
+                @can('add_invoices')
+                    <x-anchor-tag href="#" class="btn btn-primary me-1 add-invoice" tabindex="0" aria-controls="table-hover"
+                        type="button" value="Create Invoice" />
+                @endcan
+                @can('add_tasks')
                     <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
                         type="button" wire:click="openModal" value="Add Task" />
-                </div>
-            @endcan
+                @endcan
+            </div>
         </div>
         <div class="card-body">
             @php
@@ -20,12 +24,15 @@
 
             <x-table-search :dataCounter="$dataCount" />
 
-            <div class="table-responsive">
+            <div class="card-table table-responsive card-min-height">
                 <table class="table table-hover">
                     <thead>
                         <tr>
                             @if (!$projectId)
                                 <th>Project</th>
+                            @else
+                                <th></th>
+                                <th>ID</th>
                             @endif
                             <th>p</th>
                             <th>Title</th>
@@ -41,6 +48,14 @@
                             <tr>
                                 @if (!$projectId)
                                     <td>{{ $task?->project?->name }}</td>
+                                @else
+                                    <td>
+                                        @if (count($task?->billableComments) > 0)
+                                            <x-input-checkbox type="checkbox" id="daily-reports_{{ $task?->id }}" name="tasks[]"
+                                                :value="$task?->id" statusClass="form-check-success" :labelValue="__('')" />
+                                        @endif
+                                    </td>
+                                    <td>{{ $task?->id }}</td>
                                 @endif
                                 <td><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
                                 <td>
@@ -148,6 +163,12 @@
                 @include('livewire.backend.task.form')
             </x-main-modal>
         @endcan
+    @elseif($isAddInvoiceModalOpen)
+        @can('add_invoices')
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInvoiceModal">
+                @include('livewire.backend.invoice.form')
+            </x-main-modal>
+        @endcan
     @else
         <x-main-modal wireIgnoreSelf="wire:ignore.self">
         </x-main-modal>
@@ -160,6 +181,23 @@
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
                 Livewire.dispatch('feather-icons');
+            });
+
+            $(document).on('click', '.add-invoice', function (event) {
+                event.preventDefault();
+                window.Swal.fire({
+                    text: 'Please wait..',
+                    showCancelButton: false,
+                    showConfirmButton: false
+                });
+
+                const tasks = [];
+                $.each($("input[name='tasks[]']:checked"), function() {
+                    tasks.push($(this).val());
+                });
+
+                Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
+                window.Swal.close();
             });
         });
     </script>

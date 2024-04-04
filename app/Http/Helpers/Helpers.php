@@ -1,6 +1,7 @@
 <?php
 
 use Carbon\Carbon;
+use App\Models\Invoice;
 use App\Models\Setting;
 use App\Models\Business;
 use Illuminate\Support\Str;
@@ -73,9 +74,9 @@ function formatDate($date, $format = 'd M y')
 }
 
 // Currencies
-function currencies($currency = null) : array
+function currencies($currency = null) : array|string
 {
-    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'GBP' => '£', 'CAD' => 'CAD'];
+    $currencies = ['EURO' => '€', 'USD' => '$', 'PKR' => 'Rs', 'Pound' => '£', 'GBP' => '£', 'CAD' => 'CAD'];;
     if ($currency) {
         return $currencies[$currency];
     }
@@ -189,6 +190,44 @@ function convertMinutesToHours($minutes)
     return !empty($minutes) ? ($minutes / 60) : 0;
 }
 
+function formatInvoiceStatus($status) : string
+{
+    $formattedStatus = '';
+    $s = slugToName($status);
+    switch ($status) {
+        case 'pending':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-danger'>{$s}</span>";
+            break;
+        case 'processing':
+        case 'processed':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-info'>{$s}</span>";
+            break;
+        case 'partially_paid':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-warning'>{$s}</span>";
+            break;
+        case 'paid':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-success'>{$s}</span>";
+            break;
+    }
+    return $formattedStatus;
+}
+
+function formatTaskCompletedStatus($status) : string
+{
+    $formattedStatus = '';
+    $s = slugToName($status);
+    switch ($status) {
+        case 'completed':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-success'>{$s}</span>";
+            break;
+        case 'active':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-warning'>{$s}</span>";
+            break;
+    }
+    return $formattedStatus;
+}
+
+// Storage path
 function getStoragePath(string $type): string
 {
     $path = '';
@@ -207,4 +246,11 @@ function getStoragePath(string $type): string
             break;
     }
     return $path;
+}
+
+
+function getInvoiceRecord($invoice_id)
+{
+    $invoice = Invoice::find($invoice_id);
+    return  $invoice;
 }

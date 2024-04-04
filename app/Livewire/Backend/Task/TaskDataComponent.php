@@ -3,17 +3,25 @@
 namespace App\Livewire\Backend\Task;
 
 use Exception;
-use Carbon\Carbon;
 use App\Models\Task;
 use App\Models\User;
+use App\Models\Comment;
+use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
 use Livewire\Attributes\On;
+use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
 use App\Livewire\Forms\TaskForm;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use App\Livewire\Forms\InvoiceForm;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -32,20 +40,27 @@ class TaskDataComponent extends Component
     public ?string $projectSlug;
 
     public TaskForm $form;
+    public InvoiceForm $invoiceForm;
 
     public bool $isTaskModalOpen = false;
     public bool $isRevenueModalOpen = false;
+    public bool $isAddInvoiceModalOpen = false;
+    public $project = null;
+    public $tasksList = null;
+    public $inputs, $i;
 
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
         $this->projectSlug = $projectSlug ?? null;
+        $this->inputs = [];
+        $this->i = 1;
     }
 
     private function getTasksQuery()
     {
         $projectId = isset($this->projectId) ? $this->projectId : null;
-        return Task::hasProject($projectId)->with(['project'])
+        return Task::hasProject($projectId)->with(['project', 'comments'])
             ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
@@ -103,6 +118,7 @@ class TaskDataComponent extends Component
     {
         $this->isTaskModalOpen = true;
         $this->isRevenueModalOpen = false;
+        $this->dispatch('reinitialize-dispatcher');
         $this->dispatch('resetSelectInput');
         $this->openMainModal();
     }
@@ -162,7 +178,7 @@ class TaskDataComponent extends Component
             $this->dispatch('project-select', ['formProject' => $verifiedTask->project_id]);
             $this->dispatch('assigned-member-select', ['formUser' => $verifiedTask->user_id]);
 
-            $this->openMainModal();
+            $this->openModal();
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while edit task and task id is, ' . $id . ' error: ' . $exception->getMessage());
@@ -304,5 +320,251 @@ class TaskDataComponent extends Component
             Log::error('Get error while task delete and task id is ' . $id . ' ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+
+    #[On('open-invoice-modal')]
+    public function openInvoiceModal($tasks)
+    {
+        $this->isAddInvoiceModalOpen = true;
+        $this->tasksList = $this->listWithBillableComments($tasks);
+        if (!empty($this->project)) {
+            $this->project = Project::sessionBusiness()->whereId($this->projectId)->first();
+        }
+        $this->openMainModal();
+        $this->dispatch('reinitialize-flatpickr');
+    }
+
+    public function closeInvoiceModal()
+    {
+        $this->isAddInvoiceModalOpen = false;
+        $this->invoiceForm->total_amount = null;
+        $this->closeMainModal();
+        $this->invoiceForm->reset();
+    }
+
+    public function createInvoice()
+    {
+        $this->invoiceForm->project_id = $this?->project?->id;
+        $validated = $this->invoiceForm->validate();
+
+        try {
+            DB::beginTransaction();
+            $invoiceNumber = $this->generateUniqueInvoiceNumber();
+            $invoice = Invoice::create([
+                'project_id' => $validated['project_id'],
+                'invoice_number' => $invoiceNumber,
+                'deduction' => $validated['deduction'],
+                'notes' => $validated['notes'],
+                'currency' => $this?->project?->currency,
+                'due_at' => $validated['due_at'],
+                'send_emails' => isset($validated['isEmail']) ? $validated['isEmail'] : false,
+            ]);
+
+            $projectCost = 0;
+            if (isset($validated['task'])) {
+                foreach ($validated['task'] as $key => $task) {
+                    $time = 0;
+                    $comments = [];
+                    foreach ($task['comments'] as $commentId => $value) {
+                        $time = floatval($task['time'][$commentId]);
+                        $comment = Comment::findOrFail($commentId);
+                        $comment->update(['invoiced_at' => now()]);
+                        $comments[] = $comment->id;
+                    }
+                    $ratePerHour = null;
+                    $totalCost = 0;
+                    if ($this?->project?->type->value === 'hourly') {
+                        $totalCost = $task['rate_per_hour'] * ($time / 60);
+                        $ratePerHour = $task['rate_per_hour'];
+                    } else if ($this?->project?->type?->value === 'fixed') {
+                        $totalCost = $task['task_amount'];
+                    }
+
+                    $projectCost += $totalCost;
+                    $invoice->invoiceData()->create([
+                        'task_id' => $key,
+                        'time' => $time,
+                        'rate_per_hour' => $ratePerHour,
+                        'amount' => $totalCost,
+                        'comments' => implode(',', $comments)
+                    ]);
+                }
+            }
+
+            if (isset($validated['generic_comments'])) {
+                foreach($validated['generic_comments'] as $comment) {
+                    $invoice->invoiceData()->create([
+                        'time' => $comment['quantity'] ? $comment['quantity'] * 60 : 0,
+                        'rate_per_hour' => $comment['rate'],
+                        'amount' => $comment['amount'],
+                        'comments' => $comment['description']
+                    ]);
+                }
+            }
+
+            $deduction = ($projectCost === 0) ? 0 : $validated['deduction'];
+            $invoice->update([
+                'total' => $projectCost + ($projectCost === 0 && $validated['deduction'] > 0 ? $validated['deduction'] : 0),
+                'deduction' => $deduction,
+            ]);
+
+            // generate Invoice
+            $invoice->update(['status' => InvoiceStatus::PROCESSING->value]);
+            $invoice = $invoice->with(['invoiceData.task'])->find($invoice->id);
+            foreach ($invoice->invoiceData as $key => $record) {
+                $comments = Comment::whereIn('id', explode(',', $record->comments))->get();
+                if ($record->task) {
+                    $record->task->setRelation('comments', $comments);
+                }
+            }
+
+            $this->generateInvoice($invoice);
+
+            DB::commit();
+            $this->closeInvoiceModal();
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Invoice created successfully.']);
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error while create invoice: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while create invoice: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    private function generateUniqueInvoiceNumber()
+    {
+        $business = $this?->project?->client?->business;
+        $invoiceNumber = $business?->invoice_prefix . $business?->invoice_serial;
+        $serialLength = strlen($business?->invoice_serial);
+        $serial = (int) $business?->invoice_serial + 1;
+        $newSerial = str_pad($serial, $serialLength, '0', STR_PAD_LEFT);
+        $business->update([
+            'invoice_serial' => $newSerial,
+        ]);
+        return $invoiceNumber;
+    }
+
+    /**
+     * @param Request $request
+     * @return \Illuminate\Contracts\View\Factory|JsonResponse|View
+     */
+    private function listWithBillableComments($tasks)
+    {
+        try {
+            if(!empty($tasks)) {
+                $this->invoiceForm->total_amount = 0;
+            } else {
+                $this->invoiceForm->total_amount = null;
+            }
+            $tasks = Task::whereHas('project' , function ($query) {
+                $query->sessionBusiness()->with('client');
+            })->with(['project' => function ($query) {
+                $query->sessionBusiness()->with('client');
+            }, 'billableComments'])
+                ->whereIn('id', $tasks)->get();
+
+            foreach ($tasks as $task) {
+                if ($task->billableComments) {
+                    foreach ($task->billableComments as $comment) {
+                        $this->invoiceForm->task[$task->id]['unit'] = $task?->project?->currency;
+                        if ($task?->type?->value === 'fixed') {
+                            $this->invoiceForm->task[$task->id]['task_amount'] = $task?->project?->hourly_rate;
+                        } else {
+                            $this->invoiceForm->task[$task->id]['rate_per_hour'] = $task?->project?->hourly_rate;
+                        }
+                        $this->invoiceForm->task[$task->id]['time'][$comment?->id] = $comment?->time;
+                    }
+                }
+            }
+
+            return $tasks;
+        } catch (Exception $exception) {
+            Log::error('Get error on get selected tasks with billable comments on create invoices: ' . $exception->getMessage());
+
+            return response()->json([
+                'status_code' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'message' => $exception->getMessage(),
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function addGenericCommentsFields($i)
+    {
+        $this->i = $i + 1;
+        array_push($this->inputs, 1);
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
+    }
+
+    public function removeGenericCommentsFields($key)
+    {
+        unset($this->inputs[$key]);
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
+    }
+
+    private function generateInvoice($data, $isEmails = true)
+    {
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+        $fileName = $data->invoice_number . '.pdf';
+
+        if (!Storage::disk('public')->exists(getStoragePath('invoice'))) {
+            Storage::disk('public')->makeDirectory(getStoragePath('invoice'));
+        }
+
+        $invoicePdfFile = public_path('storage/' . getStoragePath('invoice')) . '/' . $fileName;
+        $view = 'livewire.backend.invoice.invoice-pdf';
+        $pdf->loadView($view, compact('data'))->save($invoicePdfFile);
+
+        $invoice = $data;
+        $data->update([
+            'status' => 'processed',
+            'file' => 'storage/' . getStoragePath('invoice') . '/' . $fileName,
+        ]);
+
+        if ($data->send_emails && $isEmails) {
+            $invoiceNumber = $data->invoice_number;
+            $user = User::where('id', $data->project->client_id)->first();
+            $uEmail = $user->email;
+
+            $data = [
+                'first_name' => $user->first_name,
+                'invoice_number' => $invoiceNumber,
+            ];
+
+            // get super and and admin users
+            $users = User::whereHas('roles', function ($query) {
+                $query->where('name', 'super-admin')
+                ->orWhere('name', 'admin');
+            })->get();
+
+            $userEmail = array();
+            foreach ($users as $user) {
+                $temp = $user->email;
+                array_push($userEmail, $temp);
+            }
+            array_push($userEmail, $uEmail);
+
+            // Get business name
+            $businessName = $invoice?->project?->client?->business?->name;
+
+            // Send email
+            Mail::send('emails.invoice', $data, function ($message) use ($invoice, $fileName, $userEmail, $businessName) {
+                $message->attach($invoice, [
+                    'as' => $fileName, // name to client name
+                    'mime' => 'application/pdf',
+                ]);
+                $message->from(env('MAIL_USERNAME'), $businessName);
+
+                $message->to($userEmail)->subject('Invoice creation of project');
+            });
+        }
+        return redirect()->back();
     }
 }
