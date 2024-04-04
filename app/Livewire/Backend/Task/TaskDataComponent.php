@@ -331,6 +331,7 @@ class TaskDataComponent extends Component
             $this->project = Project::sessionBusiness()->whereId($this->projectId)->first();
         }
         $this->openMainModal();
+        $this->dispatch('reinitialize-flatpickr');
     }
 
     public function closeInvoiceModal()
@@ -338,6 +339,7 @@ class TaskDataComponent extends Component
         $this->isAddInvoiceModalOpen = false;
         $this->invoiceForm->total_amount = null;
         $this->closeMainModal();
+        $this->invoiceForm->reset();
     }
 
     public function createInvoice()
@@ -548,7 +550,6 @@ class TaskDataComponent extends Component
                 array_push($userEmail, $temp);
             }
             array_push($userEmail, $uEmail);
-            throw new Exception(json_encode($userEmail));
 
             // Get business name
             $businessName = $invoice?->project?->client?->business?->name;

@@ -24,8 +24,9 @@ class SendPaymentConfirmationEmail implements ShouldQueue
     public function handle()
     {
         $email = $this->email;
-        Mail::send('emails.invoice_payment', $this->data, function ($message) use ($email) {
-            $message->from(env('MAIL_USERNAME'), 'The Right Software');
+        $businessName = $this->data['business_name'];
+        Mail::send('emails.invoice-payment', $this->data, function ($message) use ($email, $businessName) {
+            $message->from(env('MAIL_USERNAME'), $businessName);
             $message->to($email)->subject('Thanks for Payment');
         });
     }

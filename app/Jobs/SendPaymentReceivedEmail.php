@@ -26,8 +26,9 @@ class SendPaymentReceivedEmail implements ShouldQueue
     {
         foreach ($this->users as $user) {
             $this->data['first_name'] = $user->first_name;
-            Mail::send('emails.payment_received', $this->data, function ($message) use ($user) {
-                $message->from(env('MAIL_USERNAME'), 'The Right Software');
+            $businessName = $this->data['business_name'];
+            Mail::send('emails.payment-received', $this->data, function ($message) use ($user, $businessName) {
+                $message->from(env('MAIL_USERNAME'), $businessName);
                 $message->to($user->email)->subject('Payment Received');
             });
         }

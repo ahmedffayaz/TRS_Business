@@ -120,6 +120,12 @@
         $(document).ready(function () {
             // Initialize flatpickr
             Livewire.dispatch('flatpickr');
+            Livewire.on('reinitialize-flatpickr', () => {
+                $(document).ready(function () {
+                    Livewire.dispatch('flatpickr');
+                });
+            });
+
             Livewire.on('reinitialize-feather-icons', () => {
                 $(document).ready(function () {
                     Livewire.dispatch('feather-icons');

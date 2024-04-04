@@ -165,7 +165,7 @@
         @endcan
     @elseif($isAddInvoiceModalOpen)
         @can('add_invoices')
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInvoiceModal">
                 @include('livewire.backend.invoice.form')
             </x-main-modal>
         @endcan

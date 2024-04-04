@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use App\Jobs\SendPaymentReceivedEmail;
 use Illuminate\Support\Facades\Storage;
+use App\Jobs\SendPaymentConfirmationEmail;
 use App\Livewire\Forms\InvoicePaymentForm;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -173,15 +175,16 @@ class InvoiceComponent extends Component
                         'received_amount' => $validated['amount'],
                         'payment_date' => formatDate($validated['billed_at']),
                         'currency' => $invoice->project->currency,
+                        'business_name' => $invoice?->project?->business?->name
                     ];
 
                     // Dispatch email to client
-                    // dispatch(new SendPaymentConfirmationEmail($data, $user->email));
+                    dispatch(new SendPaymentConfirmationEmail($data, $user->email));
                     // Dispatch email to admin user
                     $users = User::whereHas('roles', function ($q) {
                         $q->where('name', 'admin')->orWhere('name', 'super-admin');
                     })->get();
-                    // dispatch(new SendPaymentReceivedEmail($data, $users));
+                    dispatch(new SendPaymentReceivedEmail($data, $users));
                 }
             }
             $this->dispatch('alert', ['type' => 'success', 'message' => 'Invoice payment added successfully.']);
