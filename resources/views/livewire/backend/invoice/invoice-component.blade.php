@@ -72,7 +72,7 @@
                                                     </x-anchor-tag>
 
                                                     @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
-                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);">
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="resendEmail({{ $invoice?->id }})">
                                                             <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
                                                             <span>Resend Email</span>
                                                         </x-anchor-tag>
