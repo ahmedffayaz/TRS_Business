@@ -39,23 +39,24 @@ use App\Http\Controllers\AttachmentsController;
 use App\Livewire\Backend\User\ProfileComponent;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
+use App\Livewire\Backend\Task\TaskDataComponent;
+use App\Livewire\Backend\Task\ViewTaskComponent;
 use App\Livewire\Backend\UpdatePasswordComponent;
+use App\Livewire\Backend\Invoice\InvoiceComponent;
 use App\Livewire\Backend\Project\ProjectComponent;
 use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
+use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
-use App\Livewire\Backend\Invoice\InvoiceComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
-use App\Livewire\Backend\Task\TaskDataComponent;
-use App\Livewire\Backend\Task\ViewTaskComponent;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -129,6 +130,8 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::get('profile', UserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
+
+            Route::get('emails', EmailTemplateComponent::class)->name('emails');
         });
         Route::post('upload-digital-image', [TermsConditionAcceptComponent::class , 'uploadDigitalImage'])->name('upload-digital-image');
     });

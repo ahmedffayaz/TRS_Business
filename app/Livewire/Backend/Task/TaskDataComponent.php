@@ -20,7 +20,7 @@ use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
-use Illuminate\Support\Facades\Mail;
+use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -530,41 +530,36 @@ class TaskDataComponent extends Component
 
         if ($data->send_emails && $isEmails) {
             $invoiceNumber = $data->invoice_number;
-            $user = User::where('id', $data->project->client_id)->first();
-            $uEmail = $user->email;
+            $user = User::where('client_id', $data->project->client_id)->first();
+            if ($user) {
+                $uEmail = $user->email;
 
-            $data = [
-                'first_name' => $user->first_name,
-                'invoice_number' => $invoiceNumber,
-            ];
+                // get super and and admin users
+                $users = User::whereHas('roles', function ($query) {
+                    $query->where('name', 'super-admin')
+                    ->orWhere('name', 'admin');
+                })->get();
 
-            // get super and and admin users
-            $users = User::whereHas('roles', function ($query) {
-                $query->where('name', 'super-admin')
-                ->orWhere('name', 'admin');
-            })->get();
+                $userEmail = array();
+                foreach ($users as $user) {
+                    $temp = $user->email;
+                    array_push($userEmail, $temp);
+                }
+                array_push($userEmail, $uEmail);
 
-            $userEmail = array();
-            foreach ($users as $user) {
-                $temp = $user->email;
-                array_push($userEmail, $temp);
+                $emailData = [
+                    'first_name' => $user->first_name,
+                    'invoice_number' => $invoiceNumber,
+                    'business_name' => $invoice?->project?->business?->name,
+                    'business_logo' => $invoice?->project?->business?->logo
+                ];
+
+                $filteredKeywords = ['{{CLIENT_NAME}}', '{{PROJECT}}', '{{INVOICE_NUMBER}}'];
+                $filteredKeywordsValue = [$emailData['first_name'], $invoice?->project?->name, $emailData['invoice_number']];
+
+                // Dispatch email to admin
+                dispatch(new SendCreateProjectInvoice($invoice, $fileName, $data, $userEmail, $filteredKeywords, $filteredKeywordsValue));
             }
-            array_push($userEmail, $uEmail);
-
-            // Get business name
-            $businessName = $invoice?->project?->client?->business?->name;
-
-            // Send email
-            Mail::send('emails.invoice', $data, function ($message) use ($invoice, $fileName, $userEmail, $businessName) {
-                $message->attach($invoice, [
-                    'as' => $fileName, // name to client name
-                    'mime' => 'application/pdf',
-                ]);
-                $message->from(env('MAIL_USERNAME'), $businessName);
-
-                $message->to($userEmail)->subject('Invoice creation of project');
-            });
         }
-        return redirect()->back();
     }
 }
