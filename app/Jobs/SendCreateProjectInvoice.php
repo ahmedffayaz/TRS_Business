@@ -9,41 +9,55 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
-class SendPaymentReceivedEmail implements ShouldQueue
+class SendCreateProjectInvoice implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $invoice;
+    protected $fileName;
     protected $data;
-    protected $users;
+    protected $emails;
     protected $filteredKeywords;
     protected $filteredKeywordsValue;
 
-    public function __construct($data, $users, $filteredKeywords, $filteredKeywordsValue)
+    /**
+     * Create a new job instance.
+     */
+    public function __construct($invoice, $fileName, $data, $emails, $filteredKeywords, $filteredKeywordsValue)
     {
+        $this->invoice = $invoice;
+        $this->fileName = $fileName;
         $this->data = $data;
-        $this->users = $users;
+        $this->emails = $emails;
         $this->filteredKeywords = $filteredKeywords;
         $this->filteredKeywordsValue = $filteredKeywordsValue;
     }
 
-    public function handle()
+    /**
+     * Execute the job.
+     */
+    public function handle(): void
     {
-        $emailTemplate = emailTemplate('admin_payment_received', $this->data, $this->filteredKeywords, $this->filteredKeywordsValue);
+        $emailTemplate = emailTemplate('project_invoice_creation', $this->data, $this->filteredKeywords, $this->filteredKeywordsValue);
 
-        foreach ($this->users as $user) {
+        foreach($this->emails as $email) {
             $emailData = array(
                 'name' =>  $emailTemplate['title'],
-                'email' => $user->email,
+                'email' => $email,
                 'emailMessage' => $emailTemplate['message'],
                 'subject' => $emailTemplate['subject'],
                 'businessLogo' => $this->data['business_logo']
             );
 
-            $this->data['first_name'] = $user->first_name;
+            $invoice = $this->invoice;
+            $fileName = $this->fileName;
             $businessName = $this->data['business_name'];
-            Mail::send('emails.email-template', $emailData, function ($message) use ($emailData, $user, $businessName) {
+
+            // Send email
+            Mail::send('emails.email-template', $emailData, function ($message) use ($invoice, $fileName, $email, $businessName) {
                 $message->from(env('MAIL_USERNAME'), $businessName);
-                $message->to($user->email)->subject($emailData['subject']);
+
+                $message->to($email)->subject('Invoice creation of project');
             });
         }
     }

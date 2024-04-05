@@ -1,9 +1,12 @@
-@props(['wireIgnoreSelf', 'closeModal' => null, 'modalSize' => 'modal-lg'])
+@props(['wireIgnoreSelf', 'closeModal' => null, 'modalSize' => 'modal-lg', 'modalTitle' => null])
 <div {{ $wireIgnoreSelf }} class="modal  fade" id="main-modal" tabindex="-1" data-bs-backdrop="false"
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered {{$modalSize}}">
         <div class="modal-content">
-            <div class="modal-header bg-transparent">
+            <div class="modal-header {{ empty($modalTitle) ? 'bg-transparent' : '' }}">
+                @if (!empty($modalTitle))
+                    <h4 class="modal-title" id="myModalLabel1">{{ $modalTitle }}</h4>
+                @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     wire:click="{{ $closeModal ? $closeModal : 'closeMainModal' }}"></button>
             </div>

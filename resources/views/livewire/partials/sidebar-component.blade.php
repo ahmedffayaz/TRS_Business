@@ -5,7 +5,7 @@
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="{{ route('dashboard.home') }}">
                         <span class="brand-logo">
-                            <img src="{{ !empty($business->logo) ? asset('storage/' . $business->logo) : asset('trs_logo.svg') }}" alt="" height="40">
+                            <img src="{{ getSiteLogo($business->logo) }}" alt="" height="40">
                         </span>
                         <h2 class="brand-text">{{ !empty($business->name) ? $business->name : cmsName() }}</h2>
                     </a>
@@ -112,6 +112,14 @@
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
                             <i data-feather="settings"></i>
                             <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
+                        </x-anchor-tag>
+                    </x-nav>
+                @endcan
+                @can('view_emails')
+                    <x-nav class="nav-itme">
+                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.emails') }}">
+                            <i data-feather="mail"></i>
+                            <span class="menu-title text-truncate" data-i18n="Emails">Email Templates</span>
                         </x-anchor-tag>
                     </x-nav>
                 @endcan

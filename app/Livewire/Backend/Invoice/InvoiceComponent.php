@@ -162,31 +162,37 @@ class InvoiceComponent extends Component
             $invoice->update($payload);
 
             DB::commit();
-            $this->closeModal();
 
             if ($validated['send_email']) {
-                $invoice_number = $invoice->invoice_number;
+                $invoiceNumber = $invoice->invoice_number;
                 $user = User::where('client_id', $invoice->project->client_id)->first();
                 if ($user) {
                     $data = [
                         'first_name' => $user->first_name,
                         'client' => $invoice->project->client->name,
-                        'invoice_number' => $invoice_number,
-                        'received_amount' => $validated['amount'],
+                        'invoice_number' => $invoiceNumber,
+                        'received_amount' => formatCurrency($validated['amount'], $invoice?->project?->currency),
                         'payment_date' => formatDate($validated['billed_at']),
                         'currency' => $invoice->project->currency,
-                        'business_name' => $invoice?->project?->business?->name
+                        'business_name' => $invoice?->project?->business?->name,
+                        'business_logo' => $invoice?->project?->business?->logo
                     ];
 
+                    $filteredKeywords = ['{{DATE}}', '{{CLIENT_NAME}}', '{{CLIENT_EMAIL}}',
+                        '{{PROJECT}}', '{{INVOICE_NUMBER}}', '{{AMOUNT}}'];
+                    $filteredKeywordsValue = [$data['payment_date'], $data['first_name'], $user->email,
+                        $invoice?->project?->name, $data['invoice_number'], $data['received_amount']];
+
                     // Dispatch email to client
-                    dispatch(new SendPaymentConfirmationEmail($data, $user->email));
+                    dispatch(new SendPaymentConfirmationEmail($data, $user->email, $filteredKeywords, $filteredKeywordsValue));
                     // Dispatch email to admin user
                     $users = User::whereHas('roles', function ($q) {
                         $q->where('name', 'admin')->orWhere('name', 'super-admin');
                     })->get();
-                    dispatch(new SendPaymentReceivedEmail($data, $users));
+                    dispatch(new SendPaymentReceivedEmail($data, $users, $filteredKeywords, $filteredKeywordsValue));
                 }
             }
+            $this->closeModal();
             $this->dispatch('alert', ['type' => 'success', 'message' => 'Invoice payment added successfully.']);
         } catch (Exception $exception) {
             DB::rollBack();
