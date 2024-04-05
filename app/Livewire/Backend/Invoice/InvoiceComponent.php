@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use App\Jobs\SendCreateProjectInvoice;
 use App\Jobs\SendPaymentReceivedEmail;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\SendPaymentConfirmationEmail;
@@ -289,6 +290,71 @@ class InvoiceComponent extends Component
             'status' => 'processed',
             'file' => 'storage/' . getStoragePath('invoice') . '/' . $fileName,
         ]);
+    }
+
+    public function resendEmail($id)
+    {
+        try {
+            $data = Invoice::whereHas('project', function ($query) {
+                $query->sessionBusiness();
+            })->with(['project' => function ($query) {
+                $query->with(['client' => function ($query) {
+                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'business_id')
+                    ->with(['business' => function ($query) {
+                        $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
+                    }]);
+                }, 'business' => function ($query) {
+                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
+                }]);
+            }, 'invoiceData.task:name,id'])
+            ->whereStatus(InvoiceStatus::PROCESSED->value)->whereId($id)->first();
+
+            $fileName = $data->invoice_number . '.pdf';
+
+            if (!Storage::disk('public')->exists(getStoragePath('invoices'))) {
+                Storage::disk('public')->makeDirectory(getStoragePath('invoices'));
+            }
+
+            $invoice = public_path('storage/' . getStoragePath('invoice')) . '/' . $fileName;
+            $invoiceNumber = $data->invoice_number;
+
+            $user = User::where('client_id', $data->project->client_id)->first();
+            if ($user) {
+                $uEmail = $user->email;
+
+                $users = User::whereHas(
+                    'roles',
+                    function ($q) {
+                        $q->where('name', 'admin');
+                    }
+                )->get();
+                $userEmail = array();
+                foreach ($users as $user) {
+                    $temp = $user->email;
+                    array_push($userEmail, $temp);
+                }
+                array_push($userEmail, $uEmail);
+
+                $emailData = [
+                    'first_name' => $user->first_name,
+                    'invoice_number' => $invoiceNumber,
+                    'business_name' => $data?->project?->business?->name,
+                    'business_logo' => $data?->project?->business?->logo
+                ];
+
+                $filteredKeywords = ['{{CLIENT_NAME}}', '{{PROJECT}}', '{{INVOICE_NUMBER}}'];
+                $filteredKeywordsValue = [$emailData['first_name'], $data?->project?->name, $emailData['invoice_number']];
+
+                // Dispatch email to admin
+                dispatch(new SendCreateProjectInvoice($invoice, $fileName, $data, $userEmail, $filteredKeywords, $filteredKeywordsValue));
+                $this->dispatch('alert', ['type' => 'success', 'message' => 'Email sent successfully.']);
+            } else {
+                $this->dispatch('alert', ['type' => 'error', 'message' => 'Client not found.']);
+            }
+        } catch (Exception $exception) {
+            Log::error('Get error on resend invoice email and error is ' . $id . ' ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
     }
 
     public function render()
