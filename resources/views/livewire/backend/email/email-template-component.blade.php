@@ -76,7 +76,7 @@
         </div>
     </div>
 
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="Edit Email Template">
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-xl" modalTitle="Edit Email Template">
         @include('livewire.backend.email.form')
     </x-main-modal>
 </div>
