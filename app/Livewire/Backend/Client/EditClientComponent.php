@@ -128,7 +128,7 @@ class EditClientComponent extends Component
                     'last_name' => $this->form->last_name[$index],
                     'email' => $this->form->email[$index],
                     'phone' => $this->form->phone[$index],
-                    'password' => Hash::make($this->form->password[$index]),
+                    'password' => $this->form->password[$index],
                     'account_type' => AccountType::CLIENT->value,
                     'client_id' => $client->id,
                     'is_active' => UserStatus::ACTIVE->value
