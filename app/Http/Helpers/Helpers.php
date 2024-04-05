@@ -5,6 +5,7 @@ use App\Models\Invoice;
 use App\Models\Setting;
 use App\Models\Business;
 use Illuminate\Support\Str;
+use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Models\Permission;
 
@@ -258,4 +259,27 @@ function getInvoiceRecord($invoice_id)
 function getSiteLogo($path = null)
 {
     return !empty($path) ? asset('storage/' . $path) : asset('trs_logo.svg');
+}
+
+function emailTemplate($key, $details, $filteredKeywords = [], $filteredKeywordsValue = [])
+{
+    $emailTemplate = EmailTemplate::where('key', $key)->first();
+
+    $variables = ['{{SITE_TITLE}}', '{{SITE_URL}}', '{{SUBJECT}}, {{BUSINESS}}'];
+    $variablesMerge = array_merge($variables, $filteredKeywords);
+
+    $data = ['The Right software', url('/'), $emailTemplate->subject, $details['business_name']];
+    $dataMerge = array_merge($data, $filteredKeywordsValue);
+
+    if ($filteredKeywords && $filteredKeywordsValue) {
+        $filteredMessage  = str_replace($variablesMerge, $dataMerge, $emailTemplate->body);
+    } else {
+        $filteredMessage  = str_replace($variables, $data, $emailTemplate->body);
+    }
+
+    return array(
+        'title' => $emailTemplate->title,
+        'message' => $filteredMessage,
+        'subject' => $emailTemplate->subject
+    );
 }

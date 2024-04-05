@@ -15,19 +15,33 @@ class SendPaymentConfirmationEmail implements ShouldQueue
 
     protected $data;
     protected $email;
-    public function __construct($data, $email)
+    protected $filteredKeywords;
+    protected $filteredKeywordsValue;
+    public function __construct($data, $email, $filteredKeywords, $filteredKeywordsValue)
     {
         $this->data = $data;
         $this->email = $email;
+        $this->filteredKeywords = $filteredKeywords;
+        $this->filteredKeywordsValue = $filteredKeywordsValue;
     }
 
     public function handle()
     {
+        $emailTemplate = emailTemplate('client_invoice_payment_confirm', $this->data, $this->filteredKeywords, $this->filteredKeywordsValue);
+
+        $emailData = array(
+            'name' =>  $emailTemplate['title'],
+            'email' => $this->email,
+            'emailMessage' => $emailTemplate['message'],
+            'subject' => $emailTemplate['subject'],
+            'businessLogo' => $this->data['business_logo']
+        );
+
         $email = $this->email;
         $businessName = $this->data['business_name'];
-        Mail::send('emails.invoice-payment', $this->data, function ($message) use ($email, $businessName) {
+        Mail::send('emails.email-template', $emailData, function ($message) use ($emailData, $email, $businessName) {
             $message->from(env('MAIL_USERNAME'), $businessName);
-            $message->to($email)->subject('Thanks for Payment');
+            $message->to($email)->subject($emailData['subject']);
         });
     }
 }

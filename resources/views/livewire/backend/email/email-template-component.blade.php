@@ -5,7 +5,7 @@
         <div class="row">
             @if (isset($emails))
                 @foreach ($emails as $email)
-                    <div class="col-md-6">
+                    <div class="col-md-6 mb-2">
                         <h2>{{ $email?->title }}</h2>
                         <p>{{ $email?->detail }}</p>
                         <div class="accordion-item">
