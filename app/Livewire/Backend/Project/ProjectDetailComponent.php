@@ -2,12 +2,20 @@
 
 namespace App\Livewire\Backend\Project;
 
+use DateTime;
 use Exception;
+use DatePeriod;
+use DateInterval;
 use Carbon\Carbon;
+use App\Models\Task;
+use App\Models\Comment;
 use App\Models\Project;
 use Livewire\Component;
 use App\Traits\WithMainModal;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Attributes\Title;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 #[Title('Project Details')]
@@ -116,6 +124,50 @@ class ProjectDetailComponent extends Component
         } catch (Exception $exception) {
             Log::error('Get error while get project revenue: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    public function chartData($slug)
+    {
+        try {
+            $project = Project::whereSlug($slug)->firstOrFail();
+            $projectId = $project?->id;
+            // Chart data
+            $data = Comment::selectRaw('SUM(time) as y, DATE(dated) as x')
+                ->whereIn('task_id', function ($query) use ($projectId) {
+                    $query->select('id')->from(with(new Task)->getTable())
+                        ->where('project_id', $projectId);
+                })->where('type', 'time')
+                ->groupBy(DB::raw('x'))->orderBy('x', 'ASC')->get();
+
+            $dates = [];
+            $formattedData = [];
+            if (count($data) > 0) {
+                $period = new DatePeriod(new DateTime($data[0]->x), new DateInterval('P1D'), new DateTime($data[count($data) - 1]->x . ' +1 day'));
+                foreach ($period as $key => $date) {
+                    $formattedDate = $date->format("Y-m-d");
+                    $dates[] = formatDate($formattedDate, 'D, d M y');
+                    $item = $data->where('x', $formattedDate)->first();
+                    $formattedData[$key][] = formatDate($formattedDate);
+
+                    $formattedData[$key][] = $item ? $item->y / 60 : 0;
+                }
+            }
+            return response()->json([
+                'status' => JsonResponse::HTTP_OK,
+                'data' => [
+                    'chartData' => $formattedData,
+                    'dates' => $dates,
+                ],
+            ], JsonResponse::HTTP_OK);
+        } catch (ModelNotFoundException $exception) {
+            Log::error('Get error on chart data model note found: ' . $exception->getMessage());
+        } catch (Exception $exception) {
+            Log::error('Get error on chart data: ' . $exception->getMessage());
+            return response()->json([
+                'status' => JsonResponse::HTTP_INTERNAL_SERVER_ERROR,
+                'error' => $exception->getMessage()
+            ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
