@@ -262,20 +262,4 @@
     <section class="mt-3">
         @livewire('backend.task.task-data-component', ['project' => $project?->id, 'projectSlug' => $project?->slug])
     </section>
-
-    @if ($isRevenueModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm" closeModal="closeRevenueModal">
-            <div class="mb-2">
-                <h1 class="mb-1">Project Revenue</h1>
-            </div>
-            <div class="row">
-                <p>
-                    <b>Project Cost:</b> <span>-</span>
-                </p>
-                <p>
-                    <b>Revenue:</b> <span>-</span>
-                </p>
-            </div>
-        </x-main-modal>
-    @endif
 </div>

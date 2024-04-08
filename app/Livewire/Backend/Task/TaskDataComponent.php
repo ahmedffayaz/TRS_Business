@@ -48,6 +48,7 @@ class TaskDataComponent extends Component
     public $project = null;
     public $tasksList = null;
     public $inputs, $i;
+    public ?array $projectRevenue;
 
     public function mount($project = null, $projectSlug = null)
     {
@@ -561,5 +562,19 @@ class TaskDataComponent extends Component
                 dispatch(new SendCreateProjectInvoice($invoice, $fileName, $data, $userEmail, $filteredKeywords, $filteredKeywordsValue));
             }
         }
+    }
+
+    #[On('open-revenue-modal')]
+    public function openRevenueModal($data)
+    {
+        $this->isRevenueModalOpen = true;
+        $this->projectRevenue = $data;
+        $this->dispatch('open-main-modal');
+    }
+
+    public function closeRevenueModal()
+    {
+        $this->dispatch('close-main-modal');
+        $this->isRevenueModalOpen = false;
     }
 }
