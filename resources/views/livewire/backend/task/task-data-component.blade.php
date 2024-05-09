@@ -169,6 +169,15 @@
                 @include('livewire.backend.invoice.form')
             </x-main-modal>
         @endcan
+    @elseif ($isRevenueModalOpen)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm" closeModal="closeRevenueModal">
+            <div class="mb-2">
+                <h1 class="mb-1">Project Revenue</h1>
+            </div>
+            <div class="row">
+                <p>{!! $projectRevenue['projectRevenueDetail'] !!}</p>
+            </div>
+        </x-main-modal>
     @else
         <x-main-modal wireIgnoreSelf="wire:ignore.self">
         </x-main-modal>

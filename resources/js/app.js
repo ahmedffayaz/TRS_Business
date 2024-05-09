@@ -8,6 +8,7 @@ import Quill from 'quill';
 import Showdown from 'showdown'
 window.jQuery = window.$ = $;
 
+import '../assets/js/apexCharts.min.js'
 import '../assets/js/app-menu'
 import '../assets/js/app-core'
 import 'toastr'
@@ -15,6 +16,7 @@ import '../assets/vendors/editors/markdown-text-editor-master/js/editor.min'
 import MTE from '../assets/vendors/editors/markdown-text-editor-master/js/mte'
 import flatpickr from 'flatpickr'
 import '../assets/js/app-chat'
+// import '../assets/js/chart-apex.js'
 import '../assets/js/script'
 
 document.addEventListener('DOMContentLoaded', () => {

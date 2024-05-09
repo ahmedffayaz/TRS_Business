@@ -108,6 +108,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             });
 
             // Projects routes
+            Route::get('projects/chart-data/{slug}', [ProjectDetailComponent::class, 'chartData'])->name('project.chart-data');
             Route::prefix('projects')->name('projects.')->group(function () {
                 Route::get('/', ProjectComponent::class)->name('index')->middleware('permission:view_projects|view_associated_projects');
                 Route::get('{slug}', ProjectDetailComponent::class)->name('detail')->middleware('permission:view_users|view_associated_projects');

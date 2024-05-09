@@ -132,7 +132,7 @@ class User extends Authenticatable
 
     public function userContracts(): HasMany
     {
-        return $this->hasMany(TermConditionUser::class);
+        return $this->hasMany(TermsConditionUser::class);
     }
 
     public function leaves(): HasMany
