@@ -298,19 +298,14 @@
                             var lineChartEl = document.querySelector('#line-chart'),
                             lineChartConfig = {
                                 chart: {
-                                    height: 400,
+                                    height: 200,
                                     type: 'line',
                                     zoom: { enabled: false },
                                     parentHeightOffset: 0,
                                     toolbar: { show: false }
                                 },
                                 series: [
-                                    {
-                                        data: [function(tooltipItem, data) {
-                                            const time = tolltipItem.yLabel.toFixed(1);
-                                            return time;
-                                        }]
-                                    }
+                                    { data: dataset }
                                 ],
                                 markers: {
                                     strokeWidth: 7,
@@ -329,24 +324,23 @@
                                     custom: function (newData) {
                                         return (
                                             '<div class="px-1 py-50">' + '<span>' +
-                                            newData.series[newData.seriesIndex][newData.dataPointIndex] +
-                                            '%</span>' + '</div>'
+                                            '<b>Time:</b> ' + newData.series[newData.seriesIndex][newData.dataPointIndex] +
+                                            ' hrs</span>' + '</div>'
                                         );
                                     }
                                 },
                                 xaxis: {
-                                    categories: [dates]
+                                    categories: dates
                                 },
                                 yaxis: { opposite: isRtl }
                             };
                             if (typeof lineChartEl !== undefined && lineChartEl !== null) {
-                                var lineChart = new ApexCharts(lineChartEl, lineChartConfig); console.log(lineChart);
+                                var lineChart = new ApexCharts(lineChartEl, lineChartConfig);
                                 lineChart.render();
                             }
                         }
                     },
                     error: function(response) {
-                        console.log('dskl');
                         console.log(response);
                     }
                 })

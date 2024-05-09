@@ -146,11 +146,11 @@ class ProjectDetailComponent extends Component
                 $period = new DatePeriod(new DateTime($data[0]->x), new DateInterval('P1D'), new DateTime($data[count($data) - 1]->x . ' +1 day'));
                 foreach ($period as $key => $date) {
                     $formattedDate = $date->format("Y-m-d");
-                    $dates[] = formatDate($formattedDate, 'D, d M y');
+                    $dates[] = formatDate($formattedDate, 'd M y');
                     $item = $data->where('x', $formattedDate)->first();
                     $formattedData[$key][] = formatDate($formattedDate);
 
-                    $formattedData[$key][] = $item ? $item->y / 60 : 0;
+                    $formattedData[$key][] = number_format($item ? $item->y / 60 : 0, 1, '.', '');
                 }
             }
             return response()->json([
