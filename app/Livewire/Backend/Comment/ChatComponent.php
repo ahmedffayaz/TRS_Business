@@ -5,11 +5,23 @@ namespace App\Livewire\Backend\Comment;
 use App\Models\Task;
 use App\Models\Comment;
 use Livewire\Component;
+use Exception;
+use Validator;
+use App\Enums\Comment\CommentType;
+use App\Enums\Comment\CommentUnit;
+use App\Livewire\Forms\ChatHourForm;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ChatComponent extends Component
 {
     public ?int $taskId;
+    public $isHourModalVisible = false;
+
+    public ChatHourForm $form;
+    public $message;
+
 
     public function mount($taskId)
     {
@@ -24,7 +36,52 @@ class ChatComponent extends Component
             });
         })->with('fromUser')->get();
     }
+    public function showElement()
+    {
+        $this->isHourModalVisible = true;
+        $this->form->isHourModalVisible = true;
+        $this->dispatch('reinitialize-dispatcher');
+    }
 
+    public function hideElement()
+    {
+        $this->isHourModalVisible = false;
+        $this->form->isHourModalVisible = false;
+        $this->form->reset();
+        // $this->resetValidation();
+        $this->dispatch('reinitialize-dispatcher');
+    }
+    public function storeChatHours()
+    {
+        $validated = $this->form->validate();
+        $message = 'comment created successfully.';
+        // dd($this->form->all());
+
+        $this->isHourModalVisible = true;
+        try {
+            DB::beginTransaction();
+            Comment::create([
+                'description' => $validated['description'],
+                'time' => $validated['time'] ?? null,
+                'type' => 'comment',
+                'task_id' => $this->taskId,
+                'from' => auth()->user()->id,
+                'dated' => $validated['dated'] ?? null,
+                'is_billable' => $this->validated['is_billable'] ?? 0,
+            ]);
+
+
+            DB::commit();
+            $this->message ="";
+            $this->dispatch('alert', ['type' => 'success', 'message' => $message]);
+            // $this->showElement();
+            $this->form->reset();
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while add time: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
     private function getTask()
     {
         return Task::whereHas('project', function ($query) {
