@@ -96,21 +96,21 @@
                             <!-- User Chat messages -->
 
                             <!-- Submit Chat form -->
-                            <form class="chat-app-form position-relative" wire:submit.prevent="storeChatHours">
+                            <form class="chat-app-form position-relative">
                                 <div class="input-group input-group-merge me-1 form-send-message">
                                     @if($isHourModalVisible)
-                                        <span class="time input-group-text" wire:click="hideElement" data-bs-toggle="collapse"
-                                            href="#collapseShowElement" role="button" aria-expanded="false" wire:ignore.
-                                            aria-controls="collapseShowElement">
-                                            <i data-feather="arrow-down" class="cursor-pointer"></i>
-                                        </span>
+                                    <span class="time input-group-text" wire:click="hideElement"
+                                        data-bs-toggle="collapse" href="#collapseShowElement" role="button"
+                                        aria-expanded="false" wire:ignore. aria-controls="collapseShowElement">
+                                        <i data-feather="arrow-down" class="cursor-pointer"></i>
+                                    </span>
                                     @endif
                                     @if(!$isHourModalVisible)
-                                        <span class="time input-group-text" data-bs-toggle="collapse" wire:click="showElement"
-                                            href="#collapseShowElement" role="button" aria-expanded="false"  wire:ignore.
-                                            aria-controls="collapseShowElement">
-                                            <i data-feather="clock" class="cursor-pointer"></i>
-                                        </span>
+                                    <span class="time input-group-text" data-bs-toggle="collapse"
+                                        wire:click="showElement" href="#collapseShowElement" role="button"
+                                        aria-expanded="false" wire:ignore. aria-controls="collapseShowElement">
+                                        <i data-feather="clock" class="cursor-pointer"></i>
+                                    </span>
                                     @endif
                                     <input wire:model="form.description" type="text" class="form-control message"
                                         placeholder="Type your message or use speech to text" />
@@ -121,14 +121,14 @@
                                         </label>
                                     </span>
                                 </div>
-                                <button type="submit" class="btn btn-primary send" role="button">
-                                    <i data-feather="send" class="d-lg-none"></i>
+                                <button type="button" class="btn btn-primary send" role="" wire:click="storeChatHours" wire:submit.prevent>
+                                    <i data-feather="send" class="d-lg-none" ></i>
                                     <span class="d-none d-lg-block">Send</span>
                                 </button>
 
                                 <div class="card collapse position-absolute bottom-50 me-2 no-shadow"
                                     style="margin-right: -1rem !important; margin-left: -1rem; margin-bottom: 28px; box-shadow: none !important; border-radius:0%"
-                                    id="collapseShowElement">
+                                    id="collapseShowElement" wire:ignore.self>
                                     <div class="card-body py-0 mt-1 me-2">
                                         <div>
                                             @php
@@ -136,7 +136,7 @@
                                             $hours = \App\Enums\Comment\CommentUnit::HOURS->value;
                                             @endphp
                                             <div class="row">
-                                                <div class="col-md-3 inputs wire:ignore.">
+                                                <div class="col-md-3 inputs">
                                                     <x-input type="hidden" wire:model="form.task_id" />
                                                     <x-input type="text" name="time" id="time"
                                                         :class="$errors->has('form.time') ? 'error' : ''"
@@ -146,13 +146,15 @@
                                                     @enderror
                                                 </div>
                                                 <div class="col-md-3 inputs">
-                                                    <x-select-input id="unit-select"
-                                                        :class="$errors->has('form.unit') ? 'error select2' : 'select2'"
-                                                        wire:model="form.unit">
-                                                        <option value="">--Select Unit--</option>
-                                                        <option value="{{ $minutes }}">{{ $minutes }}</option>
-                                                        <option value="{{ $hours }}">{{ $hours }}</option>
-                                                    </x-select-input>
+                                                    <span wire:ignore.>
+                                                        <x-select-input id="unit-select"
+                                                            :class="$errors->has('form.unit') ? 'error select2' : 'select2'"
+                                                            wire:model="form.unit">
+                                                            <option value="">--Select Unit--</option>
+                                                            <option value="{{ $minutes }}">{{ $minutes }}</option>
+                                                            <option value="{{ $hours }}">{{ $hours }}</option>
+                                                        </x-select-input>
+                                                    </span>
                                                     @error('form.unit')
                                                     <x-input-error :message="$message" />
                                                     @enderror
@@ -217,4 +219,3 @@
         });
 </script>
 @endscript
-

@@ -20,8 +20,6 @@ class ChatComponent extends Component
     public $isHourModalVisible = false;
 
     public ChatHourForm $form;
-    public $message;
-
 
     public function mount($taskId)
     {
@@ -47,17 +45,21 @@ class ChatComponent extends Component
     {
         $this->isHourModalVisible = false;
         $this->form->isHourModalVisible = false;
-        $this->form->reset();
-        // $this->resetValidation();
+        $this->form->dated = null;
+        $this->form->time = null;
+        $this->form->unit = null;
+        $this->form->is_billable = null;
+;
+        $this->resetValidation();
         $this->dispatch('reinitialize-dispatcher');
     }
     public function storeChatHours()
     {
+        if (!$this->isHourModalVisible && empty($this->form->description)) {
+            return $this->dispatch('alert', ['type' => 'error', 'message' => 'Description field is required.']);
+        }
         $validated = $this->form->validate();
-        $message = 'comment created successfully.';
-        // dd($this->form->all());
 
-        $this->isHourModalVisible = true;
         try {
             DB::beginTransaction();
             Comment::create([
@@ -70,12 +72,12 @@ class ChatComponent extends Component
                 'is_billable' => $this->validated['is_billable'] ?? 0,
             ]);
 
-
             DB::commit();
-            $this->message ="";
-            $this->dispatch('alert', ['type' => 'success', 'message' => $message]);
-            // $this->showElement();
+            $this->form->description ="";
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'comment created successfully.']);
             $this->form->reset();
+            $this->resetValidation();
+            $this->form->isHourModalVisible = false;
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while add time: ' . $exception->getMessage());
