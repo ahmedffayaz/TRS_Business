@@ -119,6 +119,7 @@
                 <div class="col-md-4">
                     <div class="card card-transaction h-100">
                         <div class="card-body">
+                            <div id="line-chart"></div>
                             <div style="max-height: 200px; overflow-y: auto; margin-bottom: 1rem;">
                                 @foreach ($project?->members as $member)
                                     <div class="transaction-item">
@@ -262,20 +263,88 @@
     <section class="mt-3">
         @livewire('backend.task.task-data-component', ['project' => $project?->id, 'projectSlug' => $project?->slug])
     </section>
-
-    @if ($isRevenueModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalSize="modal-sm" closeModal="closeRevenueModal">
-            <div class="mb-2">
-                <h1 class="mb-1">Project Revenue</h1>
-            </div>
-            <div class="row">
-                <p>
-                    <b>Project Cost:</b> <span>-</span>
-                </p>
-                <p>
-                    <b>Revenue:</b> <span>-</span>
-                </p>
-            </div>
-        </x-main-modal>
-    @endif
 </div>
+
+@script
+    <script type="module">
+        $(document).ready(function () {
+            chartData();
+
+            function chartData() {
+                let projectSlug = "{{ $project->slug }}";
+                let path = "{{ route('dashboard.project.chart-data', ':projectSlug') }}"
+                // replace :projectSlug with projectSlug
+                path = path.replace(':projectSlug', projectSlug);
+                $.ajax({
+                    url: path,
+                    type : 'GET',
+                    success: function(response) {
+                        const data = response.data.chartData;
+                        const dates = response.data.dates
+                        const dataset = data.map(item => {
+                            return item[1];
+                        });
+                        if (data.length > 0) {
+                            var flatPicker = $('.flat-picker'),
+                            isRtl = $('html').attr('data-textdirection') === 'rtl',
+                            chartColors = {
+                                column: { series1: '#826af9', series2: '#d2b0ff', bg: '#f8d3ff' },
+                                success: { shade_100: '#7eefc7', shade_200: '#06774f' },
+                                donut: { series1: '#ffe700', series2: '#00d4bd', series3: '#826bf8', series4: '#2b9bf4', series5: '#FFA1A1' },
+                                area: { series3: '#a4f8cd', series2: '#60f2ca', series1: '#2bdac7' }
+                            };
+                            // Line Chart
+                            // --------------------------------------------------------------------
+                            var lineChartEl = document.querySelector('#line-chart'),
+                            lineChartConfig = {
+                                chart: {
+                                    height: 200,
+                                    type: 'line',
+                                    zoom: { enabled: false },
+                                    parentHeightOffset: 0,
+                                    toolbar: { show: false }
+                                },
+                                series: [
+                                    { data: dataset }
+                                ],
+                                markers: {
+                                    strokeWidth: 7,
+                                    strokeOpacity: 1,
+                                    strokeColors: [window.colors.solid.white],
+                                    colors: [window.colors.solid.warning]
+                                },
+                                dataLabels: { enabled: false },
+                                stroke: { curve: 'straight' },
+                                colors: [window.colors.solid.warning],
+                                grid: {
+                                    xaxis: { lines: { show: true } },
+                                    padding: { top: -20 }
+                                },
+                                tooltip: {
+                                    custom: function (newData) {
+                                        return (
+                                            '<div class="px-1 py-50">' + '<span>' +
+                                            '<b>Time:</b> ' + newData.series[newData.seriesIndex][newData.dataPointIndex] +
+                                            ' hrs</span>' + '</div>'
+                                        );
+                                    }
+                                },
+                                xaxis: {
+                                    categories: dates
+                                },
+                                yaxis: { opposite: isRtl }
+                            };
+                            if (typeof lineChartEl !== undefined && lineChartEl !== null) {
+                                var lineChart = new ApexCharts(lineChartEl, lineChartConfig);
+                                lineChart.render();
+                            }
+                        }
+                    },
+                    error: function(response) {
+                        console.log(response);
+                    }
+                })
+            }
+        })
+    </script>
+@endscript

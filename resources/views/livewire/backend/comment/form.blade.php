@@ -33,7 +33,7 @@
                 @enderror
             </div>
             <div class="col-md-6">
-                <span wire:ignore.>
+                <span>
                     <x-input-label for="unit-select" class="required" value="Unit" />
                     <x-select-input id="unit-select"
                         :class="$errors->has('form.unit') ? 'error select2' : 'select2'" wire:model="form.unit">
