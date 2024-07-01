@@ -123,7 +123,6 @@
                                             </div>
                                         </div>
                                     @endforeach
-                                    {{-- {{ $comments->links() }} <!-- Pagination links --> --}}
                                 </div>
                             </div>
                             <!-- User Chat messages -->
