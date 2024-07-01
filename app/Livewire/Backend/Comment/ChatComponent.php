@@ -18,13 +18,15 @@ class ChatComponent extends Component
 
     public ChatHourForm $form;
 
-    public int $limitPerPage = 10;
+    public int $limitPerPage = 3;
 
     public string $sortDirection = 'desc';
 
     public string $columnName = 'created_at';
 
-    public $hideShowMoreButton = true;
+    public bool $hideShowMoreButton = true;
+
+    public string $filterBy = "";
     public function mount($taskId)
     {
         $this->taskId = $taskId;
@@ -37,19 +39,22 @@ class ChatComponent extends Component
             $query->whereHas('project', function ($query) {
                 $query->sessionBusiness();
             });
-        })
-        ->orderBy('id', $this->sortDirection)
-        ->with('fromUser')
-        ->paginate($this->limitPerPage);
+        })->orderBy('id', $this->sortDirection)->with('fromUser');
 
-            $hide = !$comments->hasMorePages();
-            $this->hideShowMoreButton = $hide ? false : true;
+        if ($this->filterBy === 'chatsOnly')
+            $comments = $comments->whereNull('time')->whereNull('dated');
+        if ($this->filterBy === 'hoursOnly')
+            $comments = $comments->whereNotNull('time')->whereNotNull('dated');
 
-            return $comments;
+        $comments = $comments->paginate($this->limitPerPage);
+
+        $this->hideShowMoreButton = !$comments->hasMorePages() ? false : true;
+
+        return $comments;
     }
     public function loadMore()
     {
-        $this->limitPerPage += 10;
+        $this->limitPerPage += $this->perPageLimit();
         $this->getComments();
     }
     public function showElement()
@@ -71,6 +76,28 @@ class ChatComponent extends Component
         $this->resetValidation();
         $this->dispatch('reinitialize-dispatcher');
     }
+
+    public function filterByWithoutHours()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "chatsOnly";
+        return $this->getComments();
+    }
+
+    public function filterByHours()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "hoursOnly";
+        return $this->getComments();
+    }
+
+    public function showAll()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "";
+        $this->getComments();
+    }
+
     public function storeChatHours()
     {
         if (!$this->isHourModalVisible && empty($this->form->description)) {
@@ -112,9 +139,15 @@ class ChatComponent extends Component
     public function render()
     {
         $comments = $this->getComments();
+
         $task = $this->getTask();
         $this->dispatch('reinitialize-icons');
 
         return view('livewire.backend.comment.chat-component', compact('comments', 'task'));
+    }
+
+    private function perPageLimit() : int
+    {
+        return 3;
     }
 }

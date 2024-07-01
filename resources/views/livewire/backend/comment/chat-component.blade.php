@@ -56,6 +56,16 @@
                                         </div>
                                         <h6 class="mb-0">{{ $task?->user?->fullName }}</h6>
                                     </div>
+                                    <div class="dropdown my-2">
+                                        <button class="btn btn-dark btn-sm dropdown-toggle btn-dark text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          Filter By
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="showAll">All</a></li>
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="filterByWithoutHours" wire:loading.attr="disabled">Without Hours</a></li>
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="filterByHours" wire:loading.attr="disabled">With Hours</a></li>
+                                        </ul>
+                                      </div>
                                 </header>
                             </div>
                             <!--/ Chat Header -->
