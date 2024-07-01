@@ -2,14 +2,11 @@
 
 namespace App\Livewire\Backend\Comment;
 
+use App\Livewire\Forms\ChatHourForm;
 use App\Models\Task;
 use App\Models\Comment;
 use Livewire\Component;
 use Exception;
-use Validator;
-use App\Enums\Comment\CommentType;
-use App\Enums\Comment\CommentUnit;
-use App\Livewire\Forms\ChatHourForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,18 +18,39 @@ class ChatComponent extends Component
 
     public ChatHourForm $form;
 
+    public int $limitPerPage = 10;
+
+    public string $sortDirection = 'desc';
+
+    public string $columnName = 'created_at';
+
+    public $hideShowMoreButton = true;
     public function mount($taskId)
     {
         $this->taskId = $taskId;
     }
 
-    private function getComments()
+    private function getComments() : LengthAwarePaginator
     {
-        return Comment::where('task_id', $this->taskId)->whereHas('task', function ($query) {
+        $comments = Comment::where('task_id', $this->taskId)
+        ->whereHas('task', function ($query) {
             $query->whereHas('project', function ($query) {
                 $query->sessionBusiness();
             });
-        })->with('fromUser')->get();
+        })
+        ->orderBy('id', $this->sortDirection)
+        ->with('fromUser')
+        ->paginate($this->limitPerPage);
+
+            $hide = !$comments->hasMorePages();
+            $this->hideShowMoreButton = $hide ? false : true;
+
+            return $comments;
+    }
+    public function loadMore()
+    {
+        $this->limitPerPage += 10;
+        $this->getComments();
     }
     public function showElement()
     {
