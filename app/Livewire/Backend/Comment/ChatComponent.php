@@ -2,14 +2,11 @@
 
 namespace App\Livewire\Backend\Comment;
 
+use App\Livewire\Forms\ChatHourForm;
 use App\Models\Task;
 use App\Models\Comment;
 use Livewire\Component;
 use Exception;
-use Validator;
-use App\Enums\Comment\CommentType;
-use App\Enums\Comment\CommentUnit;
-use App\Livewire\Forms\ChatHourForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -21,18 +18,44 @@ class ChatComponent extends Component
 
     public ChatHourForm $form;
 
+    public int $limitPerPage = 10;
+
+    public string $sortDirection = 'desc';
+
+    public string $columnName = 'created_at';
+
+    public bool $hideShowMoreButton = true;
+
+    public string $filterBy = "";
     public function mount($taskId)
     {
         $this->taskId = $taskId;
     }
 
-    private function getComments()
+    private function getComments() : LengthAwarePaginator
     {
-        return Comment::where('task_id', $this->taskId)->whereHas('task', function ($query) {
+        $comments = Comment::where('task_id', $this->taskId)
+        ->whereHas('task', function ($query) {
             $query->whereHas('project', function ($query) {
                 $query->sessionBusiness();
             });
-        })->with('fromUser')->get();
+        })->orderBy('id', $this->sortDirection)->with('fromUser');
+
+        if ($this->filterBy === 'chatsOnly')
+            $comments = $comments->whereNull('time')->whereNull('dated');
+        if ($this->filterBy === 'hoursOnly')
+            $comments = $comments->whereNotNull('time')->whereNotNull('dated');
+
+        $comments = $comments->paginate($this->limitPerPage);
+
+        $this->hideShowMoreButton = !$comments->hasMorePages() ? false : true;
+
+        return $comments;
+    }
+    public function loadMore()
+    {
+        $this->limitPerPage += $this->perPageLimit();
+        $this->getComments();
     }
     public function showElement()
     {
@@ -53,6 +76,28 @@ class ChatComponent extends Component
         $this->resetValidation();
         $this->dispatch('reinitialize-dispatcher');
     }
+
+    public function filterByWithoutHours()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "chatsOnly";
+        return $this->getComments();
+    }
+
+    public function filterByHours()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "hoursOnly";
+        return $this->getComments();
+    }
+
+    public function showAll()
+    {
+        $this->limitPerPage = $this->perPageLimit();
+        $this->filterBy = "";
+        $this->getComments();
+    }
+
     public function storeChatHours()
     {
         if (!$this->isHourModalVisible && empty($this->form->description)) {
@@ -94,9 +139,15 @@ class ChatComponent extends Component
     public function render()
     {
         $comments = $this->getComments();
+
         $task = $this->getTask();
         $this->dispatch('reinitialize-icons');
 
         return view('livewire.backend.comment.chat-component', compact('comments', 'task'));
+    }
+
+    private function perPageLimit() : int
+    {
+        return 10;
     }
 }
