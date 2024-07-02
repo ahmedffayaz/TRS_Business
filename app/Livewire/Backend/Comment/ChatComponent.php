@@ -5,6 +5,7 @@ namespace App\Livewire\Backend\Comment;
 use App\Livewire\Forms\ChatHourForm;
 use App\Models\Task;
 use App\Models\Comment;
+use App\Models\User;
 use Livewire\Component;
 use Exception;
 use Illuminate\Support\Facades\DB;
@@ -51,6 +52,14 @@ class ChatComponent extends Component
 
         return $comments;
     }
+    private function getMembers()
+    {
+        return User::sessionBusiness()->join('comments', function ($join) {
+            $join->on('users.id', '=', 'comments.from')->orOn('users.id', '=', 'comments.to');
+        })->groupBy('users.id')
+            ->select('users.*')->get();
+    }
+
     #[On('chats')]
     public function chats()
     {
@@ -147,11 +156,11 @@ class ChatComponent extends Component
     public function render()
     {
         $comments = $this->getComments();
-
+        $members = $this->getMembers();
         $task = $this->getTask();
         $this->dispatch('reinitialize-icons');
 
-        return view('livewire.backend.comment.chat-component', compact('comments', 'task'));
+        return view('livewire.backend.comment.chat-component', compact('comments', 'task', 'members'));
     }
 
     private function perPageLimit() : int

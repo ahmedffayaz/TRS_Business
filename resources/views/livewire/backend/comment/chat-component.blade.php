@@ -44,17 +44,22 @@
                                 <header class="chat-header">
                                     <div class="d-flex align-items-center">
                                         <div class="design-group">
-                                            <div class="avatar avatar-border m-0 me-1">
-                                                @if ($task?->user?->avatar)
-                                                <img src="{{ getUserAvatar($task?->user?->avatar) }}" alt="avatar"
-                                                    height="36" width="36" />
-                                                <span class="avatar-status-busy"></span>
-                                                @else
-                                                <div class="avatar-content">{{ $task?->user?->avatarName }}</div>
+                                            @foreach ($members as $member)
+                                                @if ($loop->iteration <= 5)
+                                                    <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
+                                                        title="{{ $member?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
+                                                        @if ($member?->avatar)
+                                                            <img src="{{ getUserAvatar($member) }}" alt="Avatar" width="36" height="36" />
+                                                        @else
+                                                            <div class="avatar-content">{{ $member?->avatarName }}</div>
+                                                        @endif
+                                                    </div>
                                                 @endif
-                                            </div>
+                                                @if (count($members) > 5)
+                                                    <span>+ {{ count($members) - 5 }}</span>
+                                                @endif
+                                            @endforeach
                                         </div>
-                                        <h6 class="mb-0">{{ $task?->user?->fullName }}</h6>
                                     </div>
                                     <div class="dropdown my-2">
                                         <button class="btn btn-dark btn-sm dropdown-toggle btn-dark text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
