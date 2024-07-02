@@ -35,7 +35,11 @@ class CommentComponent extends Component
     {
         $this->taskId = $taskId;
     }
-
+    #[On('comments')]
+    public function comments()
+    {
+        $this->getComments();
+    }
     private function getComments(): LengthAwarePaginator
     {
         return Comment::whereHas('task', function ($query) {
@@ -215,6 +219,7 @@ class CommentComponent extends Component
                 'type' => 'success',
                 'message' => 'Comment deleted successfully.'
             ]);
+            $this->dispatch('chats');
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while comment is deleting and comment id is ' . $id . ' ' . $exception->getMessage());

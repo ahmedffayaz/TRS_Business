@@ -23,7 +23,7 @@ class ChatHourForm extends Form
             'unit' => $this->isHourModalVisible ? 'required|string' : 'nullable',
             'is_billable' => 'nullable|boolean',
             'dated' => $this->isHourModalVisible ? 'required|date' : 'nullable',
-            'description' => 'required|string'
+            'description' => 'nullable|string'
         ];
 
         if ($this->unit === CommentUnit::MINUTES->value) {

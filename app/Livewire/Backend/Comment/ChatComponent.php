@@ -10,7 +10,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Pagination\LengthAwarePaginator;
-
+use Livewire\Attributes\On;
 class ChatComponent extends Component
 {
     public ?int $taskId;
@@ -31,7 +31,6 @@ class ChatComponent extends Component
     {
         $this->taskId = $taskId;
     }
-
     private function getComments() : LengthAwarePaginator
     {
         $comments = Comment::where('task_id', $this->taskId)
@@ -51,6 +50,11 @@ class ChatComponent extends Component
         $this->hideShowMoreButton = !$comments->hasMorePages() ? false : true;
 
         return $comments;
+    }
+    #[On('chats')]
+    public function chats()
+    {
+        $this->getComments();
     }
     public function loadMore()
     {
@@ -105,6 +109,10 @@ class ChatComponent extends Component
         }
         $validated = $this->form->validate();
 
+        if (empty($validated['description'])) {
+            return $this->dispatch('alert', ['type' => 'error', 'message' => 'Description field is required.']);
+        }
+
         try {
             DB::beginTransaction();
             Comment::create([
@@ -119,10 +127,10 @@ class ChatComponent extends Component
 
             DB::commit();
             $this->form->description ="";
-            $this->dispatch('alert', ['type' => 'success', 'message' => 'comment created successfully.']);
             $this->form->reset();
             $this->resetValidation();
-            $this->form->isHourModalVisible = false;
+            $this->dispatch('comments');
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'comment created successfully.']);
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while add time: ' . $exception->getMessage());
