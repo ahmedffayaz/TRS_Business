@@ -53,11 +53,13 @@
                                                     </button>
                                                     <div class="dropdown-menu dropdown-menu-end">
                                                         @can('edit_comments')
+                                                        @if($comment->dated && $comment->time)
                                                             <x-anchor-tag class="dropdown-item" href="#"
                                                                 wire:click="edit({{ $comment?->id }})">
                                                                 <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                                 <span>Edit</span>
                                                             </x-anchor-tag>
+                                                            @endif
                                                         @endcan
                                                         @can('delete_comments')
                                                             <x-anchor-tag class="dropdown-item" href="#"
