@@ -18,7 +18,7 @@ class ChatComponent extends Component
 
     public ChatHourForm $form;
 
-    public int $limitPerPage = 3;
+    public int $limitPerPage = 10;
 
     public string $sortDirection = 'desc';
 
@@ -148,6 +148,6 @@ class ChatComponent extends Component
 
     private function perPageLimit() : int
     {
-        return 3;
+        return 10;
     }
 }
