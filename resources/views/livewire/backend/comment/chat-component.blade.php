@@ -56,6 +56,16 @@
                                         </div>
                                         <h6 class="mb-0">{{ $task?->user?->fullName }}</h6>
                                     </div>
+                                    <div class="dropdown my-2">
+                                        <button class="btn btn-dark btn-sm dropdown-toggle btn-dark text-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                          Filter By
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="showAll">All</a></li>
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="filterByWithoutHours" wire:loading.attr="disabled">Without Hours</a></li>
+                                          <li><a class="dropdown-item" href="javascript:;" wire:click="filterByHours" wire:loading.attr="disabled">With Hours</a></li>
+                                        </ul>
+                                      </div>
                                 </header>
                             </div>
                             <!--/ Chat Header -->
@@ -63,34 +73,66 @@
                             <!-- User Chat messages -->
                             <div class="user-chats">
                                 <div class="chats">
-                                    @foreach ($comments as $comment)
-                                    <div
-                                        class="chat {{ $comment?->fromUser?->id !== auth()->user()->id ? 'chat-left' : '' }}">
-                                        <div class="chat-avatar">
-                                            <span class="avatar box-shadow-1 cursor-pointer">
-                                                @if ($comment?->fromUser?->avatar)
-                                                <img src="{{ getUserAvatar($comment?->fromUser?->avatar) }}"
-                                                    alt="avatar" height="36" width="36" />
-                                                @else
-                                                <div class="avatar-content">{{ $comment?->fromUser?->avatarName }}
+                                    @php
+                                    $lastDate = null;
+                                    @endphp
+                                    <div class="text-center">
+                                        @if($hideShowMoreButton)
+                                        <x-button class="btn-dark btn-sm" wire:click="loadMore" wire:loading.attr="disabled">
+                                            <span wire:loading.remove>Show more</span>
+                                            <x-button-loader />
+                                        </x-button>
+                                        @endif
+                                    </div>
+                                    @foreach ($comments->sortBy('id') as $comment)
+                                        @php
+                                            $commentDate = $comment->created_at->format('Y-m-d');
+                                            $isToday = ($commentDate === now()->format('Y-m-d'));
+                                            $isYesterday = ($commentDate === now()->subDay()->format('Y-m-d'));
+                                            $isWithinLastWeek = $comment->created_at->greaterThanOrEqualTo(now()->subDays(7));
+                                        @endphp
+
+                                        <div
+                                            class="chat {{ $comment->fromUser && $comment->fromUser->id !== auth()->user()->id ? 'chat-left' : '' }}">
+
+                                            {{-- Display "Today" divider if it's the first comment of today --}}
+                                            @if (($isToday && $lastDate !== 'today') || ($isYesterday && $lastDate !== 'yesterday') || ($isWithinLastWeek && !$isToday && !$isYesterday) || (!$isWithinLastWeek && !$isToday && !$isYesterday))
+                                                @php
+                                                    if ($isToday){
+                                                        $lastDate = 'today';
+                                                    }elseif($isYesterday){
+                                                        $lastDate = 'yesterday';
+                                                    }elseif ($isWithinLastWeek){
+                                                        $lastDate =  $comment->created_at->format('l'); // Get full day name
+                                                    }elseif (!$isWithinLastWeek && !$isToday && !$isYesterday){
+                                                        $lastDate = $comment->created_at->format('F jS, Y');
+                                                    }
+                                                @endphp
+
+                                                <div class="divider">
+                                                    <div class="divider-text">{{ ucfirst($lastDate) }}</div>
                                                 </div>
-                                                @endif
-                                            </span>
-                                        </div>
-                                        <div class="chat-body">
-                                            <div class="chat-content">
-                                                <p class="mb-1">{{ $comment?->description }}</p>
-                                                <small><b>Created at:</b> {{ formatDate($comment?->created_at)
-                                                    }}</small>
+                                            @endif
+
+                                            <div class="chat-avatar">
+                                                <span class="avatar box-shadow-1 cursor-pointer">
+                                                    @if ($comment->fromUser && $comment->fromUser->avatar)
+                                                    <img src="{{ getUserAvatar($comment->fromUser->avatar) }}" alt="avatar"
+                                                        height="36" width="36" />
+                                                    @else
+                                                    <div class="avatar-content">{{ $comment->fromUser ?
+                                                        $comment->fromUser->avatarName : '' }}</div>
+                                                    @endif
+                                                </span>
                                             </div>
-                                            <div>
+                                            <div class="chat-body">
+                                                <div class="chat-content">
+                                                    <p class="mb-1">{{ $comment->description }}</p>
+                                                    <small><b>Created at:</b> {{ formatDate($comment->created_at) }}</small>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
                                     @endforeach
-                                    <div class="divider">
-                                        <div class="divider-text">Yesterday</div>
-                                    </div>
                                 </div>
                             </div>
                             <!-- User Chat messages -->
@@ -121,8 +163,9 @@
                                         </label>
                                     </span>
                                 </div>
-                                <button type="button" class="btn btn-primary send" role="" wire:click="storeChatHours" wire:submit.prevent>
-                                    <i data-feather="send" class="d-lg-none" ></i>
+                                <button type="button" class="btn btn-primary send" role="" wire:click="storeChatHours"
+                                    wire:submit.prevent>
+                                    <i data-feather="send" class="d-lg-none"></i>
                                     <span class="d-none d-lg-block">Send</span>
                                 </button>
 

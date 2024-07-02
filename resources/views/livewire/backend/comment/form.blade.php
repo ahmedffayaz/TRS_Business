@@ -75,7 +75,7 @@
 
         <div class="row">
             <div class="col-md-12 text-center">
-                <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
+                <x-button class="btn-primary me-1" type="submit" tabindex="4"
                     wire:loading.attr="disabled">
                         <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
                     <x-button-loader />
