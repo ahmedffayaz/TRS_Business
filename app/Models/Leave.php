@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\Leave\LeaveIsWorking;
+use App\Enums\Leave\LeaveType;
 use App\Enums\Leave\LeaveStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,20 +17,34 @@ class Leave extends Model
         'is_working',
         'status',
         'processed_by',
-        'processing_reason'
+        'processing_reason',
+        'cancel_reason'
     ];
 
     protected $casts = [
-        'is_working' => LeaveIsWorking::class,
+        'is_working' => LeaveType::class,
         'status' => LeaveStatus::class
     ];
-    
+
     /**
      * @return BelongsTo
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function scopeGetList($query, $search, $columnName, $sortDirection)
+    {
+        if (!empty($search)) {
+            $query->where(function ($subQuery) use ($search) {
+                $subQuery->where('start_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('end_date', 'LIKE', '%' . $search . '%')
+                    ->orWhere('status', 'LIKE', '%' . $search . '%');
+            });
+        }
+
+        return $query->orderBy($columnName, $sortDirection);
     }
 
     /**

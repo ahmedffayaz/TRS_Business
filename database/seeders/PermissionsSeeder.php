@@ -109,6 +109,10 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'leave', 'name' => 'add_leaves', 'title' => 'Add leave']);
         Permission::create(['group' => 'leave', 'name' => 'delete_leaves', 'title' => 'Delete leave']);
         Permission::create(['group' => 'leave', 'name' => 'view_leaves', 'title' => 'View leave']);
+        Permission::create(['group' => 'leave', 'name' => 'edit_leaves', 'title' => 'Edit leave']);
+        Permission::create(['group' => 'leave', 'name' => 'reject_leaves', 'title' => 'Reject leave']);
+        Permission::create(['group' => 'leave', 'name' => 'cancel_leaves', 'title' => 'Cancel leave']);
+        Permission::create(['group' => 'leave', 'name' => 'view_reason', 'title' => 'View Reason']);
         // project new field add
         Permission::create(['group' => 'project', 'name' => 'view_statistics', 'title' => 'View Statistics']);
 		Permission::create(['group' => 'leave', 'name' => 'add_employees_leaves', 'title' => 'Add Employees Leaves']);

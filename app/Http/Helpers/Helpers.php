@@ -283,3 +283,17 @@ function emailTemplate($key, $details, $filteredKeywords = [], $filteredKeywords
         'subject' => $emailTemplate->subject
     );
 }
+
+function leaveStatus($status)
+{
+    switch ($status->name) {
+        case 'APPROVED':
+            return 'success';
+        case 'PENDING':
+            return 'warning';
+        case 'REJECTED':
+            return 'danger';
+        case 'Canceled':
+            return 'danger';
+    }
+}
