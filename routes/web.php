@@ -18,6 +18,7 @@ use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
 use App\Livewire\Backend\Task\TaskComponent;
 
+use App\Livewire\Backend\Leaves\LeaveComponent;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -105,6 +106,11 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
                 Route::get('contracts', UserContractComponent::class)->name('contracts')->middleware('permission:view_contracts');
                 Route::get('contracts/view/{id}', [UserContractComponent::class, 'view'])
                 ->name('contracts.view')->middleware('permission:view_contracts');
+            });
+
+            // User leave routes
+            Route::prefix('leave')->name('leave.')->group(function () {
+                Route::get('/', LeaveComponent::class)->name('index')->middleware('permission:view_leaves');;
             });
 
             // Projects routes

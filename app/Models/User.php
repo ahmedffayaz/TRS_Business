@@ -184,7 +184,7 @@ class User extends Authenticatable
 
     public function business() : BelongsTo
     {
-        return $this->belongsTo(Business::class);
+        return $this->belongsTo(Business::class,);
     }
 
     public function scopeSessionBusiness($query)

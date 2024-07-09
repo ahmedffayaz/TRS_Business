@@ -35,14 +35,30 @@
                         </x-anchor-tag>
                     </x-nav>
                 @endcan
-                @can('view_users')
-                    <x-nav class="{{ request()->routeIs('dashboard.users.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.users.index') }}">
-                            <i data-feather="users"></i>
-                            <span class="menu-title text-truncate" data-i18n="Companies">Users</span>
-                        </x-anchor-tag>
-                    </x-nav>
-                @endcan
+                <li class=" nav-item">
+                    <a class="d-flex align-items-center" href="#">
+                        <i data-feather="shield"></i>
+                        <span class="menu-title text-truncate" data-i18n="Companies &amp; Permissions">Users</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li>
+                             @can('view_users')
+                                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.users.index') }}">
+                                        <i data-feather="users"></i>
+                                        <span class="menu-title text-truncate" data-i18n="Companies">Users</span>
+                                    </x-anchor-tag>
+                            @endcan
+                        </li>
+                        <li>
+                              @can('view_leaves')
+                                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.leave.index') }}">
+                                        <i data-feather="circle"></i>
+                                        <span class="menu-title text-truncate" data-i18n="Companies">Leaves</span>
+                                    </x-anchor-tag>
+                            @endcan
+                        </li>
+                    </ul>
+                </li>
                 @if (auth()->user()->can('view_projects') || auth()->user()->can('view_associated_projects'))
                     <x-nav class="{{ request()->routeIs('dashboard.projects.index') ? 'active' : '' }} nav-item">
                         <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.projects.index') }}">
