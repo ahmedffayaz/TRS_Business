@@ -29,8 +29,10 @@ class CreateLeavesTable extends Migration
             $table->unsignedBigInteger('processed_by')->nullable();
             $table->foreign('processed_by')->references('id')->on('users')->onDelete('restrict')->onUpdate('restrict');
 
+            $table->unsignedBigInteger('business_id')->nullable();
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('restrict')->onUpdate('restrict');
+
             $table->text('processing_reason')->nullable();
-            $table->text('cancel_reason')->nullable();
             $table->string('status')->default(LeaveStatus::PENDING->value);
             $table->timestamps();
             $table->softDeletes();

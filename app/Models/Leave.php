@@ -15,10 +15,10 @@ class Leave extends Model
         'start_date',
         'end_date',
         'is_working',
+        'business_id',
         'status',
         'processed_by',
         'processing_reason',
-        'cancel_reason'
     ];
 
     protected $casts = [
@@ -26,12 +26,11 @@ class Leave extends Model
         'status' => LeaveStatus::class
     ];
 
-    /**
-     * @return BelongsTo
-     */
-    public function user(): BelongsTo
+    public function scopeSessionBusiness()
     {
-        return $this->belongsTo(User::class);
+        return $this->whereHas('business', function ($query) {
+            $query->whereName(session('business'));
+        });
     }
 
     public function scopeGetList($query, $search, $columnName, $sortDirection)
@@ -53,5 +52,18 @@ class Leave extends Model
     public function processor(): BelongsTo
     {
         return $this->belongsTo(User::class, 'processed_by');
+    }
+
+    public function business() : BelongsTo
+    {
+        return $this->belongsTo(Business::class);
+    }
+
+    /**
+     * @return BelongsTo
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -9,7 +9,7 @@
     </div>
     <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'createLeave' }}">
         <div class="row mb-1">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <x-input-label for="start-date" class="required" value="Start Date" />
                 <x-input type="text" name="start_date" id="start_date" placeholder="2020-09-23"
                     :class="$errors->has('form.start_date') ? 'error flatpickr-basic' : 'flatpickr-basic'"
@@ -18,7 +18,7 @@
                     <x-input-error :message="$message" />
                 @enderror
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <x-input-label for="end-date" class="required" value="End Date" />
                 <x-input type="text" name="end_date" id="end_date" placeholder="2020-09-23"
                     :class="$errors->has('form.end_date') ? 'error flatpickr-basic' : 'flatpickr-basic'"
@@ -27,9 +27,7 @@
                     <x-input-error :message="$message" />
                 @enderror
             </div>
-        </div>
-        <div class="row mb-1">
-            <div class="col-md-12">
+            <div class="col-md-4">
                 <span>
                     <x-input-label for="is-working" class="required" value="Is Working" />
                     <x-select-input id="is-working"
@@ -44,21 +42,18 @@
             <x-input-error :message="$message" />
             @enderror
         </div>
-    </div>
-
+        </div>
     <div class="row mb-1">
         <div class="col-md-12">
-            <span wire:ignore.>
-                <x-input-label for="reason" class="required" value="Reason" />
-                <x-textarea name="reason" id="reason" rows="4" wire:model="form.reason"
-                :class="$errors->has('form.reason') ? 'error' : ''" />
-            </span>
+            <x-input-label for="reason" value="Reason" />
+            <x-textarea id="reason" data-length="200" length="200" rows="3"
+                :class="$errors->has('form.reason') ? 'error char-textarea' : 'char-textarea'"
+                placeholder="Enter Reason" wire:model="form.reason"/>
             @error('form.reason')
-            <x-input-error :message="$message" />
+                <x-input-error :message="$message" />
             @enderror
         </div>
     </div>
-
 
         <div class="row">
             <div class="col-md-12 text-center">

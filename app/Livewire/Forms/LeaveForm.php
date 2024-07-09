@@ -22,7 +22,7 @@ class LeaveForm extends Form
         $rules = [
             'reason' => 'required|string|min:10',
             'start_date' => 'required|date' ,
-            'end_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
             'is_working' => 'required',
         ];
         return $rules;
@@ -32,9 +32,9 @@ class LeaveForm extends Form
     {
         return [
             'reason' => 'reason',
-            'start_date' => 'start_date',
-            'end_date' => 'end_date',
-            'is_working' => 'is_working',
+            'start_date' => 'start date',
+            'end_date' => 'end date',
+            'is_working' => 'is working',
         ];
     }
 

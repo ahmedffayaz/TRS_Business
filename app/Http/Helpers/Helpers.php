@@ -293,7 +293,7 @@ function leaveStatus($status)
             return 'warning';
         case 'REJECTED':
             return 'danger';
-        case 'Canceled':
+        case 'CANCELED':
             return 'danger';
     }
 }
