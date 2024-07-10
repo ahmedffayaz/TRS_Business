@@ -39,7 +39,6 @@ class Task extends Model
         if (!empty($search)) {
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('name', 'LIKE', '%' . $search . '%')
-                    ->orWhere('status', 'LIKE', '%' . $search . '%')
                     ->orWhere('description', 'LIKE', '%' . $search . '%')
                     ->orWhere('priority', 'LIKE', '%' . $search . '%');
             });

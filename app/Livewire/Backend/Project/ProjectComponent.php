@@ -43,7 +43,9 @@ class ProjectComponent extends Component
     private function getProjectQuery()
     {
         $user = auth()->user();
+        $this->dispatch('reinitialize-icons');
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
+        $this->dispatch('reinitialize-chart');
         return Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
                 $query->whereHas('members', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
@@ -98,6 +100,8 @@ class ProjectComponent extends Component
         $this->dispatch('currency-select', ['formCurrency' => []]);
         $this->dispatch('project-auto-archive-status-select', ['formIsAutoArchived' => []]);
         $this->dispatch('project-members-select', ['formMembers' => []]);
+        $this->dispatch('reinitialize-icons');
+        $this->dispatch('reinitialize-chart');
     }
 
     public function store()
@@ -129,6 +133,7 @@ class ProjectComponent extends Component
 
             DB::commit();
             $this->closeModal();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Project created successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
@@ -200,6 +205,8 @@ class ProjectComponent extends Component
             DB::commit();
 
             $this->closeModal();
+            $this->dispatch('reinitialize-icons');
+            $this->dispatch('reinitialize-chart');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Project updated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
@@ -231,6 +238,7 @@ class ProjectComponent extends Component
             $project = Project::sessionBusiness()->findOrFail($id);
             $project->delete();
             DB::commit();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', [
                 'type' => 'success',
                 'message' => 'Project deleted successfully.']);
@@ -241,6 +249,40 @@ class ProjectComponent extends Component
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while delete project: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
+
+    public function restoreConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' => $id,
+            'type' => 'restore',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You are about to restore the project.',
+        ]);
+    }
+    #[On('restore')]
+    public function restore($id)
+    {
+        try {
+            DB::beginTransaction();
+            $project = Project::withTrashed()->sessionBusiness()->findOrFail($id);
+            $project->restore();
+            DB::commit();
+            $this->dispatch('reinitialize-icons');
+            $this->dispatch('alert', [
+                'type' => 'success',
+                'message' => 'Project restored successfully.']);
+                $this->dispatch('reinitialize-chart');
+        } catch (ModelNotFoundException $exception) {
+            DB::rollBack();
+            Log::error('Get error while restore project: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        } catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while restore project: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }

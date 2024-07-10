@@ -4,7 +4,7 @@
         <div class="col-md-12 col-12">
             <div class="card">
                 <div class="card-header border-bottom">
-                    <h4 class="card-title">Setting Details</h4>
+                    <h4 class="card-title">System Setting</h4>
                 </div>
                 <div class="card-body  py-2 my-25">
                     <form class="form form-horizontal" wire:submit.prevent="submit">
@@ -37,13 +37,15 @@
                                 <label class="col-form-label" for="Company favicon">Favicon</label>
                                 <div class="d-flex">
                                     <a href="#" class="me-25">
-                                        <img src="{{ $favicon }}" wire:model="favicon"  id="favicon-img" class="uploadedAvatar rounded me-50" alt="profile image"
+                                        <img src="{{ $form?->favicon
+                                                 ? $form?->favicon?->temporaryUrl()
+                                                : (isset($cmsFavicon) && $cmsFavicon ? asset('storage/cms/images/' . $cmsFavicon) : asset($defaultFavicon)) }}" wire:model="form.favicon"  id="favicon-img" class="uploadedAvatar rounded me-50" alt="profile image"
                                             height="100" width="100">
                                     </a>
                                     <div class="d-flex align-items-end mt-75 ms-1">
                                         <div>
                                             <label for="favicon" class="btn btn-sm btn-primary mb-75 me-75 waves-effect waves-float waves-light">Upload</label>
-                                            <input type="file" id="favicon" hidden="" accept="image/*" wire:model="form.faviconFile">
+                                            <input type="file" id="favicon" hidden="" accept="image/*" wire:model="form.favicon">
                                             <p class="mb-0">Allowed file types: png, jpg, jpeg.</p>
                                         </div>
                                     </div>
@@ -56,7 +58,9 @@
                                 <label class="col-form-label" for="Company Logo">Logo</label>
                                 <div class="d-flex">
                                     <a href="#" class="me-25">
-                                        <img src="{{ $logo }}" wire:model="logo"  id="logo-img" class="uploadedAvatar rounded me-50" alt="profile image"
+                                        <img src="{{ $form?->logoFile
+                                            ? $form?->logoFile?->temporaryUrl()
+                                           : (isset($cmsLogo) && $cmsLogo ? asset('storage/cms/images/' . $cmsLogo) : asset($defaultLogo)) }}" wire:model="form.logoFile"  id="logo-img" class="uploadedAvatar rounded me-50" alt="profile image"
                                             height="100" width="100">
                                     </a>
                                     <div class="d-flex align-items-end mt-75 ms-1">

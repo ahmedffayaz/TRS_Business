@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Comment;
 
+use App\Enums\Comment\CommentUnit;
 use App\Livewire\Forms\ChatHourForm;
 use App\Models\Task;
 use App\Models\Comment;
@@ -113,11 +114,11 @@ class ChatComponent extends Component
 
     public function storeChatHours()
     {
+        $this->form->unit = $this->form->unit?? CommentUnit::MINUTES->value;
         if (!$this->isHourModalVisible && empty($this->form->description)) {
             return $this->dispatch('alert', ['type' => 'error', 'message' => 'Description field is required.']);
         }
         $validated = $this->form->validate();
-
         if (empty($validated['description'])) {
             return $this->dispatch('alert', ['type' => 'error', 'message' => 'Description field is required.']);
         }
@@ -135,9 +136,10 @@ class ChatComponent extends Component
             ]);
 
             DB::commit();
-            $this->form->description ="";
             $this->form->reset();
             $this->resetValidation();
+            $this->dispatch('reinitialize-dispatcher');
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('comments');
             $this->dispatch('alert', ['type' => 'success', 'message' => 'comment created successfully.']);
         } catch (Exception $exception) {

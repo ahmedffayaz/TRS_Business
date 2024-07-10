@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ cmsName() }}</title>
+    @livewire('partials.favicon-component')
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -25,9 +26,9 @@
                         <div class="card mb-0">
                             <div class="card-body">
                                 <a href="index.html" class="brand-logo">
-                                    <img src="{{ asset('trs_logo.svg') }}" alt="" height="60">
+                                    <img src="{{ cmsLogo() }}" alt="" height="60">
                                 </a>
-                                <h4 class="card-title mb-1 text-center">The Right Software</h4>
+                                <h4 class="card-title mb-1 text-center">{{ cmsName() }}</h4>
                                 {{ $slot }}
                             </div>
                         </div>

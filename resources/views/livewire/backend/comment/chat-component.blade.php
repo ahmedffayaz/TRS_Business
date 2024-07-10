@@ -55,9 +55,6 @@
                                                         @endif
                                                     </div>
                                                 @endif
-                                                @if (count($members) > 5)
-                                                    <span>+ {{ count($members) - 5 }}</span>
-                                                @endif
                                             @endforeach
                                         </div>
                                     </div>
@@ -133,7 +130,10 @@
                                             <div class="chat-body">
                                                 <div class="chat-content">
                                                     <p class="mb-1">{{ $comment->description }}</p>
-                                                    <small><b>Created at:</b> {{ formatDate($comment->created_at) }}</small>
+                                                    @if ($comment?->time && $comment?->dated)
+                                                        <small><b>Time Spent</b> {{ formatTime($comment?->time)}}</small>
+                                                        <small class="float-end"><b>Dated</b> {{ formatDate($comment?->dated)}}</small>
+                                                    @endif
                                                 </div>
                                             </div>
                                         </div>
@@ -177,14 +177,14 @@
                                 <div class="card collapse position-absolute bottom-50 me-2 no-shadow"
                                     style="margin-right: -1rem !important; margin-left: -1rem; margin-bottom: 28px; box-shadow: none !important; border-radius:0%"
                                     id="collapseShowElement" wire:ignore.self>
-                                    <div class="card-body py-0 mt-1 me-2">
-                                        <div>
+                                    <div class="card-body my-0 mt-1 p-0">
+                                        <div class="p-0 ms-1 ">
                                             @php
                                             $minutes = \App\Enums\Comment\CommentUnit::MINUTES->value;
                                             $hours = \App\Enums\Comment\CommentUnit::HOURS->value;
                                             @endphp
-                                            <div class="row">
-                                                <div class="col-md-3 inputs">
+                                            <div class="row p-0">
+                                                <div class="col-md-3">
                                                     <x-input type="hidden" wire:model="form.task_id" />
                                                     <x-input type="text" name="time" id="time"
                                                         :class="$errors->has('form.time') ? 'error' : ''"
@@ -193,12 +193,11 @@
                                                     <x-input-error :message="$message" />
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-3 inputs">
+                                                <div class="col-md-3">
                                                     <span wire:ignore.>
                                                         <x-select-input id="unit-select"
                                                             :class="$errors->has('form.unit') ? 'error select2' : 'select2'"
                                                             wire:model="form.unit">
-                                                            <option value="">--Select Unit--</option>
                                                             <option value="{{ $minutes }}">{{ $minutes }}</option>
                                                             <option value="{{ $hours }}">{{ $hours }}</option>
                                                         </x-select-input>
@@ -207,7 +206,7 @@
                                                     <x-input-error :message="$message" />
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-4 inputs">
+                                                <div class="col-md-3">
                                                     <x-input type="text" name="dated" id="dated"
                                                         placeholder="2020-09-23"
                                                         :class="$errors->has('form.dated') ? 'error flatpickr-basic' : 'flatpickr-basic'"
@@ -216,7 +215,7 @@
                                                     <x-input-error :message="$message" />
                                                     @enderror
                                                 </div>
-                                                <div class="col-md-2 inputs" style="margin-top: 9px">
+                                                <div class="col-md-3" style="margin-top: 9px">
                                                     <x-input-checkbox type="checkbox" id="is-billable"
                                                         name="is_billable" wire:model="form.is_billable"
                                                         statusClass="form-check-success"

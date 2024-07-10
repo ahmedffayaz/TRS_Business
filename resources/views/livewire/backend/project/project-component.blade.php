@@ -4,19 +4,19 @@
         <div class="card-header">
             <h4 class="card-title">Projects</h4>
             @can('add_projects')
-                <div>
-                    <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
-                        type="button" wire:click="openMainModal" value="Add Project" />
-                </div>
+            <div>
+                <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover" type="button"
+                    wire:click="openMainModal" value="Add Project" />
+            </div>
             @endcan
         </div>
         <div class="card-body">
             @php
-                $dataCount = [
-                    'total' => $totalProjects,
-                    'active' => $activeProjects,
-                    'archived' => $archivedProjects
-                ];
+            $dataCount = [
+            'total' => $totalProjects,
+            'active' => $activeProjects,
+            'archived' => $archivedProjects
+            ];
             @endphp
 
             <x-table-search :dataCounter="$dataCount" />
@@ -29,72 +29,89 @@
                             <th>Start Date</th>
                             <th>End Date</th>
                             <th>Status</th>
-                            <th>Budget</th>
                             <th>Members</th>
                             <th>Tasks</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($projects as $project)
-                            <tr>
-                                <td>
-                                    <div class="d-flex flex-column">
-                                        <x-anchor-tag href="{{ route('dashboard.projects.detail', $project->slug) }}" class="user_name text-truncate text-body">
-                                            <span class="fw-bolder">{{ $project?->name }}</span>
+                        @forelse ($projects as $project)
+                        <tr>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <x-anchor-tag href="{{ route('dashboard.projects.detail', $project->slug) }}"
+                                        class="user_name text-truncate text-body">
+                                        <span class="fw-bolder">{{ $project?->name }}</span>
+                                    </x-anchor-tag>
+                                    <small class="emp_post text-muted"><strong>Client:
+                                        </strong>{{ $project?->client?->name }}</small>
+                                </div>
+                            </td>
+                            <td>{{ formatDate($project?->start_date) }}</td>
+                            <td>{{ formatDate($project?->end_date) }}</td>
+                            <td>
+                                <span class="badge rounded-pill badge-light-{{ status($project?->status) }}">{{
+                                    ucfirst(str_replace('-', ' ', $project?->status?->value)) }}</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill badge-light-primary me-1">{{ $project?->members_count
+                                    }}</span>
+                            </td>
+                            <td>
+                                <span class="badge rounded-pill badge-light-primary me-1">{{ $project?->tasks_count
+                                    }}</span>
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    @can('edit_projects', 'delete_projects')
+                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                        data-bs-toggle="dropdown">
+                                        <span wire:ignore><i data-feather="more-vertical">open</i></span>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        @can('edit_projects')
+                                        <x-anchor-tag class="dropdown-item" href="#"
+                                            wire:click="edit({{ $project->id }})">
+                                            <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                            <span>Edit</span>
                                         </x-anchor-tag>
-                                        <small class="emp_post text-muted"><strong>Client:
-                                            </strong>{{ $project?->client?->name }}</small>
-                                    </div>
-                                </td>
-                                <td>{{ formatDate($project?->start_date) }}</td>
-                                <td>{{ formatDate($project?->end_date) }}</td>
-                                <td>
-                                    <span
-                                        class="badge rounded-pill badge-light-{{ status($project?->status) }}">{{ ucfirst(str_replace('-', ' ', $project?->status?->value)) }}</span>
-                                </td>
-                                <td>{{ formatCurrency($project?->budget, $project?->currency) }}</td>
-                                <td>
-                                    <span class="badge rounded-pill badge-light-primary me-1">{{ $project?->members_count }}</span>
-                                </td>
-                                <td>
-                                    <span class="badge rounded-pill badge-light-primary me-1">{{ $project?->tasks_count }}</span>
-                                </td>
-                                <td>
-                                    <div class="dropdown">
-                                        @can('edit_projects', 'delete_projects')
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
-                                                data-bs-toggle="dropdown">
-                                                <span wire:ignore><i data-feather="more-vertical">open</i></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                @can('edit_projects')
-                                                    <x-anchor-tag class="dropdown-item" href="#"
-                                                        wire:click="edit({{ $project->id }})">
-                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                        <span>Edit</span>
-                                                    </x-anchor-tag>
-                                                @endcan
-                                                @can('delete_projects')
-                                                    <x-anchor-tag class="dropdown-item" href="#"
-                                                        wire:click="deleteConfirmation({{ $project->id }})">
-                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                        <span>Delete</span>
-                                                    </x-anchor-tag>
-                                                @endcan
-                                            </div>
-                                        @else
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
-                                                data-bs-toggle="dropdown">
-                                                <span wire:ignore.>
-                                                    <i data-feather='lock'></i>
-                                                </span>
-                                            </button>
                                         @endcan
+                                        @if(!$project->deleted_at)
+                                        @can('delete_projects')
+                                        <x-anchor-tag class="dropdown-item" href="#"
+                                            wire:click="deleteConfirmation({{ $project->id }})">
+                                            <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                            <span>Delete</span>
+                                        </x-anchor-tag>
+                                        @endcan
+                                        @else
+                                        @can('restore_projects')
+                                        <x-anchor-tag class="dropdown-item" href="#"
+                                            wire:click="restoreConfirmation({{ $project->id }})">
+                                            <span wire:ignore><i data-feather="refresh-cw" class="me-50"></i></span>
+                                            <span>Restore</span>
+                                        </x-anchor-tag>
+                                        @endcan
+                                        @endif
                                     </div>
-                                </td>
-                            </tr>
-                        @endforeach
+                                    @else
+                                    <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                        data-bs-toggle="dropdown">
+                                        <span wire:ignore.>
+                                            <i data-feather='lock'></i>
+                                        </span>
+                                    </button>
+                                    @endcan
+                                </div>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr class="no-hover">
+                            <td colspan="8" class="text-center py-1 fw-bold">
+                                <p>No Project Found</p>
+                            </td>
+                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $projects->links('components.pagination') }}
@@ -102,21 +119,23 @@
         </div>
 
         @can('add_projects')
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-                @include('livewire.backend.project.form')
-            </x-main-modal>
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            @include('livewire.backend.project.form')
+        </x-main-modal>
         @endcan
     </div>
 
 </div>
 
 @script
-    <script type="module">
-        $(document).ready(function () {
+<script type="module">
+    $(document).ready(function () {
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
+                $(document).ready(function () {
                 Livewire.dispatch('feather-icons');
+                });
             });
         });
-    </script>
+</script>
 @endscript

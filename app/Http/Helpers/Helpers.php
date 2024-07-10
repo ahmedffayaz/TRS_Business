@@ -7,6 +7,7 @@ use App\Models\Business;
 use Illuminate\Support\Str;
 use App\Models\EmailTemplate;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Models\Permission;
 
 /**
@@ -14,20 +15,34 @@ use Spatie\Permission\Models\Permission;
  */
 function cmsName() : string
 {
-    $cms_name = Setting::where('name', 'cms_name')->first();
-    return isset($cms_name) ? $cms_name->value : config('app.name');
+    $cmsName = Setting::where('name', 'cms_name')->first();
+    return isset($cmsName) ? $cmsName->value : config('app.name');
+}
+
+function cmsLogo() : string
+{
+    $cmsLogo = Setting::where('name', 'cms_logo')->first();
+    return isset($cmsLogo) && Storage::disk('public')->exists('cms/images/' . $cmsLogo->value)
+        ? asset('storage/cms/images/' . $cmsLogo->value)
+        : asset('trs_logo.svg');
+}
+
+function favicon($favicon = null)
+{
+    if ($favicon && Auth::check()) {
+        return $favicon && Storage::disk('public')->exists($favicon) ? asset('storage/' . $favicon) : asset('trs_logo.svg');
+    }
+
+    $cmsFavicon = Setting::where('name', 'cms_favicon')->first();
+    return isset($cmsFavicon) && Storage::disk('public')->exists('cms/images/' . $cmsFavicon->value)
+        ? asset('storage/cms/images/' . $cmsFavicon->value)
+        : asset('trs_logo.svg');
 }
 
 function getAuthRoles(){
     $user = Auth::user();
     $rolesString = implode(', ', $user->roles->pluck('name')->toArray());
     return $rolesString;
-}
-
-function favicon() : string
-{
-    $favicon = Setting::where('name', 'favicon')->first();
-    return isset($favicon) ? asset('storage/' . $favicon->value) : asset('images/favicon.png');
 }
 
 //function for uuid

@@ -39,7 +39,7 @@
                             $paidStatus = \App\Enums\Invoice\InvoiceStatus::PAID->value;
                             $approvedStatus = \App\Enums\Invoice\InvoiceStatus::APPROVED->value;
                         @endphp
-                            @foreach ($invoices as $invoice)
+                            @forelse ($invoices as $invoice)
                                 <tr>
                                     <td class="sorting_1">
                                         <x-anchor-tag href="#">{{ $invoice?->project?->client?->name }}</x-anchor-tag>
@@ -115,7 +115,13 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                                @empty
+                                <tr class="no-hover">
+                                    <td colspan="8" class="text-center py-1 fw-bold">
+                                        <p>No Invoice Found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         @endisset
                     </tbody>
                 </table>

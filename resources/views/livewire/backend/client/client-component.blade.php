@@ -42,7 +42,7 @@
                     </thead>
                     <tbody>
                         @isset($clients)
-                            @foreach ($clients as $client)
+                            @forelse ($clients as $client)
                                 <tr>
                                     <td>
                                         <x-anchor-tag href="javascript:void(0)"
@@ -94,7 +94,13 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                                @empty
+                                <tr class="no-hover">
+                                    <td colspan="8" class="text-center py-1 fw-bold">
+                                        <p>No Client Found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         @endisset
                     </tbody>
                 </table>

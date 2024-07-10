@@ -5,15 +5,18 @@
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="{{ route('dashboard.home') }}">
                         <span class="brand-logo">
-                            <img src="{{ getSiteLogo($business->logo) }}" alt="" height="40">
+                            <img src="{{ cmsLogo() }}" alt="" height="40">
                         </span>
-                        <h2 class="brand-text">{{ !empty($business->name) ? $business->name : cmsName() }}</h2>
+                        <h2 class="brand-text">{{ strlen(cmsName()) > 10
+                            ? substr(cmsName(), 0, 10) . '...'
+                            : cmsName() }}</h2>
                     </a>
                 </li>
                 <li class="nav-item nav-toggle">
                     <a class="nav-link modern-nav-toggle pe-0" data-bs-toggle="collapse">
                         <i class="d-block d-xl-none text-primary toggle-icon font-medium-4" data-feather="x"></i>
-                        <i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary" data-feather="disc" data-ticon="disc"></i>
+                        <i class="d-none d-xl-block collapse-toggle-icon font-medium-4  text-primary"
+                            data-feather="disc" data-ticon="disc"></i>
                     </a>
                 </li>
             </ul>
@@ -28,12 +31,12 @@
                     </x-anchor-tag>
                 </x-nav>
                 @can('view_clients')
-                    <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
-                            <i data-feather="user-check"></i>
-                            <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">
+                        <i data-feather="user-check"></i>
+                        <span class="menu-title text-truncate" data-i18n="Clients">Clients</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 <li class=" nav-item">
                     <a class="d-flex align-items-center" href="#">
@@ -42,62 +45,63 @@
                     </a>
                     <ul class="menu-content">
                         <li>
-                             @can('view_users')
-                                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.users.index') }}">
-                                        <i data-feather="users"></i>
-                                        <span class="menu-title text-truncate" data-i18n="Companies">Users</span>
-                                    </x-anchor-tag>
+                            @can('view_users')
+                            <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.users.index') }}">
+                                <i data-feather="users"></i>
+                                <span class="menu-title text-truncate" data-i18n="Companies">Users</span>
+                            </x-anchor-tag>
                             @endcan
                         </li>
                         <li>
-                              @can('view_leaves')
-                                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.leave.index') }}">
-                                        <i data-feather="circle"></i>
-                                        <span class="menu-title text-truncate" data-i18n="Companies">Leaves</span>
-                                    </x-anchor-tag>
+                            @can('view_leaves')
+                            <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.leave.index') }}">
+                                <i data-feather="circle"></i>
+                                <span class="menu-title text-truncate" data-i18n="Companies">Leaves</span>
+                            </x-anchor-tag>
                             @endcan
                         </li>
                     </ul>
                 </li>
                 @if (auth()->user()->can('view_projects') || auth()->user()->can('view_associated_projects'))
-                    <x-nav class="{{ request()->routeIs('dashboard.projects.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.projects.index') }}">
-                            <i data-feather="file-text"></i>
-                            <span class="menu-title text-truncate" data-i18n="Projects">Projects</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.projects.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.projects.index') }}">
+                        <i data-feather="file-text"></i>
+                        <span class="menu-title text-truncate" data-i18n="Projects">Projects</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endif
                 @can('view_tasks')
-                    <x-nav class="{{ request()->routeIs('dashboard.tasks.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.tasks.index') }}">
-                            <i data-feather="check-circle"></i>
-                            <span class="menu-title text-truncate" data-i18n="Tasks">Tasks</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.tasks.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.tasks.index') }}">
+                        <i data-feather="check-circle"></i>
+                        <span class="menu-title text-truncate" data-i18n="Tasks">Tasks</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 @can('view_invoices')
-                    <x-nav class="{{ request()->routeIs('dashboard.invoices.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.invoices.index') }}">
-                            <i data-feather="clipboard"></i>
-                            <span class="menu-title text-truncate" data-i18n="Tasks">Invoices</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.invoices.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.invoices.index') }}">
+                        <i data-feather="clipboard"></i>
+                        <span class="menu-title text-truncate" data-i18n="Tasks">Invoices</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 @can('view_terms_conditions')
-                    <x-nav class="{{ request()->routeIs('dashboard.terms-conditions.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.terms-conditions.index') }}">
-                            <i data-feather='copy'></i>
-                            <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.terms-conditions.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center"
+                        href="{{ route('dashboard.terms-conditions.index') }}">
+                        <i data-feather='copy'></i>
+                        <span class="menu-title text-truncate" data-i18n="Knowledge Base">Terms & Conditions</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 @can('view_knowledgeBase')
-                    <x-nav class="{{ request()->routeIs('dashboard.knowledgebase.index') ? 'active' : '' }} nav-item">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">
-                            <i data-feather='help-circle'></i>
-                            <span class="menu-title text-truncate" data-i18n="Knowledge Base">Knowledge Base</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="{{ request()->routeIs('dashboard.knowledgebase.index') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.knowledgebase.index') }}">
+                        <i data-feather='help-circle'></i>
+                        <span class="menu-title text-truncate" data-i18n="Knowledge Base">Knowledge Base</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 <li class=" navigation-header">
                     <span data-i18n="System Settings">System Settings</span>
@@ -106,7 +110,8 @@
                 <li class=" nav-item">
                     <a class="d-flex align-items-center" href="#">
                         <i data-feather="shield"></i>
-                        <span class="menu-title text-truncate" data-i18n="Roles &amp; Permissions">Roles &amp; Permissions</span>
+                        <span class="menu-title text-truncate" data-i18n="Roles &amp; Permissions">Roles &amp;
+                            Permissions</span>
                     </a>
                     <ul class="menu-content">
                         <li>
@@ -123,21 +128,29 @@
                         </li>
                     </ul>
                 </li>
+                <x-nav class="nav-itme">
+                    <x-anchor-tag class="d-flex align-items-center"
+                        href="{{ route('dashboard.businesses.edit', $business->slug) }}">
+                        <i data-feather="settings"></i>
+                        <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @can('edit_businesses')
-                    <x-nav class="nav-itme">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
-                            <i data-feather="settings"></i>
-                            <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="nav-itme">
+                    <x-anchor-tag class="d-flex align-items-center"
+                        href="{{ route('dashboard.businesses.edit', $business->slug) }}">
+                        <i data-feather="settings"></i>
+                        <span class="menu-title text-truncate" data-i18n="BusinessSettings">Business Settings</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
                 @can('view_emails')
-                    <x-nav class="nav-itme">
-                        <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.emails') }}">
-                            <i data-feather="mail"></i>
-                            <span class="menu-title text-truncate" data-i18n="Emails">Email Templates</span>
-                        </x-anchor-tag>
-                    </x-nav>
+                <x-nav class="nav-itme">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.emails') }}">
+                        <i data-feather="mail"></i>
+                        <span class="menu-title text-truncate" data-i18n="Emails">Email Templates</span>
+                    </x-anchor-tag>
+                </x-nav>
                 @endcan
             </ul>
         </div>

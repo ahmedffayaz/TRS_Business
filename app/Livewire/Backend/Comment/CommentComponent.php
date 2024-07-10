@@ -42,6 +42,7 @@ class CommentComponent extends Component
     }
     private function getComments(): LengthAwarePaginator
     {
+        $this->dispatch('reinitialize-dispatcher');
         return Comment::whereHas('task', function ($query) {
             $query->where('id', $this->taskId)->whereHas('project', function ($query) {
                 $query->sessionBusiness();

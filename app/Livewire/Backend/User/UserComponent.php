@@ -119,7 +119,6 @@ class UserComponent extends Component
     public function store()
     {
         $validated = $this->form->validate();
-
         try {
             DB::beginTransaction();
             $user = User::create([
@@ -245,6 +244,7 @@ class UserComponent extends Component
             $user = User::findOrFail($id);
             $user->update(['is_active' => false]);
             DB::commit();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'User deactivated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
@@ -276,6 +276,7 @@ class UserComponent extends Component
             $user = User::findOrFail($id);
             $user->update(['is_active' => true]);
             DB::commit();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'User activated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();

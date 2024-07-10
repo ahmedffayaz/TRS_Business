@@ -218,7 +218,9 @@
             // Reinitialize icons
             Livewire.dispatch('feather-icons');
             Livewire.on('reinitialize-icons', () => {
+                $(document).ready(function () {
                 Livewire.dispatch('feather-icons');
+                });
             });
             $(document).on('change', '#add-user', function (event) {
                 var $this = $(this);
