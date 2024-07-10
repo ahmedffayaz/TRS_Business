@@ -33,10 +33,15 @@ class ProjectDetailComponent extends Component
 
     private function getProject()
     {
+        $this->dispatch('reinitialize-chart');
         return Project::sessionBusiness()->whereSlug($this->slug)
             ->with(['tasks', 'client', 'members' => function ($query) {
                 $query->with(['roles']);
-            }, 'invoices'])->withCount(['tasks', 'members'])->firstOrFail();
+            }, 'invoices'])->withCount(['tasks', 'members', 'tasks as completed_tasks_count' => function ($query) {
+                $query->whereNotNull('completed_at');
+            }, 'tasks as pending_tasks' => function ($query) {
+                $query->whereNull('completed_at');
+            }])->firstOrFail();
     }
 
     public function render()
@@ -119,7 +124,7 @@ class ProjectDetailComponent extends Component
             $revenue = formatCurrency($projectRevenue, "PKR");
             $class = $projectRevenue > 0 ? 'text-success' : 'text-danger';
             $data .= "<div>Revenue: <span class='{$class}'>{$revenue}</span></div>";
-
+            $this->dispatch('reinitialize-chart');
             $this->dispatch('open-revenue-modal', ['projectRevenueDetail' => $data]);
         } catch (Exception $exception) {
             Log::error('Get error while get project revenue: ' . $exception->getMessage());
@@ -134,14 +139,14 @@ class ProjectDetailComponent extends Component
             $projectId = $project?->id;
             // Chart data
             $data = Comment::selectRaw('SUM(time) as y, DATE(dated) as x')
-                ->whereIn('task_id', function ($query) use ($projectId) {
+            ->whereIn('task_id', function ($query) use ($projectId) {
                     $query->select('id')->from(with(new Task)->getTable())
                         ->where('project_id', $projectId);
-                })->where('type', 'time')
-                ->groupBy(DB::raw('x'))->orderBy('x', 'ASC')->get();
+                    })->where('type', 'time')
+                    ->groupBy(DB::raw('x'))->orderBy('x', 'ASC')->get();
 
-            $dates = [];
-            $formattedData = [];
+                    $dates = [];
+                    $formattedData = [];
             if (count($data) > 0) {
                 $period = new DatePeriod(new DateTime($data[0]->x), new DateInterval('P1D'), new DateTime($data[count($data) - 1]->x . ' +1 day'));
                 foreach ($period as $key => $date) {
@@ -153,6 +158,7 @@ class ProjectDetailComponent extends Component
                     $formattedData[$key][] = number_format($item ? $item->y / 60 : 0, 1, '.', '');
                 }
             }
+            $this->dispatch('reinitialize-chart');
             return response()->json([
                 'status' => JsonResponse::HTTP_OK,
                 'data' => [

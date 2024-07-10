@@ -75,12 +75,12 @@
                                                     </x-anchor-tag>
                                                     @if ($user->is_active)
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deactivateUserConfirmation('{{ $user?->id }}')">
-                                                            <span wire:ignore><i data-feather="arrow-down" class="me-50"></i></span>
+                                                            <span><i data-feather="arrow-down" class="me-50"></i></span>
                                                             <span>Deactivate</span>
                                                         </x-anchor-tag>
                                                     @else
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="activateUserConfirmation('{{ $user?->id }}')">
-                                                            <span wire:ignore><i data-feather="arrow-up" class="me-50"></i></span>
+                                                            <span><i data-feather="arrow-up" class="me-50"></i></span>
                                                             <span>Activate</span>
                                                         </x-anchor-tag>
                                                     @endif
@@ -265,7 +265,9 @@
         $(document).ready(function () {
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
+                $(document).ready(function () {
                 Livewire.dispatch('feather-icons');
+                });
             });
 
             // Initialize select2

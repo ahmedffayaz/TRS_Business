@@ -61,7 +61,7 @@
                         </tr>
                     <tbody>
                         @isset($roles)
-                            @foreach ($roles as $role)
+                            @forelse ($roles as $role)
                                 <tr>
                                     <td>{{ ucwords($role?->name) }}</td>
                                     <td>
@@ -85,7 +85,13 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                                @empty
+                                <tr class="no-hover">
+                                    <td colspan="8" class="text-center py-1 fw-bold">
+                                        <p>No Role Found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         @endisset
                     </tbody>
                     </thead>

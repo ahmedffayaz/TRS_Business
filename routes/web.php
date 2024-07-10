@@ -110,7 +110,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             // User leave routes
             Route::prefix('leave')->name('leave.')->group(function () {
-                Route::get('/', LeaveComponent::class)->name('index')->middleware('permission:view_leaves');;
+                Route::get('/', LeaveComponent::class)->name('index')->middleware('permission:view_leaves');
             });
 
             // Projects routes

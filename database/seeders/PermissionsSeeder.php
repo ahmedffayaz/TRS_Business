@@ -60,6 +60,7 @@ class PermissionsSeeder extends Seeder
 	    Permission::create(['group' => 'project', 'name' => 'deliver_project', 'title' => 'Deliver project']);
 	    Permission::create(['group' => 'project', 'name' => 'view_revenue', 'title' => 'View revenue']);
 		Permission::create(['group' => 'project', 'name' => 'view_archived', 'title' => 'View archived']);
+        Permission::create(['group' => 'project', 'name' => 'restore_projects', 'title' => 'Restore Project']);
 		Permission::create(['group' => 'project', 'name' => 'view_associated_projects', 'title' => 'View Associated Projects']);
 
 	    // Tasks

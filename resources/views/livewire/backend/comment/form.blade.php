@@ -21,7 +21,7 @@
         </div>
 
         <div class="row mb-1">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <span wire:ignore.>
                     <x-input-label for="time" class="required" value="time" />
                     <x-input type="text" name="time" id="time"
@@ -32,7 +32,7 @@
                     <x-input-error :message="$message" />
                 @enderror
             </div>
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <span>
                     <x-input-label for="unit-select" class="required" value="Unit" />
                     <x-select-input id="unit-select"
@@ -46,10 +46,7 @@
                     <x-input-error :message="$message" />
                 @enderror
             </div>
-        </div>
-
-        <div class="row mb-1">
-            <div class="col-md-12">
+            <div class="col-md-4">
                 <x-input-label for="dated" class="required" value="Date" />
                 <x-input type="text" name="dated" id="dated" placeholder="2020-09-23"
                     :class="$errors->has('form.dated') ? 'error flatpickr-basic' : 'flatpickr-basic'"
@@ -58,6 +55,10 @@
                     <x-input-error :message="$message" />
                 @enderror
             </div>
+        </div>
+
+        <div class="row mb-1">
+
         </div>
 
         <div class="row mb-1">

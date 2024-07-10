@@ -60,6 +60,7 @@ class TaskDataComponent extends Component
 
     private function getTasksQuery()
     {
+        $this->dispatch('reinitialize-icons');
         $projectId = isset($this->projectId) ? $this->projectId : null;
         return Task::hasProject($projectId)->with(['project', 'comments'])
             ->getList($this->search, $this->columnName, $this->sortDirection);
@@ -122,6 +123,7 @@ class TaskDataComponent extends Component
         $this->dispatch('reinitialize-dispatcher');
         $this->dispatch('resetSelectInput');
         $this->openMainModal();
+        $this->dispatch('reinitialize-icons');
     }
 
     public function closeModal()
@@ -131,6 +133,7 @@ class TaskDataComponent extends Component
         $this->dispatch('assigned-member-select', ['formUser' => []]);
         $this->isTaskModalOpen = false;
         $this->isRevenueModalOpen = false;
+        $this->dispatch('reinitialize-icons');
     }
 
     public function store()
@@ -213,6 +216,7 @@ class TaskDataComponent extends Component
             ]);
             DB::commit();
             $this->closeModal();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Task updated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
@@ -239,6 +243,7 @@ class TaskDataComponent extends Component
             $task->project()->update(['last_updated_at' => now()]);
             DB::commit();
             $this->closeModal();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Task marked as completed successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
@@ -309,6 +314,7 @@ class TaskDataComponent extends Component
             })->findOrFail($id);
             $verifiedTask->delete();
             DB::commit();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', [
                 'type' => 'success',
                 'message' => 'Task deleted successfully.']);
@@ -333,6 +339,7 @@ class TaskDataComponent extends Component
         }
         $this->openMainModal();
         $this->dispatch('reinitialize-flatpickr');
+        $this->dispatch('reinitialize-icons');
     }
 
     public function closeInvoiceModal()
@@ -341,6 +348,7 @@ class TaskDataComponent extends Component
         $this->invoiceForm->total_amount = null;
         $this->closeMainModal();
         $this->invoiceForm->reset();
+        $this->dispatch('reinitialize-icons');
     }
 
     public function createInvoice()
@@ -423,6 +431,7 @@ class TaskDataComponent extends Component
 
             DB::commit();
             $this->closeInvoiceModal();
+            $this->dispatch('reinitialize-icons');
             $this->dispatch('alert', [
                 'type' => 'success',
                 'message' => 'Invoice created successfully.']);

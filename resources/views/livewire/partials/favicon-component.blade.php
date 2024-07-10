@@ -1,5 +1,5 @@
 <div>
-    @php $favicon = !empty($business->favicon) ? asset('storage/' . $business->favicon) : asset('assets/favicon'); @endphp
+    @php  $favicon = favicon($business?->favicon); @endphp
 
     <link rel="apple-touch-icon" sizes="57x57" href="{{ $favicon }}">
     <link rel="apple-touch-icon" sizes="60x60" href="{{ $favicon }}">

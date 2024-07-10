@@ -36,7 +36,7 @@
                         </tr>
                     <tbody>
                         @isset($permissions)
-                            @foreach ($permissions as $permission)
+                            @forelse ($permissions as $permission)
                                 <tr>
                                     <td>{{ $permission?->group }}</td>
                                     <td>
@@ -60,7 +60,13 @@
                                         </div>
                                     </td>
                                 </tr>
-                            @endforeach
+                                @empty
+                                <tr class="no-hover">
+                                    <td colspan="8" class="text-center py-1 fw-bold">
+                                        <p>No Permission Found</p>
+                                    </td>
+                                </tr>
+                            @endforelse
                         @endisset
                     </tbody>
                     </thead>

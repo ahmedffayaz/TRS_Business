@@ -24,10 +24,10 @@
                                     <th>ID</th>
                                     <th>Description</th>
                                     <th>Time</th>
-                                    <th>Added By</th>
-                                    <th>Dated At</th>
-                                    <th>Invoiced At</th>
-                                    <th>Created At</th>
+                                    <th class="text-nowrap">Added By</th>
+                                    <th class="text-nowrap">Dated At</th>
+                                    <th class="text-nowrap">Invoiced At</th>
+                                    <th class="text-nowrap">Created At</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -36,14 +36,14 @@
                                     <tr>
                                         <td>{{ $comment?->id }}</td>
                                         <td>{{ $comment?->description }}</td>
-                                        <td>{{ formatTime($comment?->time) }}</td>
-                                        <td>
+                                        <td class="text-nowrap">{{ formatTime($comment?->time) }}</td>
+                                        <td class="text-nowrap">
                                             <x-anchor-tag href="{{ route('dashboard.users.profile', $comment?->fromUser?->id) }}"
                                                 :value="$comment?->fromUser?->fullName" />
                                         </td>
-                                        <td>{{ formatDate($comment?->dated) }}</td>
-                                        <td>{{ formatDate($comment?->invoiced_at) }}</td>
-                                        <td>{{ formatDate($comment?->created_at) }}</td>
+                                        <td class="text-nowrap">{{ formatDate($comment?->dated) }}</td>
+                                        <td class="text-nowrap">{{ formatDate($comment?->invoiced_at) }}</td>
+                                        <td class="text-nowrap">{{ formatDate($comment?->created_at) }}</td>
                                         <td>
                                             <div class="dropdown">
                                                 @can('edit_comments', 'delete_comments')

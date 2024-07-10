@@ -31,7 +31,7 @@
                     <tbody>
                         @isset($termsConditions)
                             @can('view_terms_conditions')
-                                @foreach ($termsConditions as $termsCondition)
+                                @forelse ($termsConditions as $termsCondition)
                                     <tr>
                                         <td>{{ $termsCondition->id }}</td>
                                         <td>
@@ -74,7 +74,13 @@
                                             </div>
                                         </td>
                                     </tr>
-                                @endforeach
+                                    @empty
+                                    <tr class="no-hover">
+                                        <td colspan="8" class="text-center py-1 fw-bold">
+                                            <p>No Terms & Conditions Found</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
                             @endcan
                         @endisset
                     </tbody>

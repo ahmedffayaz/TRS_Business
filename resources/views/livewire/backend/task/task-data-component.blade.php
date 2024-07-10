@@ -3,10 +3,10 @@
         <div class="card-header">
             <h4 class="card-title">Tasks</h4>
             <div>
-                @can('add_invoices')
+                @if ($projectId && auth()->user()->can('add_invoices'))
                     <x-anchor-tag href="#" class="btn btn-primary me-1 add-invoice" tabindex="0" aria-controls="table-hover"
                         type="button" value="Create Invoice" />
-                @endcan
+                @endif
                 @can('add_tasks')
                     <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
                         type="button" wire:click="openModal" value="Add Task" />
@@ -32,19 +32,19 @@
                                 <th>Project</th>
                             @else
                                 <th></th>
-                                <th>ID</th>
+                                <th class="text-nowrap">ID</th>
                             @endif
-                            <th>p</th>
-                            <th>Title</th>
-                            <th>Deadline</th>
-                            <th>Assigned To</th>
-                            <th>Time Spent</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <th class="text-nowrap">p</th>
+                            <th class="text-nowrap">Title</th>
+                            <th class="text-nowrap">Deadline</th>
+                            <th class="text-nowrap">Assigned To</th>
+                            <th class="text-nowrap">Time Spent</th>
+                            <th class="text-nowrap">Status</th>
+                            <th class="text-nowrap">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($tasks as $task)
+                        @forelse ($tasks as $task)
                             <tr>
                                 @if (!$projectId)
                                     <td>{{ $task?->project?->name }}</td>
@@ -55,10 +55,10 @@
                                                 :value="$task?->id" statusClass="form-check-success" :labelValue="__('')" />
                                         @endif
                                     </td>
-                                    <td>{{ $task?->id }}</td>
+                                    <td class="text-nowrap">{{ $task?->id }}</td>
                                 @endif
-                                <td><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
-                                <td>
+                                <td class="text-nowrap"><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
+                                <td class="text-nowrap">
                                     <div class="d-flex flex-column">
                                         @if (is_null($task?->deleted_at))
                                             <x-anchor-tag href="{{ route('dashboard.tasks.view', $task->id) }}" class="user_name text-truncate text-body">
@@ -69,8 +69,8 @@
                                         @endif
                                     </div>
                                 </td>
-                                <td>{{ formatDate($task?->end_date) }}</td>
-                                <td>
+                                <td class="text-nowrap">{{ formatDate($task?->end_date) }}</td>
+                                <td class="text-nowrap">
                                     <div class="design-group">
                                         <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
                                             title="{{ $task?->user?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
@@ -82,16 +82,16 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{ formatTime($task?->comment?->sum('time')) }}</td>
-                                <td>
+                                <td class="text-nowrap">{{ formatTime($task?->comment?->sum('time')) }}</td>
+                                <td class="text-nowrap">
                                     @if ($task?->completed_at)
                                     <span wire:ignore><i data-feather="check-square" class="text-success"></i></span>
                                     @endif
                                 </td>
-                                <td>
+                                <td class="text-nowrap">
                                     <div class="dropdown">
                                         @if ((auth()->user()->hasPermissionTo('edit_tasks') || auth()->user()->hasPermissionTo('delete_tasks')
-                                            || auth()->user()->hasPermissionTo('view_tasks') || auth()->user()->hasPermissionTo('add_comments')
+                                            || auth()->user()->hasPermissionTo('view_tasks')
                                             || auth()->user()->hasPermissionTo('mark_completed')) && is_null($task?->deleted_at))
                                             <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                 data-bs-toggle="dropdown">
@@ -109,12 +109,6 @@
                                                     <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.tasks.view', $task?->id) }}">
                                                         <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
                                                         <span>View</span>
-                                                    </x-anchor-tag>
-                                                @endcan
-                                                @can('add_comments')
-                                                    <x-anchor-tag class="dropdown-item" href="#">
-                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                        <span>Comment</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('mark_completed')
@@ -149,7 +143,13 @@
                                     </div>
                                 </td>
                             </tr>
-                        @endforeach
+                            @empty
+                            <tr class="no-hover">
+                                <td colspan="8" class="text-center py-1 fw-bold text-nowrap">
+                                    <p>No Task Found</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
                 {{ $tasks->links('components.pagination') }}
@@ -189,7 +189,9 @@
         $(document).ready(function () {
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
+                $(document).ready(function () {
                 Livewire.dispatch('feather-icons');
+                });
             });
 
             $(document).on('click', '.add-invoice', function (event) {
