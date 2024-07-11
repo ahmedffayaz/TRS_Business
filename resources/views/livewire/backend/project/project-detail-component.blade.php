@@ -19,7 +19,7 @@
         <div class="col-md-6 float-end">
             <div class="view-options float-end d-flex">
                 @can('view_statistics')
-                <x-button class="btn btn-primary me-1" type="button" data-bs-toggle="collapse"
+                <x-button class="btn btn-primary me-1" type="button" data-bs-toggle="collapse" id="btn-project-statistics"
                     data-bs-target="#project-statistics" aria-expanded="false" aria-controls="project-statistics">
                     Project Statistics
                 </x-button>
@@ -243,79 +243,95 @@
     <section class="mt-3">
         @livewire('backend.task.task-data-component', ['project' => $project?->id, 'projectSlug' => $project?->slug])
     </section>
+    <div wire:loading wire:target=""></div>
 </div>
-
 @script
 <script type="module">
-   $(document).ready(function () {
-    var lineChart; // Declare lineChart variable globally
-
-    Livewire.on('reinitialize-chart', function () {
-        if (lineChart) {
-            lineChart.destroy(); // Destroy the existing chart if it exists
-        }
-        chartData(); // Re-fetch and render chart data
-    });
-
-    chartData(); // Initial chart data fetch and render
-
-    function chartData() {
-        let projectSlug = "{{ $project->slug }}";
-        let path = "{{ route('dashboard.project.chart-data', ':projectSlug') }}";
-        path = path.replace(':projectSlug', projectSlug);
-
-        $.ajax({
-            url: path,
-            type: 'GET',
-            success: function (response) {
-                const data = response.data.chartData;
-                const dates = response.data.dates;
-
-                if (data.length > 0) {
-                    // Line Chart Configuration
-                    var lineChartEl = document.querySelector('#line-chart');
-                    var lineChartConfig = {
-                        chart: {
-                            height: 200,
-                            type: 'line',
-                            zoom: { enabled: false },
-                            parentHeightOffset: 0,
-                            toolbar: { show: false }
-                        },
-                        series: [{ data: data.map(item => item[1]) }],
-                        markers: {
-                            strokeWidth: 7,
-                            strokeOpacity: 1,
-                            strokeColors: [window.colors.solid.white],
-                            colors: [window.colors.solid.warning]
-                        },
-                        dataLabels: { enabled: false },
-                        stroke: { curve: 'straight' },
-                        colors: [window.colors.solid.warning],
-                        grid: {
-                            xaxis: { lines: { show: true } },
-                            padding: { top: -20 }
-                        },
-                        tooltip: {
-                            custom: function ({ series, seriesIndex, dataPointIndex }) {
-                                return '<div class="px-1 py-50"><span><b>Time:</b> ' + series[seriesIndex][dataPointIndex] + ' hrs</span></div>';
-                            }
-                        },
-                        xaxis: { categories: dates },
-                        yaxis: { opposite: $('html').attr('data-textdirection') === 'rtl' }
-                    };
-
-                    // Create new ApexCharts instance
-                    lineChart = new ApexCharts(lineChartEl, lineChartConfig);
-                    lineChart.render();
-                }
-            },
-            error: function (response) {
-                console.log(response);
+    $(document).ready(function () {
+    var dataset = [];
+        $('#btn-project-statistics').click(() => {
+            if(dataset.length == 0) {
+                chartData();
             }
         });
-    }
-});
+            function chartData() {
+                console.log(dataset)
+                let projectSlug = "{{ $project->slug }}";
+                let path = "{{ route('dashboard.project.chart-data', ':projectSlug') }}"
+                // replace :projectSlug with projectSlug
+                path = path.replace(':projectSlug', projectSlug);
+                $.ajax({
+                    url: path,
+                    type : 'GET',
+                    success: function(response) {
+                        const data = response.data.chartData;
+                        const dates = response.data.dates
+                        dataset = data.map(item => {
+                            return item[1];
+                        });
+                        if (data.length > 0) {
+                            var flatPicker = $('.flat-picker'),
+                            isRtl = $('html').attr('data-textdirection') === 'rtl',
+                            chartColors = {
+                                column: { series1: '#826af9', series2: '#d2b0ff', bg: '#f8d3ff' },
+                                success: { shade_100: '#7eefc7', shade_200: '#06774f' },
+                                donut: { series1: '#ffe700', series2: '#00d4bd', series3: '#826bf8', series4: '#2b9bf4', series5: '#FFA1A1' },
+                                area: { series3: '#a4f8cd', series2: '#60f2ca', series1: '#2bdac7' }
+                            };
+                            // Line Chart
+                            // --------------------------------------------------------------------
+                            var lineChartEl = document.querySelector('#line-chart');
+                            var lineChartConfig = {
+                                    chart: {
+                                        height: 200,
+                                        type: 'line',
+                                        zoom: { enabled: false },
+                                        parentHeightOffset: 0,
+                                        toolbar: { show: false }
+                                    },
+                                    series: [
+                                        { data: dataset }
+                                    ],
+                                    markers: {
+                                        strokeWidth: 7,
+                                        strokeOpacity: 1,
+                                        strokeColors: [window.colors.solid.white],
+                                        colors: [window.colors.solid.warning]
+                                    },
+                                    dataLabels: { enabled: false },
+                                    stroke: { curve: 'straight' },
+                                    colors: [window.colors.solid.warning],
+                                    grid: {
+                                        xaxis: { lines: { show: true } },
+                                        padding: { top: -20 }
+                                    },
+                                    tooltip: {
+                                        custom: function (newData) {
+                                            return (
+                                                '<div class="px-1 py-50">' +
+                                                '<span><b>Time:</b> ' + newData.series[newData.seriesIndex][newData.dataPointIndex] + ' hrs</span>' +
+                                                '</div>'
+                                            );
+                                        }
+                                    },
+                                    xaxis: {
+                                        categories: dates
+                                    },
+                                    yaxis: { opposite: isRtl }
+                                };
+                            // Ensure lineChartEl exists before initializing ApexCharts
+                            if (typeof lineChartEl !== 'undefined' && lineChartEl !== null) {
+                                var lineChart = new ApexCharts(lineChartEl, lineChartConfig);
+                                lineChart.render(); // Render the chart
+                            }
+                        }
+                    },
+                    error: function(response) {
+                        console.error(response);
+                    }
+                })
+            }
+    });
 
 </script>
 @endscript

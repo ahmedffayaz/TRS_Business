@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Comment\CommentType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
@@ -16,6 +17,12 @@ class Comment extends Model
 	 *
 	 * @var array
 	 */
+
+    protected $casts = [
+        "type" => CommentType::class,
+    ];
+
+
 	protected $fillable = [
 		'description', 'time', 'type', 'task_id', 'to', 'from', 'dated', 'invoiced_at', 'is_billable', 'deleted_at'
 	];

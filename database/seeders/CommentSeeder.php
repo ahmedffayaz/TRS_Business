@@ -6,6 +6,9 @@ use Illuminate\Database\Seeder;
 
 class CommentSeeder extends Seeder
 {
+    public static $count = 1500;
+    public static $chunk = 200;
+
     /**
      * Run the database seeds.
      *
@@ -13,6 +16,6 @@ class CommentSeeder extends Seeder
      */
     public function run()
     {
-        CommentFactory::new()->count(4000)->create();
+        CommentFactory::new()->count(self::$chunk)->create();
     }
 }
