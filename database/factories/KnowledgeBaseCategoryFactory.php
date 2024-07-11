@@ -23,7 +23,10 @@ class KnowledgeBaseCategoryFactory extends Factory
         $businessId = $this->faker->randomElement($businessIds);
         $name = substr(fake()->unique()->sentence(), 0, 60);
         // Get a user associated with the business
-        $user = User::where('business_id', $businessId)->where('business_id', '!=', null)->inRandomOrder()->first();
+        $user = User::where('business_id', $businessId)->whereNotNull('business_id')->inRandomOrder()->first();
+
+        if(!$user)
+            $user = User::factory()->create(['business_id' => $businessId]);
 
         return [
             'business_id' => $businessId,

@@ -114,11 +114,11 @@
                                     <i class="me-50" data-feather="edit"></i> Add Business
                                 </x-anchor-tag>
                             @endcan
-                            @can('edit_businesses')
+                            @if (auth()->user()->can('edit_business') && $business)
                                 <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
                                     <i class="me-50" data-feather="settings"></i> Settings
                                 </x-anchor-tag>
-                            @endcan
+                            @endif
                             @can('view_contracts')
                                 <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.contracts') }}">
                                     <i class="me-50" data-feather="copy"></i> My Contracts

@@ -3,13 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
-use App\Models\User;
 use App\Models\Keyword;
-use App\Models\Business;
-use App\Models\KnowledgeBase;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
-use App\Models\KnowledgeBaseCategory;
 use Faker\Generator as FakerGenerator;
 use Illuminate\Support\Facades\Schema;
 use Database\Factories\KnowledgeBaseFactory;

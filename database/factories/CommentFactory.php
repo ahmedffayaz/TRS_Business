@@ -21,19 +21,20 @@ class CommentFactory extends Factory
         $faker = Faker::create();
         $isToday = $faker->boolean(60);
         $type = [
-            CommentType::ASSIGNED->value,
-            CommentType::ATTACHMENT->value,
-            CommentType::COMMENT->value,
-            CommentType::REMOVED->value,
-            CommentType::TIME->value
+            CommentType::ASSIGNED,
+            CommentType::ATTACHMENT,
+            CommentType::COMMENT,
+            CommentType::REMOVED,
+            CommentType::TIME
         ];
-
+        $tasks = Task::pluck('id')->toArray();
+        $users = User::pluck('id')->toArray();
         return [
             'description' => $faker->realText(150),
             'time' => $faker->numberBetween(3, 5) * 60,
             'type' => $faker->randomElement($type),
-            'task_id' => $faker->randomElement(Task::pluck('id')->toArray()),
-            'from' => $faker->randomElement(User::pluck('id')->toArray()),
+            'task_id' => $faker->randomElement($tasks),
+            'from' => $faker->randomElement($users),
             'dated' => $isToday
                 ? Carbon::now()->format('Y-m-d')
                 : Carbon::now()->subDays($faker->numberBetween(0, 3))->format('Y-m-d'),

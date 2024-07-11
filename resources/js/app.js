@@ -8,7 +8,7 @@ import Quill from 'quill';
 import Showdown from 'showdown'
 window.jQuery = window.$ = $;
 
-import '../assets/js/apexCharts.min.js'
+import ApexCharts from 'apexcharts'
 import '../assets/js/app-menu'
 import '../assets/js/app-core'
 import 'toastr'
@@ -83,3 +83,4 @@ window.Swal = Swal;
 window.Quill = Quill;
 window.Showdown = Showdown;
 window.MTE = MTE;
+window.ApexCharts = ApexCharts;
