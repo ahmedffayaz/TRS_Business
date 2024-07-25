@@ -133,7 +133,6 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/roles', RoleComponent::class)->name('roles');
-            Route::get('/permissions', PermissionComponent::class)->name('permissions');
             Route::get('profile', UserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
             Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');

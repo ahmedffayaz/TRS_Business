@@ -1,35 +1,43 @@
 @section('breadcrumbs', Breadcrumbs::render('roles'))
 <div>
     <div class="row">
-        @foreach ($recentRoles as $recentRole)
+        @foreach ($roles as $role)
+        @if($role->name  != "super-admin")
             <div class="col-xl-4 col-lg-6 col-md-6 h-100">
                 <div class="card">
                     <div class="card-body">
                         <div class="d-flex justify-content-between">
-                            <span>Total {{ $recentRole->users()->count() }} users</span>
+                            <span>Total {{ $role->users()->sessionBusiness()->count() }} users</span>
                             <ul class="list-unstyled d-flex align-items-center avatar-group mb-0">
-                                @for ($i = 1; $i <= min(7, $recentRole->users()->count()); $i++)
-                                    <li class="avatar avatar-sm pull-up">
+                                @for ($i = 1; $i <= min(7, $role->users()->sessionBusiness()->count()); $i++)
+                                <li class="avatar avatar-sm pull-up">
                                         <img class="rounded-circle" src="{{ asset('assets/images/avatar.png') }}" alt="Avatar" />
                                     </li>
-                                @endfor
+                                    @endfor
                             </ul>
                         </div>
                         <div class="d-flex justify-content-between align-items-end mt-1 pt-25">
                             <div class="role-heading">
-                                <h4 class="fw-bolder">{{ ucwords($recentRole->name) }}</h4>
-                                <a href="javascript:;" class="role-edit-modal" wire:click="edit('{{ $recentRole?->id }}')">
+                                <h4 class="fw-bolder">{{ ucwords($role->name) }}</h4>
+                                @can('edit_roles')
+                                <a href="javascript:;" class="role-edit-modal" wire:click="edit('{{ $role->id }}')">
                                     <small class="fw-bolder">Edit Role</small>
                                 </a>
+                                @endcan
+                                @can('view_roles')
+                                <a href="javascript:;" class="role-edit-modal ms-2" wire:click="viewPermission('{{ $role->id }}')">
+                                    <small class="fw-bolder">View Role</small>
+                                </a>
+                                @endcan
                             </div>
-
                         </div>
                     </div>
                 </div>
             </div>
-        @endforeach
-        <div class="col-xl-4 col-lg-6 col-md-6 h-100">
-            <div class="card">
+            @endif
+            @endforeach
+            <div class="col-xl-4 col-lg-6 col-md-6 h-100">
+                <div class="card">
                 <div class="row">
                     <div class="col-sm-5">
                         <div class="d-flex align-items-end justify-content-center h-100">
@@ -38,7 +46,7 @@
                     </div>
                     <div class="col-sm-7">
                         <div class="card-body text-sm-end text-center ps-sm-0">
-                            <a href="javascript:void(0)" aria-controls="table-hover" type="button" wire:click="openMainModal" class="stretched-link text-nowrap add-new-role">
+                            <a href="javascript:void(0)" aria-controls="table-hover" type="button" wire:click="openModal" class="stretched-link text-nowrap add-new-role">
                                 <span class="btn btn-primary mb-1">Add New Role</span>
                             </a>
                             <p class="mb-0">Add role, if it does not exist</p>
@@ -48,58 +56,12 @@
             </div>
         </div>
     </div>
-    <h3 class="mt-50">Total users with their roles</h3>
-    <div class="card">
-        <div class="card-body">
-            <div class="card-datatable table-responsive">
-                <table class="datatables-permissions table">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Name</th>
-                            <th>User Count</th>
-                            <th>Actions</th>
-                        </tr>
-                    <tbody>
-                        @isset($roles)
-                            @forelse ($roles as $role)
-                                <tr>
-                                    <td>{{ ucwords($role?->name) }}</td>
-                                    <td>
-                                        <span class="badge rounded-pill {{ randomColors() }}">{{ $role->users()->count() }}</span>
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-                                                <span wire:ignore><i data-feather="more-vertical"></i></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $role?->id }}')">
-                                                    <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                    <span>Edit</span>
-                                                </a>
-                                                <a class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $role?->id }}')">
-                                                    <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                    <span>Delete</span>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                @empty
-                                <tr class="no-hover">
-                                    <td colspan="8" class="text-center py-1 fw-bold">
-                                        <p>No Role Found</p>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        @endisset
-                    </tbody>
-                    </thead>
-                </table>
-                {{ $roles->links('components.pagination') }}
-            </div>
-        </div>
-    </div>
+    @if($permission)
+    <x-main-modal wireIgnoreSelf="wire:ignore.self"
+    modalTitle="Permissions based on roles">
+    @include('livewire.backend.show-role-Permission', compact('permissionList','roleName' ))
+    </x-main-modal>
+    @else
     <x-main-modal wireIgnoreSelf="wire:ignore.self">
         <div class="text-center mb-2">
             <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Role</h1>
@@ -109,9 +71,9 @@
             <div class="col-12">
                 <label class="form-label">Role Name</label>
                 <input type="text" class="form-control  @error('form.title') is-invalid @enderror" wire:model="form.title" placeholder="Role Name" autofocus
-                    data-msg="Please enter role name" />
+                data-msg="Please enter role name" />
                 @error('form.title')
-                    <small class="text-danger">{{ $message }}</small>
+                <small class="text-danger">{{ $message }}</small>
                 @enderror
             </div>
 
@@ -120,17 +82,17 @@
                 <div>
                     <table class="table table-flush-spacing">
                         <tbody>
-                            @php $allPermissions = getGroupPermissions(); @endphp
-                            @foreach ($allPermissions['group'] as $permissionGroup)
+                            {{-- @php $allPermissions = getGroupPermissions(); @endphp --}}
+                            @foreach ($permissionList as $group => $permissions)
                                 <tr>
-                                    <td class="text-nowrap fw-bolder">{{ ucwords($permissionGroup) }}</td>
+                                    <td class="text-nowrap fw-bolder">{{ ucwords($group) }}</td>
                                     <td>
                                         <div class="d-flex row">
-                                            @foreach ($allPermissions['title'][$permissionGroup] as $permissionName)
+                                            @foreach ($permissions as $permission)
                                                 <div class="col-4 mb-1 form-check me-3 me-lg-5">
-                                                    <input class="form-check-input" type="checkbox" id="{{ $permissionName }}" value="{{ $permissionName }}" wire:model="form.permissions"
-                                                        {{ in_array(old('permissions', isset($form->permissions) && checkRoleHasPermission($form->permissions, $permissionName) ?? ''), [$permissionName]) ? 'checked' : '' }}>
-                                                    <label class="form-check-label" for="{{ $permissionName }}"> {{ ucfirst($permissionName) }} </label>
+                                                    <input class="form-check-input" type="checkbox" id="{{ $permission->title }}" value="{{ $permission->title }}" wire:model="form.permissions"
+                                                        {{ in_array(old('permissions', isset($form->permissions) && checkRoleHasPermission($form->permissions, $permission->title) ?? ''), [$permission->title]) ? 'checked' : '' ,}}>
+                                                    <label class="form-check-label" for="{{ $permission->title }}"> {{ ucfirst($permission->title) }} </label>
                                                 </div>
                                             @endforeach
                                         </div>
@@ -152,4 +114,5 @@
             </div>
         </form>
     </x-main-modal>
+    @endif
 </div>

@@ -64,7 +64,6 @@ class CreateBusinessComponent extends Component
                 'date_format' => $validated['date_format']
             ]);
 
-            $business->roles()->attach($validated['roles']);
 
             DB::commit();
 

@@ -107,34 +107,21 @@
                     <span data-i18n="System Settings">System Settings</span>
                     <i data-feather="more-horizontal"></i>
                 </li>
-                <li class=" nav-item">
-                    <a class="d-flex align-items-center" href="#">
+                @can('view_roles')
+                <x-nav class="{{ request()->routeIs('dashboard.roles') ? 'active' : '' }} nav-item">
+                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.roles') }}">
                         <i data-feather="shield"></i>
-                        <span class="menu-title text-truncate" data-i18n="Roles &amp; Permissions">Roles &amp;
-                            Permissions</span>
-                    </a>
-                    <ul class="menu-content">
-                        <li>
-                            <a class="d-flex align-items-center" href="{{ route('dashboard.roles') }}">
-                                <i data-feather="circle"></i>
-                                <span class="menu-item text-truncate" data-i18n="Roles">Roles</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex align-items-center" href="{{ route('dashboard.permissions') }}">
-                                <i data-feather="circle"></i>
-                                <span class="menu-item text-truncate" data-i18n="Permissions">Permission</span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-                <x-nav class="nav-itme">
-                    <x-anchor-tag class="d-flex align-items-center"
-                        href="{{ route('dashboard.businesses.edit', $business->slug) }}">
-                        <i data-feather="settings"></i>
-                        <span class="menu-title text-truncate" data-i18n="Settings">Settings</span>
+                        <span class="menu-item text-truncate" data-i18n="Roles">Roles</span>
                     </x-anchor-tag>
                 </x-nav>
+                @endcan
+                {{-- <x-nav class="nav-itme">
+                    <x-anchor-tag class="d-flex align-items-center"
+                        href="{{ route('dashboard.system-setting') }}">
+                        <i data-feather="settings"></i>
+                        <span class="menu-title text-truncate" data-i18n="Settings">System Settings</span>
+                    </x-anchor-tag>
+                </x-nav> --}}
                 @can('edit_businesses')
                 <x-nav class="nav-itme">
                     <x-anchor-tag class="d-flex align-items-center"

@@ -1,27 +1,10 @@
 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
     <div class="row mb-1">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <x-input-label for="name" class="required" value="Name" />
             <x-input type="text" name="name" id="name" :class="$errors->has('form.name') ? 'error' : ''"
                 placeholder="Enter name" wire:model="form.name" />
             @error('form.name')
-                <x-input-error :message="$message" />
-            @enderror
-        </div>
-        <div class="col-md-6">
-            <span wire:ignore.>
-            <x-input-label for="roles" class="required" value="Roles" />
-            <x-select-input name="roles" id="role-select" multiple
-                :class="$errors->has('form.roles') ? 'error select2' : 'select2'"
-                wire:model="form.roles">
-                @isset($roles)
-                    @foreach ($roles as $role)
-                        <option value="{{ $role?->id }}">{{ $role?->title }}</option>
-                    @endforeach
-                @endisset
-            </x-select-input>
-            </span>
-            @error('form.roles')
                 <x-input-error :message="$message" />
             @enderror
         </div>

@@ -3,6 +3,8 @@
 namespace App\Livewire\Backend;
 
 use App\Livewire\Forms\RoleForm;
+use App\Models\Business;
+use App\Models\User;
 use App\Traits\WithMainModal;
 use Exception;
 use Livewire\Component;
@@ -23,48 +25,50 @@ class RoleComponent extends Component
     public string $search = '';
     public string $columnName = 'created_at';
     public string $sortDirection = 'desc';
-    public int $limitPerPage = 10;
+    public int $limitPerPage = 15;
     public RoleForm $form;
 
+    public  $permission = false;
+    public $business;
+
+    public $permissionList = [];
+
+    public $roleName;
     private function getRoles(): LengthAwarePaginator
     {
-        $this->search ? $this->resetPage() : ''; 
-        return Role::paginate($this->limitPerPage);
+        $this->search ? $this->resetPage() : '';
+        $roles= Role::where('business_id', $this->business->id)->paginate($this->limitPerPage);
+        return $roles;
     }
 
-
+    public function mount()
+    {
+        $this->business = Business::whereName(session('business'))->first();
+    }
     #[Title('User Roles')]
     public function render()
     {
         $roles = $this->getRoles();
-        $recentRoles = Role::latest()->limit(5)->get();
-        return view('livewire.backend.role-component', compact('roles', 'recentRoles'));
+       $user = User::sessionBusiness()->where(function($query){
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client')->where('business_id', $this->business->id);
+            });
+        })->count();
+        return view('livewire.backend.role-component', compact('roles','user'));
     }
 
     public function store()
     {
         $this->form->validate();
-        $this->form->validate([
-            'title' => [
-                'required',
-                function ($attribute, $value, $fail) {
-                    $existingCount = DB::table('roles')
-                        ->where('title', $value)
-                        ->count();
-
-                    if ($existingCount > 0) {
-                        $fail("The $attribute has already been taken.");
-                    }
-                }
-            ]
-        ]);
         try {
             DB::beginTransaction();
             $role = Role::create([
                 'title' => $this->form->title,
                 'name' => Str::slug($this->form->title, '-'),
+                'business_id' => $this->business->id,
             ]);
             if (isset($this->form->permissions)) {
+
                 $permissions = Permission::whereIn('title', $this->form->permissions)->pluck('id');
                 $role->permissions()->sync($permissions);
             }
@@ -78,11 +82,15 @@ class RoleComponent extends Component
 
     public function edit($id)
     {
+        $this->permissionList = null;
+        $this->permission = false;
         $this->form->isUpdate = true;
         $this->form->id = $id;
         try {
             $role = Role::findOrFail($id);
             $this->form->set($role);
+            $isShowingBusinessPermissions = $role->name == 'super_admin' ? true : false;
+            $this->permissionList = $this->getGroupPermissions(null, $isShowingBusinessPermissions);
             $this->openMainModal();
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
@@ -93,22 +101,6 @@ class RoleComponent extends Component
     {
         $this->form->validate();
         $role = Role::findOrFail($id);
-
-        $this->form->validate([
-            'title' => [
-                'required',
-                function ($attribute, $value, $fail) use ($role) {
-                    $existingCount = DB::table('roles')
-                        ->where('title', $value)
-                        ->where('id', '!=', $role->id)
-                        ->count();
-
-                    if ($existingCount > 0) {
-                        $fail("The $attribute has already been taken.");
-                    }
-                }
-            ]
-        ]);
         try {
 
             DB::beginTransaction();
@@ -141,6 +133,19 @@ class RoleComponent extends Component
         ]);
     }
 
+    public function viewPermission($id)
+    {
+        try {
+            $role = Role::findOrFail($id);
+            $isShowingBusinessPermissions = $role->name == 'super_admin' ? true : false;
+            $this->permissionList = $this->getGroupPermissions($role, $isShowingBusinessPermissions);
+            $this->roleName = $role->name;
+            $this->permission = true;
+            $this->openMainModal();
+        } catch (\Exception $exception) {
+            $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
+        }
+    }
     #[On('delete')]
     public function destroy($id)
     {
@@ -151,6 +156,37 @@ class RoleComponent extends Component
         } catch (\Exception $exception) {
             $this->dispatch('alert', ['type' => 'error',  'message' => $exception->getMessage()]);
         }
+    }
+
+    private function getGroupPermissions($role = null, $isShowBusinessPermissions = false)
+    {
+        $query = Permission::when($role, function ($query) use ($role) {
+            $query->whereHas('roles', function ($query) use ($role) {
+                $query->where('id', $role->id);
+            });
+        });
+
+        $businessPermissions = !$isShowBusinessPermissions
+            ? $query->where('group', '!=', 'business')
+            : $query;
+
+        $permissions = $businessPermissions->get();
+
+        $permissionArray = [];
+
+        foreach ($permissions as $permission) {
+            $permissionArray[$permission->group][] = $permission;
+        }
+
+        return $permissionArray;
+    }
+
+    public function openModal()
+    {
+        $this->permissionList = $this->getGroupPermissions();
+        $this->form->isUpdate = false;
+        $this->permission = false;
+        $this->openMainModal();
     }
 }
 

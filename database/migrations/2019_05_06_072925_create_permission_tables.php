@@ -27,6 +27,10 @@ class CreatePermissionTables extends Migration
 
 		Schema::create($tableNames['roles'], function (Blueprint $table) {
 			$table->increments('id');
+
+            $table->unsignedBigInteger('business_id')->nullable();
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('restrict');
+
 			$table->string('name');
 			$table->string('title');
 			$table->string('guard_name');

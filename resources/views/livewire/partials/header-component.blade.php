@@ -108,6 +108,13 @@
                             <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.update-password') }}">
                                 <i class="me-50" data-feather="key"></i> Change Password
                             </x-anchor-tag>
+                            @can('view_systems')
+                                <x-anchor-tag class="dropdown-item"
+                                    href="{{ route('dashboard.system-setting') }}">
+                                    <i data-feather="settings"></i>
+                                    <span class="menu-title text-truncate" data-i18n="Settings">System Settings</span>
+                                </x-anchor-tag>
+                            @endcan
                             <div class="dropdown-divider"></div>
                             @can('add_businesses')
                                 <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">

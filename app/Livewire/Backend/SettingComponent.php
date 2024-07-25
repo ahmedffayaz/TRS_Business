@@ -20,8 +20,8 @@ class SettingComponent extends Component
     public $cms_name;
     public $date_format;
     public SettingForm $form;
-    public string $defaultFavicon = 'assets/images/avatar.png';
-    public string $defaultLogo = 'assets/images/avatar.png';
+    public string $defaultFavicon = 'assets/images/select-logo.png';
+    public string $defaultLogo = 'assets/images/select-logo.png';
     public $cmsFavicon;
     public $cmsLogo;
     public $imagePath = 'cms/images';
