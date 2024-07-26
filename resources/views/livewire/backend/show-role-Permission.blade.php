@@ -11,10 +11,11 @@
      <tr>
         <td class="text-nowrap fw-bolder">{{ ucwords($group) }}</td>
         <td>
-            <div class="d-flex row" wire:ignore>
+            <div class="ms-5 d-flex row" wire:ignore>
                 @foreach ($permissions as $permission)
                     <div class="col-4 mb-1 me-3 me-lg-5">
-                     <p class="text-center">{{ $permission->title }}</p>
+                            <span class="badge badge-light-primary badge-pill">
+                            {{ $permission->title }}</span>
                     </div>
                 @endforeach
             </div>
@@ -23,3 +24,11 @@
 @endforeach
 </div>
 @endif
+@script
+<script type="module">
+    $(document).ready(function () {
+        // Reinitialize icons
+        Livewire.dispatch('feather-icons');
+    });
+    </script>
+    @endscript

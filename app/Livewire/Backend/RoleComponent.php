@@ -54,7 +54,13 @@ class RoleComponent extends Component
                 $query->where('name', '!=', 'client')->where('business_id', $this->business->id);
             });
         })->count();
-        return view('livewire.backend.role-component', compact('roles','user'));
+        $isAdminRoleEditAble = auth()->user()->where(function ($query) {
+            $query->whereHas('roles', function ($query) {
+                $query->where('name', 'admin')->where('business_id', $this->business->id);
+            });
+        })->first() ? true : false;
+        // dd($isAdminRoleEditAble);
+        return view('livewire.backend.role-component', compact('roles','user', 'isAdminRoleEditAble'));
     }
 
     public function store()
@@ -62,11 +68,20 @@ class RoleComponent extends Component
         $this->form->validate();
         try {
             DB::beginTransaction();
-            $role = Role::create([
-                'title' => $this->form->title,
-                'name' => Str::slug($this->form->title, '-'),
-                'business_id' => $this->business->id,
-            ]);
+
+            // Check if a role with the same name and business_id already exists
+            $existingRole = Role::where('name', Str::slug($this->form->title, '-'))
+            ->where('business_id', $this->business->id)
+            ->first();
+
+            if ($existingRole) throw new \Exception('A role with this name already exists for this business.');
+
+            $role = new Role();
+            $role->title = $this->form->title;
+            $role->name = Str::slug($this->form->title, '-');
+            $role->business_id = $this->business->id;
+            $role->save();
+
             if (isset($this->form->permissions)) {
 
                 $permissions = Permission::whereIn('title', $this->form->permissions)->pluck('id');
@@ -187,6 +202,13 @@ class RoleComponent extends Component
         $this->form->isUpdate = false;
         $this->permission = false;
         $this->openMainModal();
+    }
+
+    public function closeModal()
+    {
+        $this->form->isUpdate = true;
+        $this->permission = false;
+        $this->closeMainModal();
     }
 }
 

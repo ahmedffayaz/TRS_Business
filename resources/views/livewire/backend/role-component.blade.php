@@ -19,11 +19,11 @@
                         <div class="d-flex justify-content-between align-items-end mt-1 pt-25">
                             <div class="role-heading">
                                 <h4 class="fw-bolder">{{ ucwords($role->name) }}</h4>
-                                @can('edit_roles')
-                                <a href="javascript:;" class="role-edit-modal" wire:click="edit('{{ $role->id }}')">
-                                    <small class="fw-bolder">Edit Role</small>
-                                </a>
-                                @endcan
+                                @if ((auth()->user()->can('edit_roles') && $isAdminRoleEditAble && $role->name != 'admin') || auth()->user()->hasRole('super-admin'))
+                                    <a href="javascript:;" class="role-edit-modal" wire:click="edit('{{ $role->id }}')">
+                                        <small class="fw-bolder">Edit Role</small>
+                                    </a>
+                                @endif
                                 @can('view_roles')
                                 <a href="javascript:;" class="role-edit-modal ms-2" wire:click="viewPermission('{{ $role->id }}')">
                                     <small class="fw-bolder">View Role</small>
@@ -58,7 +58,7 @@
     </div>
     @if($permission)
     <x-main-modal wireIgnoreSelf="wire:ignore.self"
-    modalTitle="Permissions based on roles">
+    modalTitle="Permissions based on roles" closeModal="closeModal">
     @include('livewire.backend.show-role-Permission', compact('permissionList','roleName' ))
     </x-main-modal>
     @else
