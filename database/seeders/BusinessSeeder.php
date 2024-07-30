@@ -53,15 +53,8 @@ class BusinessSeeder extends Seeder
             )
         );
 
-        $roles = Role::where('name', 'super-admin')
-            ->orWhere('name', 'admin')->get()->pluck('id');
-
         Business::insert($businesses);
 
-        Business::where('name', 'The Right Software')
-        ->orWhere('name', 'Dev Provider')->get()->each(function ($business) use ($roles) {
-            $business->roles()->attach($roles);
-        });
 
         $businessFactory = BusinessFactory::new()->count(10)->create();
 

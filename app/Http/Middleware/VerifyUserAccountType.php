@@ -18,9 +18,11 @@ class VerifyUserAccountType
     public function handle(Request $request, Closure $next): Response
     {
         $user = Auth::user();
-        if ($user->hasRole(['super-admin', 'admin']) && !request()->routeIs('select-business') && !$request->session()->has('business')) {
-            return redirect()->route('select-business');
-        } else if ($user->account_type->value === AccountType::CLIENT->value && !$request->session()->has('business') && !request()->routeIs('select-business')) {
+        if ($user->hasRole('super-admin') && !$request->routeIs('cms.dashboard') && !$request->routeIs('cms.system-settings') && !$request->routeIs('cms.businesses') ) {
+            return redirect()->route('cms.dashboard');
+        }
+
+        if ($user->account_type->value === AccountType::CLIENT->value && !$request->session()->has('business') && !request()->routeIs('cms.dashboard') && !$request->routeIs('cms.system-settings') && !$request->routeIs('cms.businesses')) {
             if ($user?->client) {
                 $userBusiness = $user->client->business;
                 session(['business' => $userBusiness->name]);

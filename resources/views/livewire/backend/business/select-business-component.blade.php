@@ -40,6 +40,14 @@
             background: linear-gradient(118deg, #7367F0, rgba(115, 103, 240, .7));
             color: #fff;
         }
+        .btn.login {
+        background-color: #7367F0;
+        color: white;
+        }
+        .btn.login:hover {
+            background-color: white;
+            color: #7367F0;
+        }
     </style>
 @endassets
 <div>
@@ -47,16 +55,19 @@
         <div class="d-flex justify-content-center">
             <div class="list-group card-width">
                 @foreach ($businesses as $business)
-                    <a wire:click="selectBusiness('{{ $business->name }}')"
-                        class="list-group-item list-group-item-action d-flex">
-                        <div class="avatar me-75">
-                            <img src="{{ asset('storage/' . $business->logo) }}" class="rounded" width="60"
-                                height="60" alt="Avatar" onerror="_business_logo(this)" />
-                        </div>
-                        <div class="my-auto">
-                            <h4 class="mb-0">{{ $business->name }}</h4>
-                        </div>
-                    </a>
+                <a wire:click="selectBusiness('{{ $business->name }}')"
+                    class="list-group-item list-group-item-action d-flex align-items-center justify-content-between">
+                    <div class="avatar me-3">
+                        <img src="{{ asset('storage/' . $business->logo) }}" class="rounded" width="60" height="60"
+                            alt="Avatar" onerror="_business_logo(this)" />
+                    </div>
+                    <div>
+                        <h4 class="mb-0">{{ $business->name }}</h4>
+                    </div>
+                    <div class="ms-auto">
+                        <button class="btn btn-sm login">Login As</button>
+                    </div>
+                </a>
                 @endforeach
             </div>
         </div>

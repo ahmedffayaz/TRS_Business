@@ -45,7 +45,7 @@ class UserComponent extends Component
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         return User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client');
+                $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->getList($this->search, $this->columnName, $this->sortDirection);
     }
@@ -80,24 +80,24 @@ class UserComponent extends Component
         $currencies = Currency::get(['code']);
         $userStatuses = UserStatus::cases();
         $clients = Client::sessionBusiness()->get();
-        $roles = Role::where('name', '!=', 'client')->get();
+        $roles = Role::where('name', '!=', 'client')->where('business_id', $this->business_id)->get();
         $users = $this->getUsers();
 
         $totalUsers = User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client');
+                $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->count();
 
         $activeUsers = User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client');
+                $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->where('is_active', 1)->count();
 
         $archivedUsers = User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client');
+                $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->where('is_active', 0)->count();
 
@@ -138,10 +138,12 @@ class UserComponent extends Component
                 'is_active' => $validated['is_active'],
             ]);
 
-            $user->roles()->attach($validated['roles']);
-
+            DB::table('model_has_roles')->insert([
+                'role_id' => $this->form->roles[0],
+                'model_type' => User::class,
+                'model_id' => $user->id,
+            ]);
             DB::commit();
-
             $this->closeModal();
 
             $this->dispatch('alert', ['type' => 'success', 'message' => 'User created successfully.']);

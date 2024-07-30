@@ -38,9 +38,7 @@ class EditBusinessComponent extends Component
         $this->countries = Country::all();
         $this->roles = Role::all();
         $this->form->isUpdate = true;
-        $this->logoImage = 'assets/images/avatar.png';
-        $this->form->roles = $this->slug->roles->pluck('id')->toArray();
-        $this->dispatch('roles-select', ['formRoles' => $this->form->roles]);
+        $this->logoImage = 'assets/images/select-logo.png';
         $this->form->set($this->slug);
     }
 
@@ -82,7 +80,6 @@ class EditBusinessComponent extends Component
                 'invoice_serial' => $validated['invoice_serial'],
                 'date_format' => $validated['date_format']
             ]);
-            $business->roles()->sync($validated['roles']);
             DB::commit();
 
             // Reset form logo field

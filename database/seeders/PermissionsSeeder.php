@@ -1,6 +1,8 @@
 <?php
 
 namespace Database\Seeders;
+
+use App\Models\Business;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -122,8 +124,16 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'email', 'name' => 'view_emails', 'title' => 'Email Reports']);
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
 
-        $sudperAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
-		$sudperAdminRole->permissions()->sync(Permission::pluck('id')->all());
+        $superAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
+		$superAdminRole->permissions()->sync(Permission::pluck('id')->all());
 
+        $businesses = Business::all();
+
+        foreach ($businesses as $business) {
+            $adminRole = Role::where('business_id', $business->id)->where('name', 'admin')->first();
+            if ($adminRole) {
+                $adminRole->permissions()->sync(Permission::pluck('id')->all());
+            }
+        }
     }
 }

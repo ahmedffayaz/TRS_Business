@@ -32,8 +32,8 @@ Breadcrumbs::for('permissions', function (BreadcrumbTrail $trail) {
 
 // System Settings
 Breadcrumbs::for('system_settings', function (BreadcrumbTrail $trail) {
-    $trail->parent('dashboard');
-    $trail->push('System Settings', route('dashboard.system-setting'));
+    $trail->parent('cms_dashboard');
+    $trail->push('System Settings', route('cms.system-settings'));
 });
 
 // Businesses
@@ -146,4 +146,14 @@ Breadcrumbs::for('knowledge_base_keyword', function (BreadcrumbTrail $trail) {
 Breadcrumbs::for('emails', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
     $trail->push('Emails', route('dashboard.emails'));
+});
+
+// CMS Dashboard
+Breadcrumbs::for('cms_dashboard', function (BreadcrumbTrail $trail) {
+    $trail->push('Dashboard', route('cms.dashboard'));
+});
+// CMS Business
+Breadcrumbs::for('Businesses', function (BreadcrumbTrail $trail) {
+    $trail->parent('cms_dashboard');
+    $trail->push('Businesses', route('cms.businesses'));
 });
