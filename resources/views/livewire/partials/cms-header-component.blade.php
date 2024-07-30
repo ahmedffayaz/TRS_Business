@@ -8,7 +8,7 @@
             </div>
             <ul class="nav navbar-nav align-items-center ms-auto">
                 @if (auth()->check() && !request()->routeIs('select-business') && !request()->routeIs('dashboard.terms-conditions.accept'))
-                    @if (count($businesses) > 0)
+                    {{-- {{-- @if (count($businesses) > 0) --}}
                         <x-nav class="nav-item header-select2">
                             <x-select-input wire:model="businessId" wire:change="getBusinessState" id="businessId">
                                 @foreach ($businesses as $key => $values)
@@ -16,7 +16,7 @@
                                 @endforeach
                             </x-select-input>
                         </x-nav>
-                    @endif
+                    {{-- @endif --}}
                 <li class="nav-item d-none d-lg-block"><a class="nav-link nav-link-style"><i class="ficon" data-feather="moon"></i></a></li>
                 <li class="nav-item dropdown dropdown-notification me-25">
                     <a class="nav-link" href="#" data-bs-toggle="dropdown">
@@ -108,22 +108,6 @@
                             <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.update-password') }}">
                                 <i class="me-50" data-feather="key"></i> Change Password
                             </x-anchor-tag>
-                            <div class="dropdown-divider"></div>
-                            @can('add_businesses')
-                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.create') }}">
-                                    <i class="me-50" data-feather="edit"></i> Add Business
-                                </x-anchor-tag>
-                            @endcan
-                            @if (auth()->user()->can('edit_business') && $business)
-                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.businesses.edit', $business->slug) }}">
-                                    <i class="me-50" data-feather="settings"></i> Settings
-                                </x-anchor-tag>
-                            @endif
-                            @can('view_contracts')
-                                <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.users.contracts') }}">
-                                    <i class="me-50" data-feather="copy"></i> My Contracts
-                                </x-anchor-tag>
-                            @endcan
                         @endif
                         <form class="border-0 m-0 p-0" action="{{ route('logout') }}" method="POST">
                             @csrf

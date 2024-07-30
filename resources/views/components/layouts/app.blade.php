@@ -23,9 +23,14 @@
 </head>
 
 <body class="vertical-layout vertical-menu-modern  navbar-floating footer-static  " data-open="click" data-menu="vertical-menu-modern" data-col="">
-    @livewire('partials.header-component')
-    @if (auth()->check() && !request()->routeIs('select-business') && !request()->routeIs('dashboard.terms-conditions.accept'))
-        @livewire('partials.sidebar-component')
+    @if(auth()->check() && !auth()->user()->hasRole('super-admin'))
+        @livewire('partials.header-component')
+        @if (auth()->check() && !request()->routeIs('select-business') && !request()->routeIs('dashboard.terms-conditions.accept'))
+            @livewire('partials.sidebar-component')
+        @endif
+    @else
+    @livewire('partials.cms-header-component')
+    @livewire('partials.cms-sidebar-component')
     @endif
     <div class="app-content content ">
         <div class="content-overlay"></div>

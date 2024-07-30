@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Auth\LoginComponent;
+use App\Livewire\Backend\Cms\Businesses\ShowBusinessComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Auth\RegisterComponent;
@@ -54,6 +55,7 @@ use App\Livewire\Backend\Business\EditBusinessComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
+use App\Livewire\Backend\Cms\Dashboard\CmsDashboardComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
@@ -70,6 +72,13 @@ Route::middleware(['guest'])->group(function () {
 Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout')->middleware(['auth', 'verified']);
 Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
+
+    Route::prefix('cms')->name('cms.')->group(function () {
+        Route::get('system-settings', SettingComponent::class)->name('system-settings')->middleware('permission:manage_system_settings');
+        Route::get('businesses', ShowBusinessComponent::class,)->name('businesses')->middleware('permission:view_businesses');
+        Route::get('dashboard', CmsDashboardComponent::class,)->name('dashboard');
+    });
+
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
         Route::middleware(['terms.acceptance'])->group(function () {
             Route::get('/', DashboardComponent::class)->name('home');
@@ -135,7 +144,6 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::get('/roles', RoleComponent::class)->name('roles');
             Route::get('profile', UserProfileComponent::class)->name('profile');
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
-            Route::get('/system-setting', SettingComponent::class)->name('system-setting')->middleware('permission:edit_systems');
 
             Route::get('emails', EmailTemplateComponent::class)->name('emails');
         });
