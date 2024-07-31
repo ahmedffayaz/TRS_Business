@@ -25,6 +25,10 @@ class BusinessForm extends Form
     public ?string $invoice_serial;
     public ?string $date_format;
 
+    public ?string $email;
+    public ?string $password;
+    public ?string $first_name;
+    public ?string $last_name;
     public function rules(): array
     {
         if ($this->isUpdate) {
@@ -38,7 +42,11 @@ class BusinessForm extends Form
                 'postal_code' => 'required_if:type,business|max:20',
                 'invoice_prefix' => 'required_if:type,business',
                 'invoice_serial' => 'required_if:type,business',
-                'date_format' => 'nullable'
+                'date_format' => 'nullable',
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' =>  'required|unique:users|email',
+                'password' => 'required | min:6'
             ];
         }
         else {
@@ -52,7 +60,11 @@ class BusinessForm extends Form
                 'postal_code' => 'required_if:type,business|max:20',
                 'invoice_prefix' => 'required_if:type,business',
                 'invoice_serial' => 'required_if:type,business',
-                'date_format' => 'nullable'
+                'date_format' => 'nullable',
+                'first_name' => 'required|string',
+                'last_name' => 'required|string',
+                'email' => 'required|email|unique:users',
+                'password' => 'required|min:6'
             ];
         }
     }
@@ -69,7 +81,11 @@ class BusinessForm extends Form
             'postal_code' => 'postal address',
             'invoice_prefix' => 'invoice prefix',
             'invoice_serial' => 'invoice serial',
-            'date_format' => 'date format'
+            'date_format' => 'date format',
+            'first_name' => 'first name',
+            'last_name' => 'last name',
+            'email' =>  'email',
+            'password' => 'password'
         ];
     }
 
@@ -84,5 +100,9 @@ class BusinessForm extends Form
         $this->invoice_prefix = $business?->invoice_prefix;
         $this->invoice_serial = $business?->invoice_serial;
         $this->date_format = $business?->date_format;
+        $this->first_name = $business?->first_name;
+        $this->last_name = $business?->last_name;
+        $this->email = $business?->email;
+        $this->password = $business?->password;
     }
 }

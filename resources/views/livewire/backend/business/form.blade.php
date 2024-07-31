@@ -1,3 +1,6 @@
+<div class="text-center mb-2">
+    <h1 class="mb-1">Add Business</h1>
+</div>
 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
     <div class="row mb-1">
         <div class="col-md-12">
@@ -143,7 +146,42 @@
             @enderror
         </div>
     </div>
-
+    <div class="row mb-1">
+        <div class="col-md-6 pe-md-1">
+            <x-input-label class="required" for="first_name" value="First Name" />
+            <x-input type="text" name="first_name" id="first_name" :class="$errors->has('form.first_name') ? 'error' : ''" placeholder="Enter User First Name"
+                wire:model="form.first_name" />
+            @error('form.first_name')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+        <div class="col-md-6 ps-md-1">
+            <x-input-label class="required" for="last_name" value="Last Name" />
+            <x-input type="text" name="last_name" id="last_name" :class="$errors->has('form.last_name') ? 'error' : ''" placeholder="Enter User Last Name"
+                wire:model="form.last_name" />
+            @error('form.last_name')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+    </div>
+    <div class="row mb-1">
+        <div class="col-md-6 pe-md-1">
+            <x-input-label class="required" for="email" value="User Email" />
+            <x-input type="text" name="email" id="user_email" :class="$errors->has('form.email') ? 'error' : ''" placeholder="Enter User Email"
+                wire:model="form.email" />
+            @error('form.email')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+        <div class="col-md-6 ps-md-1">
+            <x-input-label class="required" for="password" value="Password" />
+            <x-input type="text" name="password" id="password" :class="$errors->has('form.password') ? 'error' : ''" placeholder="Enter User Password"
+                wire:model="form.password" />
+            @error('form.password')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+    </div>
     <div class="row mt-1">
         <div class="col-md-12 text-end">
             <x-primary-button type="submit">Submit</x-primary-button>

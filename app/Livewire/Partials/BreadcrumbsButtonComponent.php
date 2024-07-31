@@ -20,4 +20,9 @@ class BreadcrumbsButtonComponent extends Component
     {
         $this->dispatch('openKnowledgeBaseCategoryModal');
     }
+
+    public function openCreateBusinessModal()
+    {
+        $this->dispatch('openCreateBusinessModal');
+    }
 }

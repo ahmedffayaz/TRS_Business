@@ -22,12 +22,10 @@ class VerifyUserAccountType
             return redirect()->route('cms.dashboard');
         }
 
-        if ($user->account_type->value === AccountType::CLIENT->value && !$request->session()->has('business') && !request()->routeIs('cms.dashboard') && !$request->routeIs('cms.system-settings') && !$request->routeIs('cms.businesses')) {
+        if ($user->account_type->value === AccountType::CLIENT->value && !$request->session()->has('business') && !$request->routeIs('cms.dashboard') && !$request->routeIs('cms.system-settings') && !$request->routeIs('cms.businesses')) {
             if ($user?->client) {
                 $userBusiness = $user->client->business;
                 session(['business' => $userBusiness->name]);
-            } else if ($user->hasRole(['super-admin', 'admin'])) {
-                return redirect()->route('dashboard.home');
             } else {
                 session(['business' => $user->business->name]);
                 return redirect()->route('dashboard.home');

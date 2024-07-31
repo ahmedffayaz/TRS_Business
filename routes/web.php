@@ -1,7 +1,7 @@
 <?php
 
 use App\Livewire\Auth\LoginComponent;
-use App\Livewire\Backend\Cms\Businesses\ShowBusinessComponent;
+use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Auth\RegisterComponent;
@@ -75,7 +75,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
 
     Route::prefix('cms')->name('cms.')->group(function () {
         Route::get('system-settings', SettingComponent::class)->name('system-settings')->middleware('permission:manage_system_settings');
-        Route::get('businesses', ShowBusinessComponent::class,)->name('businesses')->middleware('permission:view_businesses');
+        Route::get('businesses', BusinessComponent::class,)->name('businesses')->middleware('permission:view_businesses');
         Route::get('dashboard', CmsDashboardComponent::class,)->name('dashboard');
     });
 
