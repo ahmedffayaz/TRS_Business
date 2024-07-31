@@ -50,14 +50,6 @@
                     <span data-i18n="System Settings">System Settings</span>
                     <i data-feather="more-horizontal"></i>
                 </li>
-                @can('view_roles')
-                <x-nav class="{{ request()->routeIs('dashboard.roles') ? 'active' : '' }} nav-item">
-                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.roles') }}">
-                        <i data-feather="shield"></i>
-                        <span class="menu-item text-truncate" data-i18n="Roles">Roles</span>
-                    </x-anchor-tag>
-                </x-nav>
-                @endcan
             </ul>
         </div>
     </div>
