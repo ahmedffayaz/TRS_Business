@@ -8,7 +8,7 @@
             <select class="form-control">
                 @isset($roles)
                 @foreach ($roles as $role)
-                    <option value="{{ encrypt($role['id']) }}">{{ $role['title'] }}</option>
+                    <option value="{{ encrypt($role['id']) }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
                 @endforeach
                 @endisset
             </select>
@@ -39,7 +39,7 @@
             <select class="form-control" id="role-select">
                 @isset($roles)
                 @foreach ($roles as $role)
-                    <option value="{{ encrypt($role['id']) }}">{{ $role['title'] }}</option>
+                   <option value="{{ encrypt($role['id']) }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
                 @endforeach
                 @endisset
             </select>
@@ -50,7 +50,7 @@
     <script type="module">
         $(document).ready(function() {
 
-
+            updateSelectedRole();
             function updateSelectedRole() {
                 var selectedRole = $('#role-select option:selected').text();
                 $('#selected-role').text(selectedRole);

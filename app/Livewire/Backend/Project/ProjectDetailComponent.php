@@ -185,10 +185,11 @@ class ProjectDetailComponent extends Component
     {
         $project = Project::where('slug', $this->slug)->firstOrFail();
 
-        $business = $project->business;
+        // $business = $project->members->toArray();
 
-        $this->roles = $business->businessRoles->toArray();
-        
+        // $this->roles = $business->roles->toArray();
+         $this->roles = $project->members->toArray();
+            // dd($this->roles);
         $this->isInviteModalOpen = true;
 
         $data = [

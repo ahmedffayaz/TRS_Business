@@ -26,15 +26,15 @@ class ProjectController extends Controller
         }
 
         try {
-            $roleId = Crypt::decrypt($role_id);
+            // $roleId = Crypt::decrypt($role_id);
 
-            $role = Role::findOrFail($roleId);
+            // $role = Role::findOrFail($roleId);
             $project = Project::where('slug', $project_slug)->firstOrFail();
-            $user = Auth::user();
+            // $user = Auth::user();
 
-            if (!$user->roles->contains($role->id)) {
-                $user->roles()->attach($role->id);
-            }
+            // if (!$user->roles->contains($role->id)) {
+            //     $user->roles()->attach($role->id);
+            // }
 
             return Redirect::route('dashboard.projects.detail', ['slug' => $project->slug]);
 
