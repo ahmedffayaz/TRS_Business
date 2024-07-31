@@ -1,4 +1,4 @@
-@assets
+    @assets
 <style>
     .avatar-group .avatar .avatar-content {
         background-color: unset !important;
@@ -18,6 +18,9 @@
         </div>
         <div class="col-md-6 float-end">
             <div class="view-options float-end d-flex">
+                <x-button class="btn btn-primary me-1" type="button" wire:click="openInviteClientModal">
+                    Invite Client
+                </x-button>
                 @can('view_statistics')
                 <x-button class="btn btn-primary me-1" type="button" data-bs-toggle="collapse" id="btn-project-statistics"
                     data-bs-target="#project-statistics" aria-expanded="false" aria-controls="project-statistics">
