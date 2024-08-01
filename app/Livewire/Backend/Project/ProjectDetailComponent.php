@@ -188,7 +188,9 @@ class ProjectDetailComponent extends Component
         // $business = $project->members->toArray();
 
         // $this->roles = $business->roles->toArray();
-         $this->roles = $project->members->toArray();
+        //  $this->roles = $project->members->toArray();
+         $this->roles = $project->client->employees->toArray();
+
             // dd($this->roles);
         $this->isInviteModalOpen = true;
 

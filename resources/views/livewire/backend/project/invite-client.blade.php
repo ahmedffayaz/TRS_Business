@@ -1,22 +1,5 @@
 <div>
     <h3 class="mb-1">Invite Client</h3>
-    <div class="row">
-        <div class="col-md-8">
-            <input type="email" placeholder="Email address" class="form-control">
-        </div>
-        <div class="col-md-2">
-            <select class="form-control">
-                @isset($roles)
-                @foreach ($roles as $role)
-                    <option value="{{ encrypt($role['id']) }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
-                @endforeach
-                @endisset
-            </select>
-        </div>
-        <div class="col-md-2">
-            <button type="button" class="btn btn-primary" style="position: relative;"> Share </button>
-        </div>
-    </div>
     <div class="row mt-3">
         <div class="col-md-8 d-flex align-items-center gap-1">
             <div
@@ -30,16 +13,15 @@
                 </svg>
             </div>
             <div>
-                Anyone with the link can join as a <span id="selected-role"></span> <br>
+                <span id="client-name"></span> can join with the link as a <span id="selected-role" style="text-transform: capitalize;"></span> <br>
                 <a href="javascript:void(0)" id="copy-link">Copy link</a>
-
             </div>
         </div>
         <div class="col-md-4">
             <select class="form-control" id="role-select">
                 @isset($roles)
                 @foreach ($roles as $role)
-                   <option value="{{ encrypt($role['id']) }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
+                   <option value="{{ encrypt($role['id']) }}" data-account-type="{{ $role['account_type'] }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
                 @endforeach
                 @endisset
             </select>
@@ -52,8 +34,12 @@
 
             updateSelectedRole();
             function updateSelectedRole() {
-                var selectedRole = $('#role-select option:selected').text();
-                $('#selected-role').text(selectedRole);
+                var select_option = $('#role-select option:selected');
+                var select_role = select_option.text();
+                var account_type = select_option.data('account-type');
+
+                $('#client-name').text(select_role);
+                $('#selected-role').text(account_type);
             }
 
             // Bind the change event to select element
@@ -65,8 +51,8 @@
 
             $('#copy-link').on('click', function(e) {
                 e.preventDefault();
-                var selectedRole = $('#role-select option:selected').val();
-                var url = '{{ url('/invite') }}/' + selectedRole + '/{{ $slug }}';
+                var select_role = $('#role-select option:selected').val();
+                var url = '{{ url('/invite') }}/' + select_role + '/{{ $slug }}';
                 navigator.clipboard.writeText(url);
                 Livewire.dispatch('close-invite-client-modal');
                 window.Swal.fire({

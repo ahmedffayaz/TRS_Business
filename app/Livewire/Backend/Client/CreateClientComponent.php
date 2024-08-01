@@ -17,6 +17,7 @@ use App\Enums\User\AccountType;
 use App\Livewire\Forms\ClientForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Validator;
 
 #[Title('Add Client')]
@@ -94,7 +95,7 @@ class CreateClientComponent extends Component
     private function addUser($client)
     {
         if (!empty($this->form->first_name) && !empty($this->form->email) && !empty($this->form->last_name)
-        && !empty($this->form->phone) && !empty($this->form->password)) {
+        && !empty($this->form->phone)) {
             foreach ($this->form->first_name as $index => $first_name) {
                 $userValidate = Validator::make([
                     'email' => $this->form->email[$index]
@@ -110,12 +111,13 @@ class CreateClientComponent extends Component
                     ]);
                 }
 
+                DB::beginTransaction();
                 $user = User::create([
                     'first_name' => $first_name,
                     'last_name' => $this->form->last_name[$index],
                     'email' => $this->form->email[$index],
                     'phone' => $this->form->phone[$index],
-                    'password' => $this->form->password[$index],
+                    'password' => '*&^%$#@!~~!@#$%^&*',
                     'account_type' => AccountType::CLIENT->value,
                     'business_id' => $this->form->business_id,
                     'client_id' => $client->id,
@@ -124,6 +126,13 @@ class CreateClientComponent extends Component
 
                 $clientRoleId = Role::whereName('client')->pluck('id')->toArray();
                 $user->roles()->sync($clientRoleId);
+
+                 // Send the password reset link
+                 if(isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true){
+                     $broker = Password::broker();
+                     $broker->sendResetLink(['email' => $this->form->email[$index]]);
+                 }
+                 DB::commit();
             }
         } else {
             $this->dispatch('alert', [
