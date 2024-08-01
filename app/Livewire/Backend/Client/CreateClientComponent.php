@@ -78,7 +78,7 @@ class CreateClientComponent extends Component
             ]);
 
             if ($validated['add_user'] === '1')
-                $this->addUser($client);
+                $this->addUser($client,$validated['business_id']);
 
             DB::commit();
             $this->form->reset();
@@ -91,7 +91,7 @@ class CreateClientComponent extends Component
         }
     }
 
-    private function addUser($client)
+    private function addUser($client,$business_id)
     {
         if (!empty($this->form->first_name) && !empty($this->form->email) && !empty($this->form->last_name)
         && !empty($this->form->phone) && !empty($this->form->password)) {
@@ -122,7 +122,7 @@ class CreateClientComponent extends Component
                     'is_active' => UserStatus::ACTIVE->value
                 ]);
 
-                $clientRoleId = Role::whereName('client')->pluck('id')->toArray();
+                $clientRoleId = Role::whereBusinessId($business_id)->whereName('client')->pluck('id')->toArray();
                 $user->roles()->sync($clientRoleId);
             }
         } else {
