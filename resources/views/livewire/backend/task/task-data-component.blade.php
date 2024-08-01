@@ -82,7 +82,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-nowrap">{{ formatTime($task?->comment?->sum('time')) }}</td>
+
+                                <td class="text-nowrap">{{ formatTime($task?->comments?->sum('time')) }}</td>
                                 <td class="text-nowrap">
                                     @if ($task?->completed_at)
                                     <span wire:ignore><i data-feather="check-square" class="text-success"></i></span>
@@ -206,6 +207,8 @@
                 $.each($("input[name='tasks[]']:checked"), function() {
                     tasks.push($(this).val());
                 });
+
+                // window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
 
                 Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();

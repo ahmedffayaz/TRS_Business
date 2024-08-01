@@ -357,6 +357,7 @@ class TaskDataComponent extends Component
         $validated = $this->invoiceForm->validate();
 
         try {
+            dd($validated);
             DB::beginTransaction();
             $invoiceNumber = $this->generateUniqueInvoiceNumber();
             $invoice = Invoice::create([

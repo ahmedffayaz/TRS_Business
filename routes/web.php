@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Auth\LoginComponent;
-use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Auth\RegisterComponent;
@@ -10,16 +9,17 @@ use App\Http\Controllers\TasksController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LeavesController;
 use App\Livewire\Backend\SettingComponent;
-
 use App\Http\Controllers\ReportsController;
+
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
 use App\Livewire\Backend\Task\TaskComponent;
+use App\Livewire\Backend\User\UserComponent;
 
-use App\Livewire\Backend\Leaves\LeaveComponent;
+use App\Http\Controllers\CompaniesController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -31,13 +31,12 @@ use App\Livewire\Backend\Leaves\LeaveComponent;
 |
 */
 
-use App\Livewire\Backend\User\UserComponent;
-use App\Http\Controllers\CompaniesController;
 use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
 use App\Livewire\Auth\ForgotPasswordComponent;
 use App\Http\Controllers\AttachmentsController;
+use App\Livewire\Backend\Leaves\LeaveComponent;
 use App\Livewire\Backend\User\ProfileComponent;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
@@ -52,9 +51,11 @@ use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
+use App\Livewire\Backend\Invoice\CreateInvoiceComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
+use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use App\Livewire\Backend\Cms\Dashboard\CmsDashboardComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
@@ -139,6 +140,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('invoices')->name('invoices.')->group(function () {
                 Route::get('/', InvoiceComponent::class)->name('index');
             });
+            Route::get('/invoices/create', CreateInvoiceComponent::class)->name('create-invoice');
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/roles', RoleComponent::class)->name('roles');
