@@ -7,7 +7,7 @@ use App\Enums\Email\EmailStatus;
 
 class EmailTemplateService
 {
-    public function create($business_id)
+    public function create($business_id, $admin_name)
     {
         $emails = [
             [
@@ -44,7 +44,7 @@ class EmailTemplateService
                         </table>
                         <br>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>Regards,</p>
-                        <p>Khuram Javaid CEO - {{PROJECT}}</p>
+                        <p>{$admin_name} CEO - {{PROJECT}}</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
                         <a href='{{SITE_URL}}'
                             style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;'>{{SITE_NAME}}</a>
@@ -92,7 +92,7 @@ class EmailTemplateService
                         <br>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>We love having you as our customer and look forward to working with you again.</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>Regards,</p>
-                        <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>Khuram Javaid CEO - {{BUSINESS}}</p>
+                        <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>{$admin_name}CEO - {{BUSINESS}}</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
                         <a href='{{SITE_URL}}' style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;'>{{SITE_TITLE}}</a>
                         <span style='font-family: 'Montserrat', sans-serif; mso-line-height-rule:'>email: </span>
@@ -121,7 +121,7 @@ class EmailTemplateService
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;'>We look forward to doing more business with you.</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>We love having you as our customer and look forward to working with you again.</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>Regards,</p>
-                        <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>Khuram Javaid CEO - {{PROJECT}}</p>
+                        <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>{$admin_name} CEO - {{PROJECT}}</p>
                         <p style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
                         <a href='{{SITE_URL}}' style='font-family: 'Montserrat', sans-serif; mso-line-height-rule: exactly;'>{{SITE_TITLE}}</a>
                         <span style='font-family: 'Montserrat', sans-serif; mso-line-height-rule:'>email: </span>

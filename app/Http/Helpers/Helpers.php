@@ -312,3 +312,8 @@ function leaveStatus($status)
             return 'danger';
     }
 }
+
+function getFullName($user)
+{
+    return ucwords("{$user->first_name} {$user->last_name}");
+}

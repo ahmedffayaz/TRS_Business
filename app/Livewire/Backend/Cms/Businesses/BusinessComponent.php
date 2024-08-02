@@ -124,8 +124,7 @@ class BusinessComponent extends Component
             }
 
             $emailTemplateService = new emailTemplateService();
-            $emailTemplateService->create($business->id);
-            
+            $emailTemplateService->create($business->id,  getFullName($user));
             DB::commit();
 
             if (!empty($this->form->logo))

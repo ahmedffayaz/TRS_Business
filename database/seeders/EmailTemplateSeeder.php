@@ -26,9 +26,9 @@ class EmailTemplateSeeder extends Seeder
         Schema::disableForeignKeyConstraints();
         EmailTemplate::truncate();
         Schema::enableForeignKeyConstraints();
-        $businesses = Business::all();
+        $businesses = Business::with('admin')->get(['id']);
         foreach ($businesses as $business) {
-            $this->emailTemplateService->create($business->id);
+            $this->emailTemplateService->create($business->id,getFullName($business->admin));
         }
 
     }
