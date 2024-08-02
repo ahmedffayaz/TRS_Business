@@ -28,7 +28,7 @@ class EmailTemplateComponent extends Component
 
     private function getEmails()
     {
-        return EmailTemplate::get();
+        return EmailTemplate::where('business_id',$this->business->id)->get();
     }
 
     public function edit($id)
@@ -36,7 +36,7 @@ class EmailTemplateComponent extends Component
         $this->form->isUpdate = true;
 
         try {
-            $email = EmailTemplate::findOrFail($id);
+            $email = EmailTemplate::where('business_id',$this->business->id)->findOrFail($id);
             $this->form->set($email);
             $this->openMainModal();
         } catch (Exception $exception) {
@@ -49,7 +49,7 @@ class EmailTemplateComponent extends Component
         $validated = $this->form->validate();
 
         try {
-            $emailTemplate = EmailTemplate::findOrFail($id);
+            $emailTemplate = EmailTemplate::where('business_id',$this->business->id)->findOrFail($id);
             DB::beginTransaction();
             $emailTemplate->update([
                 'subject' => $validated['subject'],
