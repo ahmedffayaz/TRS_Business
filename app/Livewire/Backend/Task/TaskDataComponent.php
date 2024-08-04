@@ -24,10 +24,13 @@ use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\WithFileUploads;
+use App\Models\Attachment;
+use Illuminate\Http\File;
 
 class TaskDataComponent extends Component
 {
-    use WithPagination, WithMainModal;
+    use WithPagination, WithMainModal, WithFileUploads;
 
     public string $search = '';
     public string $columnName = 'created_at';
@@ -48,14 +51,18 @@ class TaskDataComponent extends Component
     public $project = null;
     public $tasksList = null;
     public $inputs, $i;
+    public $files;
     public ?array $projectRevenue;
+    public string $filePath = 'files/tasks';
 
+    public $editableFiles = [];
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
         $this->projectSlug = $projectSlug ?? null;
         $this->inputs = [];
         $this->i = 1;
+        $this->files = [];
     }
 
     private function getTasksQuery()
@@ -139,21 +146,38 @@ class TaskDataComponent extends Component
     public function store()
     {
         if (isset($this->projectId))
-            $this->form->project_id = $this->projectId;
+        $this->form->project_id = $this->projectId;
 
         $validated = $this->form->validate();
-
         try {
             DB::beginTransaction();
-            Task::create([
+            $task = Task::create([
                 'project_id' => $validated['project_id'],
                 'user_id' => $validated['user_id'],
                 'name' => $validated['name'],
                 'description' => $validated['description'],
                 'priority' => $validated['priority'],
                 'start_date' => $validated['start_date'],
-                'end_date' => $validated['end_date']
+                'end_date' => $validated['end_date'],
             ]);
+
+            if (!empty($validated['attachments'])) {
+
+                foreach($validated['attachments'] as $attachment) {
+
+                    $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
+                    Attachment::create([
+                        'name' => $attachment['name'],
+                        'tmpFilename' =>$attachment['tmpFilename'],
+                        'mimes' => $attachment['extension'],
+                        'file' => $path,
+                        'size' => $attachment['size'],
+                        'attachmentable_id' => $task->id,
+                        'attachmentable_type' => Task::class,
+                    ]);
+                }
+            }
+
             DB::commit();
             $this->closeModal();
             $this->dispatch('alert', ['type' => 'success',  'message' => 'Task created successfully.']);
@@ -167,7 +191,7 @@ class TaskDataComponent extends Component
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
-
+    #[On('edit')]
     public function edit($id)
     {
         $this->form->isUpdate = true;
@@ -175,10 +199,9 @@ class TaskDataComponent extends Component
             $task = Task::select('id', 'project_id')->findOrFail($id);
             $verifiedTask = Task::whereHas('project', function ($query) use ($task) {
                 $query->sessionBusiness()->whereId($task->project_id);
-            })->findOrFail($id);
-
-            $this->form->set($verifiedTask);
-
+            })->with('attachments')->findOrFail($id);
+           $this->form->set($verifiedTask);
+           $this->editableFiles = $this->form->attachments;
             $this->dispatch('project-select', ['formProject' => $verifiedTask->project_id]);
             $this->dispatch('assigned-member-select', ['formUser' => $verifiedTask->user_id]);
 
@@ -200,11 +223,13 @@ class TaskDataComponent extends Component
 
         try {
             $task = Task::select('id', 'project_id')->findOrFail($id);
+
             $verifiedTask = Task::whereHas('project', function ($query) use ($task) {
                 $query->sessionBusiness()->whereId($task->project_id);
             })->findOrFail($id);
 
             DB::beginTransaction();
+
             $verifiedTask->update([
                 'project_id' => $validated['project_id'],
                 'user_id' => $validated['user_id'],
@@ -214,11 +239,30 @@ class TaskDataComponent extends Component
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date']
             ]);
+            if (!empty($validated['attachments'])) {
+
+                foreach ($validated['attachments'] as $attachment) {
+                    if(!array_key_exists('id', $attachment)) {
+                        $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
+                        Attachment::create([
+                            'name' => $attachment['name'],
+                            'tmpFilename' =>$attachment['tmpFilename'],
+                            'mimes' => $attachment['extension'],
+                            'file' => $path,
+                            'size' => $attachment['size'],
+                            'attachmentable_id' => $task->id,
+                            'attachmentable_type' => Task::class,
+                        ]);
+                    }
+                }
+            }
+
+
             DB::commit();
             $this->closeModal();
             $this->dispatch('reinitialize-icons');
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Task updated successfully.']);
-        } catch (ModelNotFoundException $exception) {
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'Task updated successfully.']);
+        }    catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while update task and task id is, ' . $id . ' error: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
@@ -229,6 +273,37 @@ class TaskDataComponent extends Component
         }
     }
 
+    public function removeFileConfirmation($id)
+    {
+        $this->dispatch('swal-alert', [
+            'id' => $id,
+            'type' => 'removeAttachment',
+            'iconType' => 'warning',
+            'title' => 'Are you sure?',
+            'description' => 'You are about to remove this file.',
+        ]);
+    }
+
+    #[On('removeAttachment')]
+    public function removeFile($id)
+    {
+        $attachment = Attachment::where('uuid', $id)->firstOrFail();
+        $getId = $attachment->attachmentable_id;
+        try  {
+            if(Storage::disk('public')->exists($attachment->file))
+            {
+                Storage::disk('public')->delete($attachment->file);
+                $attachment->delete();
+                $this->form->isUpdate = false;
+                $this->dispatch('edit', $getId);
+                $this->dispatch('alert', ['type' => 'success',  'message' => 'Attachment removed successfully.']);
+            }
+        }catch (Exception $exception) {
+            DB::rollBack();
+            Log::error('Get error while update task and task id is, ' . $id . ' error: ' . $exception->getMessage());
+            $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
+        }
+    }
     public function markComplete($id)
     {
         try {

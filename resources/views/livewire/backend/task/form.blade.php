@@ -2,7 +2,7 @@
     <div class="text-center mb-2">
         <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} Task</h1>
     </div>
-    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
+    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" enctype="multipart/form-data">
         <div class="row mb-1">
             @if (!$projectId)
                 <div class="col-md-6">
@@ -137,16 +137,43 @@
         </div>
         <div class="row mb-1">
             <div class="col-md-12">
-                <x-input-label for="reports" value="Attachments" />
-                <div class="dropzone dropzone-area" id="dpz-multiple-files">
-                    <div class="dz-message">Drop files here or click to upload.</div>
-                </div>
+                <livewire:dropzone
+                wire:model="form.attachments"
+                :rules="['mimes:png,jpeg,jpeg,pdf,doc,docx','max:10420']"
+                :multiple="true"/>
                 @error('form.attachments')
                     <x-input-error :message="$message" />
                 @enderror
             </div>
         </div>
+        @if(count($editableFiles) > 0 && $form->isUpdate == true )
+        <div class="dz-flex dz-flex-wrap dz-gap-x-10 dz-gap-y-2 dz-justify-start dz-w-full dz-mt-5 mb-2">
+            @foreach($editableFiles as $file)
+            @if(array_key_exists('id', $file))
+                <div class="dz-flex dz-items-center dz-justify-between dz-gap-2 dz-border dz-rounded dz-border-gray-200 dz-w-full dz-h-auto dz-overflow-hidden dark:dz-border-gray-700">
+                    <div class="dz-flex dz-items-center dz-gap-3">
+                            <div class="dz-flex-none dz-w-14 dz-h-14">
+                                <img src="{{ asset('storage/' . $file['file']) }}" class="dz-object-fill dz-w-full dz-h-full" alt="{{ $file['name'] }}">
+                            </div>
+                        <div class="dz-flex dz-flex-col dz-items-start dz-gap-1">
+                            <div class="dz-text-center dz-text-slate-900 dz-text-sm dz-font-medium dark:dz-text-slate-100">{{ $file['name']}}</div>
+                            <div class="dz-text-center dz-text-gray-500 dz-text-sm dz-font-medium">{{ \Illuminate\Support\Number::fileSize($file['size']) }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dz-flex dz-items-center dz-mr-3">
+                        <button type="button" wire:click="removeFileConfirmation('{{ $file['uuid'] }}')" class="bg-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="dz-w-6 dz-h-6 dz-text-black dark:dz-text-white">
+                                <path fill-rule="evenodd" d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
 
+                    </div>
+                </div>
+            @endif
+            @endforeach
+        </div>
+    @endif
         <div class="row">
             <div class="col-md-12 text-center">
                 <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
