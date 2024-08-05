@@ -8,6 +8,7 @@ use DatePeriod;
 use DateInterval;
 use Carbon\Carbon;
 use App\Models\Task;
+use App\Models\Role;
 use App\Models\Comment;
 use App\Models\Project;
 use Livewire\Component;
@@ -26,6 +27,9 @@ class ProjectDetailComponent extends Component
     public string $slug;
     public bool $isRevenueModalOpen = false;
 
+    public bool $isInviteModalOpen = false;
+
+    public array $roles;
     public function mount($slug)
     {
         $this->slug = $slug;
@@ -175,5 +179,25 @@ class ProjectDetailComponent extends Component
                 'error' => $exception->getMessage()
             ], JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function openInviteClientModal()
+    {
+        $project = Project::where('slug', $this->slug)->firstOrFail();
+
+        // $business = $project->members->toArray();
+
+        // $this->roles = $business->roles->toArray();
+        //  $this->roles = $project->members->toArray();
+         $this->roles = $project->client->employees->toArray();
+
+            // dd($this->roles);
+        $this->isInviteModalOpen = true;
+
+        $data = [
+            'roles' => $this->roles,
+            'slug' => $this->slug,
+        ];
+        $this->dispatch('open-invite-client-modal', $data);
     }
 }

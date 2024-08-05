@@ -18,6 +18,7 @@ use App\Livewire\Forms\ClientForm;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Password;
 
 #[Title('Edit Client')]
 class EditClientComponent extends Component
@@ -81,7 +82,6 @@ class EditClientComponent extends Component
                 'business_id' => $validated['business_id'],
                 'address' => $validated['address'],
                 'city' => $validated['city'],
-                'business_id' => $this->form->business_id,
                 'country_id' => $validated['country_id'],
                 'postal_code' => $validated['postal_code'],
                 'rate_per_hour' => $validated['rate_per_hour'],
@@ -107,7 +107,8 @@ class EditClientComponent extends Component
     private function addUser($client)
     {
         if (!empty($this->form->first_name) && !empty($this->form->email) && !empty($this->form->last_name)
-        && !empty($this->form->phone) && !empty($this->form->password)) {
+        && !empty($this->form->phone)) {
+
             foreach ($this->form->first_name as $index => $first_name) {
                 $userValidate = Validator::make([
                     'email' => $this->form->email[$index]
@@ -128,7 +129,7 @@ class EditClientComponent extends Component
                     'last_name' => $this->form->last_name[$index],
                     'email' => $this->form->email[$index],
                     'phone' => $this->form->phone[$index],
-                    'password' => $this->form->password[$index],
+                    'password' =>  '*&^%$#@!~~!@#$%^&*',
                     'account_type' => AccountType::CLIENT->value,
                     'client_id' => $client->id,
                     'is_active' => UserStatus::ACTIVE->value
@@ -136,6 +137,11 @@ class EditClientComponent extends Component
 
                 $clientRoleId = Role::whereName('client')->pluck('id')->toArray();
                 $user->roles()->sync($clientRoleId);
+
+                if(isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true){
+                    $broker = Password::broker();
+                    $broker->sendResetLink(['email' => $this->form->email[$index]]);
+                }
                 DB::commit();
             }
         } else {
