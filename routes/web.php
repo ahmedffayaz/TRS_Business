@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Auth\LoginComponent;
-use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Auth\RegisterComponent;
@@ -10,15 +9,15 @@ use App\Http\Controllers\TasksController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LeavesController;
 use App\Livewire\Backend\SettingComponent;
-
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReportsController;
+
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-
+use App\Livewire\Backend\User\UserComponent;
+use App\Http\Controllers\CompaniesController;
 use App\Livewire\Backend\Task\TaskComponent;
 /*
 |--------------------------------------------------------------------------
@@ -31,8 +30,6 @@ use App\Livewire\Backend\Task\TaskComponent;
 |
 */
 
-use App\Livewire\Backend\User\UserComponent;
-use App\Http\Controllers\CompaniesController;
 use App\Livewire\Auth\ResetPasswordComponent;
 use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
@@ -53,9 +50,11 @@ use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
+use App\Livewire\Backend\Invoice\CreateInvoiceComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
+use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use App\Livewire\Backend\Cms\Dashboard\CmsDashboardComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
@@ -71,7 +70,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout')->middleware(['auth', 'verified']);
-Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
+Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])->group(function () {
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
 
     Route::prefix('cms')->name('cms.')->group(function () {
@@ -140,6 +139,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('invoices')->name('invoices.')->group(function () {
                 Route::get('/', InvoiceComponent::class)->name('index');
             });
+            Route::get('/invoices/create', CreateInvoiceComponent::class)->name('create-invoice');
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/roles', RoleComponent::class)->name('roles');
