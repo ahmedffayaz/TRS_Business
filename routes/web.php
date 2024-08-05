@@ -71,7 +71,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout')->middleware(['auth', 'verified']);
-Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
+Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])->group(function () {
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
 
     Route::prefix('cms')->name('cms.')->group(function () {

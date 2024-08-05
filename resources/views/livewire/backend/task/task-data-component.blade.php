@@ -208,9 +208,9 @@
                     tasks.push($(this).val());
                 });
 
-                window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
+                // window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
 
-                // Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
+                    Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();
             });
         });

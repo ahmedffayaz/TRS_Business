@@ -7,6 +7,7 @@ use Livewire\Component;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Livewire\Forms\InvoiceForm;
+use App\Models\Business;
 use Illuminate\Support\Facades\Log;
 
 
@@ -21,15 +22,17 @@ class CreateInvoiceComponent extends Component
     {
         if ($request->has('tasks')) {
             $taskIds = explode(',', $request->query('tasks'));
-            $this->tasks = Task::whereIn('id', $taskIds)->get();
-            $this->selectedTasks = $taskIds;
+            $this->tasks = Task::with(['project.client.country'])->whereIn('id', $taskIds)->get();
+            $this->selectedTasks = $this->tasks;
         }
     }
     public function render()
     {
-        dd(session('business'));
+        $business = Business::findOrFail(session('business_details.id'));
+        // dd($this->selectedTasks->first()->project);
         return view('livewire.backend.invoice.create-invoice-component')->with([
-            'tasks' => $this->selectedTasks
+            'tasks' => $this->selectedTasks, 
+            'business' => $business
         ]);
     }
 
