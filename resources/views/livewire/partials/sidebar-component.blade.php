@@ -131,14 +131,34 @@
                     </x-anchor-tag>
                 </x-nav>
                 @endcan
-                @can('view_emails')
-                <x-nav class="nav-itme">
-                    <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.emails') }}">
+
+                <li class="nav-item {{ request()->routeIs('dashboard.emails*') ? 'has-sub sidebar-group-active open' : '' }}">
+                    <a class="d-flex align-items-center" href="#">
                         <i data-feather="mail"></i>
-                        <span class="menu-title text-truncate" data-i18n="Emails">Email Templates</span>
-                    </x-anchor-tag>
-                </x-nav>
-                @endcan
+                        <span class="menu-title text-truncate" data-i18n="Companies &amp; Permissions">Emails</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li>
+                            @can('view_emails')
+                            <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.emails.settings') ? 'active' : '' }}" href="{{ route('dashboard.emails.settings') }}">
+                                <i data-feather="settings"></i>
+                                <span class="menu-title text-truncate" data-i18n="Companies">Email Settings</span>
+                            </x-anchor-tag>
+                            @endcan
+                        </li>
+                        <li>
+                            @can('view_emails')
+                                <x-nav class="nav-itme">
+                                    <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.emails') ? 'active' : '' }}" href="{{ route('dashboard.emails') }}">
+                                        <i data-feather="mail"></i>
+                                        <span class="menu-title text-truncate" data-i18n="Emails">Email Templates</span>
+                                    </x-anchor-tag>
+                                </x-nav>
+                            @endcan
+                        </li>
+                    </ul>
+                </li>
+
             </ul>
         </div>
     </div>
