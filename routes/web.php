@@ -11,15 +11,15 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LeavesController;
 use App\Livewire\Backend\SettingComponent;
 
+use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ReportsController;
 use App\Http\Controllers\CommentsController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-use App\Livewire\Backend\Task\TaskComponent;
 
-use App\Livewire\Backend\Leaves\LeaveComponent;
+use App\Livewire\Backend\Task\TaskComponent;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -38,6 +38,7 @@ use App\Livewire\Backend\PermissionComponent;
 use App\Http\Controllers\AttendanceController;
 use App\Livewire\Auth\ForgotPasswordComponent;
 use App\Http\Controllers\AttachmentsController;
+use App\Livewire\Backend\Leaves\LeaveComponent;
 use App\Livewire\Backend\User\ProfileComponent;
 use App\Http\Controllers\NotificationController;
 use App\Livewire\Backend\Client\ClientComponent;
@@ -231,3 +232,5 @@ Route::get('clearNotification', [ReportsController::class, 'clearNotification'])
 Route::get('/cron/process/invoices', [InvoicesController::class, 'process'])->name('invoices.process');
 Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('user.save.contract');
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
+
+Route::get('/invite/{encryptedRoleId}/{slug}', [ProjectController::class, 'invite']);

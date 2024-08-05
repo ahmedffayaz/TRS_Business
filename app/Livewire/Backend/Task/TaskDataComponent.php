@@ -48,12 +48,15 @@ class TaskDataComponent extends Component
     public bool $isTaskModalOpen = false;
     public bool $isRevenueModalOpen = false;
     public bool $isAddInvoiceModalOpen = false;
+    public bool $isInviteClientModalOpen = false;
     public $project = null;
     public $tasksList = null;
     public $inputs, $i;
     public $files;
     public ?array $projectRevenue;
     public string $filePath = 'files/tasks';
+    public ?array $roles;
+    public  $slug = null;
 
     public $editableFiles = [];
     public function mount($project = null, $projectSlug = null)
@@ -660,5 +663,20 @@ class TaskDataComponent extends Component
     {
         $this->dispatch('close-main-modal');
         $this->isRevenueModalOpen = false;
+    }
+
+    #[On('open-invite-client-modal')]
+    public function openInviteClientModal($data)
+    {
+        $this->roles = $data['roles'];
+        $this->slug = $data['slug'];
+        $this->isInviteClientModalOpen = true;
+        $this->dispatch('open-main-modal');
+    }
+    #[On('close-invite-client-modal')]
+    public function closeInviteClientModal()
+    {
+        $this->dispatch('close-main-modal');
+        $this->isInviteClientModalOpen = false;
     }
 }
