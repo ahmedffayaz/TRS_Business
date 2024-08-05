@@ -18,7 +18,6 @@ use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
 use App\Livewire\Backend\Task\TaskComponent;
 use App\Livewire\Backend\User\UserComponent;
-
 use App\Http\Controllers\CompaniesController;
 /*
 |--------------------------------------------------------------------------
