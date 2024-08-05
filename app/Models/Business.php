@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Business extends Model
 {
@@ -38,6 +39,11 @@ class Business extends Model
     public function clients() : HasMany
     {
         return $this->hasMany(Client::class);
+    }
+
+    public function admin():HasOne
+    {
+        return $this->hasOne(User::class);
     }
     public function businessRoles()
     {
