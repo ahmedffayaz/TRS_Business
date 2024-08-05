@@ -16,9 +16,12 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
+use App\Livewire\Backend\User\UserComponent;
+use App\Http\Controllers\CompaniesController;
 use App\Livewire\Backend\Task\TaskComponent;
 use App\Livewire\Backend\User\UserComponent;
 use App\Http\Controllers\CompaniesController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -51,6 +54,7 @@ use App\Livewire\Backend\Email\EmailSettingComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
+use App\Livewire\Backend\Invoice\CreateInvoiceComponent;
 use App\Livewire\Backend\Project\ProjectDetailComponent;
 use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
@@ -70,7 +74,7 @@ Route::middleware(['guest'])->group(function () {
 });
 
 Route::post('/logout', [LoginComponent::class, 'logout'])->name('logout')->middleware(['auth', 'verified']);
-Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () {
+Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])->group(function () {
     Route::get('select-business', SelectBusinessComponent::class)->name('select-business');
 
     Route::prefix('cms')->name('cms.')->group(function () {
@@ -139,6 +143,7 @@ Route::middleware(['auth', 'verified', 'user-account-type'])->group(function () 
             Route::prefix('invoices')->name('invoices.')->group(function () {
                 Route::get('/', InvoiceComponent::class)->name('index');
             });
+            Route::get('/invoices/create', CreateInvoiceComponent::class)->name('create-invoice');
 
             Route::get('/accept-terms-conditions', TermsConditionAcceptComponent::class)->name('terms-conditions.accept');
             Route::get('/roles', RoleComponent::class)->name('roles');
@@ -232,3 +237,5 @@ Route::get('clearNotification', [ReportsController::class, 'clearNotification'])
 Route::get('/cron/process/invoices', [InvoicesController::class, 'process'])->name('invoices.process');
 Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('user.save.contract');
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
+
+Route::get('/invite/{encryptedRoleId}/{slug}', [ProjectController::class, 'invite']);

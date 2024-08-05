@@ -26,6 +26,7 @@
         "vite": "^4.0.0"
     },
     "dependencies": {
+        "@dasundev/livewire-dropzone-styles": "^1.0.8",
         "apexcharts": "^3.50.0",
         "bootstrap": "5.1.0",
         "flatpickr": "^4.6.13",

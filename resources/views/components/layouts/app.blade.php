@@ -16,6 +16,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/js/all.min.js" integrity="sha512-GWzVrcGlo0TxTRvz9ttioyYJ+Wwk9Ck0G81D+eO63BaqHaJ3YZX9wuqjwgfcV/MrB2PhaVX9DkYVhbFpStnqpQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     @livewireStyles
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @stack('styles')
     <script>
         var _business_logo = (e) => e.src = `{{ asset('assets/images/company-default-logo.png') }}`;
     </script>
@@ -55,6 +56,7 @@
             Livewire.emit('updateBreadcrumbs', data.breadcrumbs);
         });
     </script>
+    @stack('scripts')
 </body>
 
 </html>

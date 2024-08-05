@@ -82,7 +82,8 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td class="text-nowrap">{{ formatTime($task?->comment?->sum('time')) }}</td>
+
+                                <td class="text-nowrap">{{ formatTime($task?->comments?->sum('time')) }}</td>
                                 <td class="text-nowrap">
                                     @if ($task?->completed_at)
                                     <span wire:ignore><i data-feather="check-square" class="text-success"></i></span>
@@ -178,6 +179,10 @@
                 <p>{!! $projectRevenue['projectRevenueDetail'] !!}</p>
             </div>
         </x-main-modal>
+    @elseif ($isInviteClientModalOpen)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInviteClientModal">
+            @include('livewire.backend.project.invite-client')
+        </x-main-modal>
     @else
         <x-main-modal wireIgnoreSelf="wire:ignore.self">
         </x-main-modal>
@@ -207,7 +212,9 @@
                     tasks.push($(this).val());
                 });
 
-                Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
+                // window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
+
+                    Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();
             });
         });

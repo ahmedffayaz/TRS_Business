@@ -6,9 +6,11 @@ use App\Enums\Task\TaskPriority;
 use App\Models\Task;
 use Livewire\Attributes\Validate;
 use Livewire\Form;
+use Livewire\WithFileUploads;
 
 class TaskForm extends Form
 {
+    use WithFileUploads;
     public ?bool $isUpdate = false;
     public ?int $id;
 
@@ -20,7 +22,7 @@ class TaskForm extends Form
     public ?string $start_date;
     public ?string $end_date;
     public ?string $completed_at;
-    public ?array $attachments;
+    public ?array $attachments = [];
 
     public function rules(): array
     {
@@ -34,7 +36,7 @@ class TaskForm extends Form
                 'start_date' => 'required|date',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
                 'completed_at' => 'nullable|datetime',
-                'attachments' => 'nullable'
+                'attachments' => 'nullable|max:10420'
             ];
         } else {
             return [
@@ -46,7 +48,7 @@ class TaskForm extends Form
                 'start_date' => 'required|date',
                 'end_date' => 'nullable|date|after_or_equal:start_date',
                 'completed_at' => 'nullable|datetime',
-                'attachments' => 'nullable'
+                'attachments' => 'nullable|max:10420'
             ];
         }
     }
@@ -61,7 +63,8 @@ class TaskForm extends Form
             'priority' => 'priority',
             'start_date' => 'start date',
             'end_date' => 'end date',
-            'completed_at' => 'completed at'
+            'completed_at' => 'completed at',
+            'attachments' => 'Attachments'
         ];
     }
 
@@ -76,5 +79,6 @@ class TaskForm extends Form
         $this->start_date = $task->start_date;
         $this->end_date = $task->end_date;
         $this->completed_at = $task->completed_at;
+        $this->attachments = $task->attachments->toArray();
     }
 }

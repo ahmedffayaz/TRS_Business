@@ -9,7 +9,6 @@ class DatabaseSeeder extends Seeder
 	{
 		$this->call([
             SettingSeeder::class,
-            EmailTemplateSeeder::class,
 			CountrySeeder::class,
             BusinessSeeder::class,
             RoleSeeder::class,
@@ -21,6 +20,7 @@ class DatabaseSeeder extends Seeder
 			ProjectSeeder::class,
 			TaskSeeder::class,
 			CommentSeeder::class,
+            EmailTemplateSeeder::class,
         ]);
 	}
 }

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('email_templates', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('business_id');
             $table->string('title');
             $table->string('detail');
             $table->string('key');
@@ -21,6 +22,8 @@ return new class extends Migration
             $table->longText('body');
             $table->string('status');
             $table->timestamps();
+
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
         });
     }
 
