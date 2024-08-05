@@ -16,10 +16,9 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
-use App\Livewire\Backend\Task\TaskComponent;
 use App\Livewire\Backend\User\UserComponent;
-
 use App\Http\Controllers\CompaniesController;
+use App\Livewire\Backend\Task\TaskComponent;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -233,3 +232,5 @@ Route::get('clearNotification', [ReportsController::class, 'clearNotification'])
 Route::get('/cron/process/invoices', [InvoicesController::class, 'process'])->name('invoices.process');
 Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('user.save.contract');
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
+
+Route::get('/invite/{encryptedRoleId}/{slug}', [ProjectController::class, 'invite']);

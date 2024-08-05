@@ -18,6 +18,7 @@ use App\Models\User;
 use App\Traits\WithMainModal;
 use Spatie\Permission\Models\Permission;
 use Livewire\WithFileUploads;
+use App\Services\EmailTemplateService;
 class BusinessComponent extends Component
 {
     use WithMainModal,WithFileUploads;
@@ -122,6 +123,8 @@ class BusinessComponent extends Component
                 }
             }
 
+            $emailTemplateService = new emailTemplateService();
+            $emailTemplateService->create($business->id);
             DB::commit();
 
             if (!empty($this->form->logo))

@@ -179,6 +179,10 @@
                 <p>{!! $projectRevenue['projectRevenueDetail'] !!}</p>
             </div>
         </x-main-modal>
+    @elseif ($isInviteClientModalOpen)
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInviteClientModal">
+            @include('livewire.backend.project.invite-client')
+        </x-main-modal>
     @else
         <x-main-modal wireIgnoreSelf="wire:ignore.self">
         </x-main-modal>
