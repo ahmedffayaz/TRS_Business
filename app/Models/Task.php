@@ -111,10 +111,12 @@ class Task extends Model
 	/**
 	 * @return MorphOne
 	 */
-	public function attachments(): MorphMany
-	{
-		return $this->morphMany(Attachment::class, 'attachment');
-	}
+// In the model that has many attachments
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachmentable');
+    }
+
 
 	// Scopes
 	public function scopeOpen($query)

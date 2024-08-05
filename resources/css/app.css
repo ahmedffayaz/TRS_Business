@@ -26,3 +26,5 @@
 @import url('../assets/css/app-chat-list.css');
 @import url('../assets/css/chart-apex.css');
 @import url('custom.css');
+@import "@dasundev/livewire-dropzone-styles";
+@import url('../assets/css/forms/dropzone.css');
