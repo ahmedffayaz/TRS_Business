@@ -28,6 +28,7 @@ class ClientForm extends Form
     public ?array $email;
     public ?array $phone;
     public ?array $password;
+    public ?array $send_email;
 
     public function rules(): array
     {

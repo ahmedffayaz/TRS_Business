@@ -39,9 +39,9 @@ function favicon($favicon = null)
         : asset('trs_logo.svg');
 }
 
-function getAuthRoles(){
+function getAuthRoles($businessId){
     $user = Auth::user();
-    $rolesString = implode(', ', $user->roles->pluck('name')->toArray());
+    $rolesString = implode(', ', $user->roles->where('business_id', $businessId)->pluck('name')->toArray());
     return $rolesString;
 }
 

@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\Project;
 
 use Exception;
+use App\Models\Role;
 use App\Models\User;
 use App\Models\Client;
 use App\Models\Project;
@@ -34,6 +35,8 @@ class ProjectComponent extends Component
     public int $limitPerPage = 10;
 
     public ProjectForm $form;
+    public array $roles = [];
+    public $slug = null;
 
     public function mount()
     {

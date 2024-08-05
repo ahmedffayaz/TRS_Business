@@ -45,4 +45,8 @@ class Business extends Model
     {
         return $this->hasOne(User::class);
     }
+    public function businessRoles()
+    {
+        return $this->belongsToMany(Role::class, 'business_role', 'business_id', 'role_id');
+    }
 }
