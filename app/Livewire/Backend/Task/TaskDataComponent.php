@@ -13,6 +13,7 @@ use Livewire\Attributes\On;
 use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
+use Illuminate\Support\Carbon;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Crypt;
 use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -55,8 +57,9 @@ class TaskDataComponent extends Component
     public $files;
     public ?array $projectRevenue;
     public string $filePath = 'files/tasks';
-    public ?array $roles;
     public  $slug = null;
+    public $generatedLink;
+    public $client_name = null;
 
     public $editableFiles = [];
     public function mount($project = null, $projectSlug = null)
@@ -668,8 +671,8 @@ class TaskDataComponent extends Component
     #[On('open-invite-client-modal')]
     public function openInviteClientModal($data)
     {
-        $this->roles = $data['roles'];
         $this->slug = $data['slug'];
+        $this->client_name = $data['client_name'];
         $this->isInviteClientModalOpen = true;
         $this->dispatch('open-main-modal');
     }
@@ -678,5 +681,23 @@ class TaskDataComponent extends Component
     {
         $this->dispatch('close-main-modal');
         $this->isInviteClientModalOpen = false;
+    }
+
+    public function generateLink($slug)
+    {
+        $expiresAt = Carbon::now()->addWeeks(2);
+        $encryptedKey = Crypt::encrypt([
+            'slug' => $slug,
+            'expires_at' => $expiresAt->timestamp
+        ]);
+
+        $link = url("/invite/{$encryptedKey}");
+
+        $this->generatedLink =  $link;
+    }
+
+    public function deleteLink($slug)
+    {
+        $this->generatedLink = null;
     }
 }

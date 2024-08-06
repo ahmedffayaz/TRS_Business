@@ -1,7 +1,12 @@
 <div>
-    <h3 class="mb-1">Invite Client</h3>
-    <div class="row mt-3">
-        <div class="col-md-8 d-flex align-items-center gap-1">
+    <div class="alert alert-success alert-dismissible" role="alert" id="copy-success-alert" style="display: none;">
+        <div class="alert-body">
+            Link copied to clipboard
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    <div class="row">
+        <div class="col-md-12 d-flex align-items-center gap-1">
             <div
                 style="flex-shrink: 0; width: 40px; height: 40px; padding: 6px; border-radius: 4px; background:  #091e420f;">
                 <svg width="30" height="30" role="presentation" viewBox="0 0 24 24"
@@ -12,58 +17,34 @@
                         fill="currentColor"></path>
                 </svg>
             </div>
-            <div>
-                <span id="client-name"></span> can join with the link as a <span id="selected-role" style="text-transform: capitalize;"></span> <br>
-                <a href="javascript:void(0)" id="copy-link">Copy link</a>
-            </div>
+            <p>
+                Share this link with the project members to join as a client under @isset($client_name)<span class="text-capitalize">{{ $client_name }}</span>@endisset.
+                <br>
+                @if($generatedLink)
+                    <a href="javascript:void(0)" id="copy-link" class="text-primary fw-bold">Copy link</a> .
+                  <input type="hidden" id="copy-input" value="{{ $generatedLink }}">
+                    <a href="javascript:void(0)" wire:click="deleteLink('{{ $slug }}')" class="text-danger fw-bold">Delete link</a>
+                @else
+                    <a href="javascript:void(0)" wire:click="generateLink('{{ $slug }}')" class="text-primary fw-bold">Create link</a>
+                @endif
+            </p>
         </div>
-        <div class="col-md-4">
-            <select class="form-control" id="role-select">
-                @isset($roles)
-                @foreach ($roles as $role)
-                   <option value="{{ encrypt($role['id']) }}" data-account-type="{{ $role['account_type'] }}">{{ $role['first_name'] }}  {{ $role['last_name'] }}</option>
-                @endforeach
-                @endisset
-            </select>
-        </div>
+
     </div>
 </div>
 @script
-    <script type="module">
-        $(document).ready(function() {
+<script type="module">
+    $(document).ready(function () {
+        $(document).on('click', '#copy-link', function(e) {
+            e.preventDefault();
 
-            updateSelectedRole();
-            function updateSelectedRole() {
-                var select_option = $('#role-select option:selected');
-                var select_role = select_option.text();
-                var account_type = select_option.data('account-type');
+            var url = $('#copy-input').val();
 
-                $('#client-name').text(select_role);
-                $('#selected-role').text(account_type);
-            }
-
-            // Bind the change event to select element
-            $('#role-select').on('change', function() {
-                updateSelectedRole();
+            navigator.clipboard.writeText(url).then(function() {
+                var $alert = $('#copy-success-alert');
+                $alert.fadeIn().delay(2000).fadeOut();
             });
-
-
-
-            $('#copy-link').on('click', function(e) {
-                e.preventDefault();
-                var select_role = $('#role-select option:selected').val();
-                var url = '{{ url('/invite') }}/' + select_role + '/{{ $slug }}';
-                navigator.clipboard.writeText(url);
-                Livewire.dispatch('close-invite-client-modal');
-                window.Swal.fire({
-                    text: 'Link copied to clipboard ',
-                    showConfirmButton: true
-                });
-            });
-
-            // Initial update
-            updateSelectedRole();
-
         });
-    </script>
+    })
+</script>
 @endscript

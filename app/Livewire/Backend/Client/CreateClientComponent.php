@@ -111,7 +111,7 @@ class CreateClientComponent extends Component
                     ]);
                 }
 
-                DB::beginTransaction();
+                isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true ? $is_active = UserStatus::ACTIVE->value : $is_active = UserStatus::INACTIVE->value;
                 $user = User::create([
                     'first_name' => $first_name,
                     'last_name' => $this->form->last_name[$index],
@@ -121,7 +121,7 @@ class CreateClientComponent extends Component
                     'account_type' => AccountType::CLIENT->value,
                     'business_id' => $this->form->business_id,
                     'client_id' => $client->id,
-                    'is_active' => UserStatus::ACTIVE->value
+                    'is_active' => $is_active,
                 ]);
 
                 $clientRoleId = Role::whereBusinessId($business_id)->whereName('client')->pluck('id')->toArray();
@@ -132,7 +132,6 @@ class CreateClientComponent extends Component
                      $broker = Password::broker();
                      $broker->sendResetLink(['email' => $this->form->email[$index]]);
                  }
-                 DB::commit();
             }
         } else {
             $this->dispatch('alert', [

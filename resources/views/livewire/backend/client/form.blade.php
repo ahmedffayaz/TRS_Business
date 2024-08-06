@@ -113,29 +113,29 @@
             <div class="row mb-1">
                 <div class="col-md-2 pe-md-1">
                     <x-input-label for="first_name" value="First Name" />
-                    <x-input type="text" name="first_name[]" placeholder="Enter first name" required
+                    <x-input type="text" name="first_name[]" placeholder="Enter first name"
                         wire:model="form.first_name.0" />
                 </div>
                 <div class="col-md-2 px-md-1">
                     <x-input-label for="last_name" value="Last Name" />
-                    <x-input type="text" name="last_name[]" placeholder="Enter last name" required
+                    <x-input type="text" name="last_name[]" placeholder="Enter last name"
                         wire:model="form.last_name.0" />
                 </div>
                 <div class="col-md-3 px-md-1">
                     <x-input-label for="email" value="Email" />
-                    <x-input type="text"  name="email[]" placeholder="Enter email" required
+                    <x-input type="text"  name="email[]" placeholder="Enter email"
                         wire:model="form.email.0" />
                 </div>
                 <div class="col-md-2 px-md-1">
                     <x-input-label for="phone" value="Phone" />
-                    <x-input type="text"  name="phone[]" placeholder="Enter phone number" required
+                    <x-input type="text"  name="phone[]" placeholder="Enter phone number"
                         wire:model="form.phone.0" />
                 </div>
                 <div class="col-md-2 px-md-1 pt-1">
                     {{-- <x-input-label for="password" value="Password" />
                     <x-input type="text"  name="password[]" placeholder="Enter password"
                         wire:model="form.password.0" /> --}}
-                        <x-input-label for="send_email" value="Send Email" />
+                        <x-input-label for="send_email" value="Allow login" title="This setting allows the user to log in if enabled." />
                         <div class="form-check form-switch form-check-success">
                             <input type="hidden" name="send_email[0]" value="false">
                             <x-input type="checkbox" class="form-check-input" id="send_email"
@@ -190,7 +190,7 @@
                         wire:model="form.password.{{ $key + 1 }}" />
                 </div> --}}
                 <div class="col-md-2 px-md-1 pt-1">
-                    <x-input-label for="send_email_{{ $key + 1 }}" value="Send Email" />
+                    <x-input-label for="send_email_{{ $key + 1 }}" value="Allow login" title="This setting allows the user to log in if enabled." />
                     <div class="form-check form-switch form-check-success">
                         <input type="hidden" name="send_email[{{ $key + 1 }}]" value="false">
                         <x-input type="checkbox" class="form-check-input" id="send_email_{{ $key + 1 }}"

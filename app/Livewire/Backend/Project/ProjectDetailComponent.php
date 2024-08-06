@@ -29,6 +29,7 @@ class ProjectDetailComponent extends Component
 
     public bool $isInviteModalOpen = false;
 
+    public $generatedLink = null;
     public array $roles;
     public function mount($slug)
     {
@@ -183,20 +184,17 @@ class ProjectDetailComponent extends Component
 
     public function openInviteClientModal()
     {
-        $project = Project::where('slug', $this->slug)->firstOrFail();
-
-        // $business = $project->members->toArray();
-
-        // $this->roles = $business->roles->toArray();
-        //  $this->roles = $project->members->toArray();
-         $this->roles = $project->client->employees->toArray();
-
-            // dd($this->roles);
         $this->isInviteModalOpen = true;
+        $project = Project::where('slug',$this->slug)->firstOrFail();
+
+        if ($project->client) {
+           $client_name = $project->client->name;
+        }
 
         $data = [
-            'roles' => $this->roles,
             'slug' => $this->slug,
+            'client_name' => $client_name,
+            'generatedLink' => $this->generatedLink,
         ];
         $this->dispatch('open-invite-client-modal', $data);
     }
