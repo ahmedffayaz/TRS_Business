@@ -1,5 +1,5 @@
 <div>
-    @section('breadcrumbs', Breadcrumbs::render('emails'))
+    @section('breadcrumbs', Breadcrumbs::render('emails_template'))
 
     <div class="accordion accordion-margin" id="accordionMargin">
         <div class="row">

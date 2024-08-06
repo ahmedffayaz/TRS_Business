@@ -145,7 +145,17 @@ Breadcrumbs::for('knowledge_base_keyword', function (BreadcrumbTrail $trail) {
 // Email
 Breadcrumbs::for('emails', function (BreadcrumbTrail $trail) {
     $trail->parent('dashboard');
-    $trail->push('Emails', route('dashboard.emails'));
+    $trail->push('Emails');
+});
+
+Breadcrumbs::for('emails_settings', function (BreadcrumbTrail $trail) {
+    $trail->parent('emails');
+    $trail->push('Email Settings', route('dashboard.emails.settings'));
+});
+
+Breadcrumbs::for('emails_template', function (BreadcrumbTrail $trail) {
+    $trail->parent('emails');
+    $trail->push('Email Template', route('dashboard.emails'));
 });
 
 // CMS Dashboard

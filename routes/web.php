@@ -19,6 +19,9 @@ use App\Livewire\Backend\DashboardComponent;
 use App\Livewire\Backend\User\UserComponent;
 use App\Http\Controllers\CompaniesController;
 use App\Livewire\Backend\Task\TaskComponent;
+use App\Livewire\Backend\User\UserComponent;
+use App\Http\Controllers\CompaniesController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -47,6 +50,7 @@ use App\Livewire\Backend\Project\ProjectComponent;
 use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
+use App\Livewire\Backend\Email\EmailSettingComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
@@ -147,6 +151,7 @@ Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
 
             Route::get('emails', EmailTemplateComponent::class)->name('emails');
+            Route::get('email/settings', EmailSettingComponent::class)->name('emails.settings');
         });
         Route::post('upload-digital-image', [TermsConditionAcceptComponent::class , 'uploadDigitalImage'])->name('upload-digital-image');
     });
