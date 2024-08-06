@@ -41,7 +41,7 @@
                                 <div class="d-flex flex-column">
                                     <x-anchor-tag href="{{ route('dashboard.projects.detail', $project->slug) }}"
                                         class="user_name text-truncate text-body">
-                                        <span class="fw-bolder">{{ $project?->name }}</span>
+                                        <span class="fw-bolder text-capitalize">{{ $project?->name }}</span>
                                     </x-anchor-tag>
                                     <small class="emp_post text-muted"><strong>Client:
                                         </strong>{{ $project?->client?->name }}</small>
