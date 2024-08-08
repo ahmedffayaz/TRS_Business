@@ -27,7 +27,7 @@ class ProjectController extends Controller
             $expiresAt = Carbon::createFromTimestamp($decrypted_key['expires_at']);
 
             if (Carbon::now()->greaterThanOrEqualTo($expiresAt)) {
-                return response('Link has expired.', 404);
+                abort(404, 'Link has expired.');
             }
 
             $project = Project::where('slug', $decrypted_key['slug'])->firstOrFail();
