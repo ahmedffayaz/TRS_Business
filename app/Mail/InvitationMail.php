@@ -16,6 +16,7 @@ class InvitationMail extends Mailable
 {
     use Queueable, SerializesModels;
    public $link;
+   public $ceo_name;
    public $email_template;
     /**
      * Create a new message instance.
@@ -25,14 +26,14 @@ class InvitationMail extends Mailable
         //
         $this->link = $link;
         $project = Project::where('slug', $slug)->first();
+        $this->ceo_name = $project->client->name;
         $this->email_template = EmailTemplate::where('key', 'invitation_mail')
             ->where('business_id', $project->business_id)->first();
     }
 
     public function build()
     {
-
-        $message = str_replace('{{INVITE_LINK}}', $this->link, $this->email_template->body);
+        $message = str_replace(['{{CEO_NAME}}', '{{INVITE_LINK}}'], [$this->ceo_name, $this->link], $this->email_template->body);
         return $this->subject($this->email_template->subject)
                     ->markdown('emails.invitation-mail', compact('message'));
     }
