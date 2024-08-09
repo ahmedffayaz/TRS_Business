@@ -9,10 +9,14 @@ use App\Models\Comment;
 use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
+// use Illuminate\Http\File;
+// use App\Models\Attachment;
 use Livewire\Attributes\On;
+use App\Mail\InvitationMail;
 use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use App\Traits\WithMainModal;
+// use Livewire\WithFileUploads;
 use Illuminate\Support\Carbon;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
@@ -21,6 +25,7 @@ use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Crypt;
 use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
@@ -62,6 +67,7 @@ class TaskDataComponent extends Component
     public $client_name = null;
 
     public $editableFiles = [];
+    public $email;
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
@@ -673,6 +679,8 @@ class TaskDataComponent extends Component
     {
         $this->slug = $data['slug'];
         $this->client_name = $data['client_name'];
+        $project = Project::where('slug',$data['slug'] )->firstOrFail();
+        $this->generatedLink = $project->invite_link;
         $this->isInviteClientModalOpen = true;
         $this->dispatch('open-main-modal');
     }
@@ -692,12 +700,28 @@ class TaskDataComponent extends Component
         ]);
 
         $link = url("/invite/{$encryptedKey}");
-
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = $link;
+        $project->save();
         $this->generatedLink =  $link;
     }
 
     public function deleteLink($slug)
     {
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = null;
+        $project->save();
         $this->generatedLink = null;
+    }
+
+    public function sendInvitationByEmail($slug)
+    {
+        $this->validate([
+            'email' => 'required|email',
+        ]);
+        $this->generateLink($slug);
+        Mail::to($this->email)->queue(new InvitationMail($this->generatedLink,$slug));
+
+        session()->flash('status', 'Invitation link sent successfully!');
     }
 }

@@ -3,9 +3,9 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered {{$modalSize}}">
         <div class="modal-content">
-            <div class="modal-header bg-white">
+            <div class="modal-header @if(!empty($modalTitle)) @else bg-white @endif">
                 @if (!empty($modalTitle))
-                    <h4 class="modal-title display-6" id="myModalLabel1">{{ $modalTitle }}</h4>
+                    <h4 class="modal-title" id="myModalLabel1">{{ $modalTitle }}</h4>
                 @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     wire:click="{{ $closeModal ? $closeModal : 'closeMainModal' }}"></button>

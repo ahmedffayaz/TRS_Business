@@ -11,6 +11,17 @@
             @endcan
         </div>
         <div class="card-body">
+            @if (session()->has('status'))
+                    <div class="alert alert-success p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
+                        {{ session('status') }}
+                    </div>
+                @endif
+                @if (session()->has('error'))
+                <div class="alert alert-error alert-danger p-1" x-data="{ show: true }" x-show="show"
+                    x-init="setTimeout(() => show = false, 3000)">
+                    {{ session('error') }}
+                </div>
+            @endif
             @php
             $dataCount = [
             'total' => $totalProjects,
@@ -128,6 +139,26 @@
 </div>
 
 @script
+@if($show_swl)
+<script type="module">
+  window.Swal.fire({
+    title: 'Confirmation Required', // Clear and concise title
+    text: 'Please confirm the invitation.',
+    icon: 'warning', // Informative icon
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Accept',
+    cancelButtonText: 'Reject',
+  }).then((result) => {
+    if (result.isConfirmed) {
+        Livewire.dispatch('accept_invite_link')
+    } else {
+        Livewire.dispatch('reject_invite_link')
+    }
+  });
+</script>
+@endif
 <script type="module">
     $(document).ready(function () {
             // Reinitialize icons
