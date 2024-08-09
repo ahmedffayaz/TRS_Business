@@ -79,7 +79,6 @@ class RegisterComponent extends Component
     {
         return view('livewire.auth.register-component',[
             'logo' => $this->logo,
-            'project_name' => $this->project_name,
             'business_name' => $this->business_name,
         ]);
     }
