@@ -5,7 +5,7 @@
             <x-input-label for="name" class="required" value="Name" />
             <x-input type="text" name="name" id="name"
                 :class="$errors->has('form.name') ? 'error' : ''"
-                placeholder="Enter name" wire:model="form.name" />
+                placeholder="Enter company name" wire:model="form.name" />
             @error('form.name')
                 <x-input-error :message="$message" />
             @enderror

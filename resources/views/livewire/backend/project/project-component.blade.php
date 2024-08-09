@@ -142,9 +142,9 @@
 @if($show_swl)
 <script type="module">
   window.Swal.fire({
-    title: 'Confirmation Required', // Clear and concise title
+    title: 'Confirmation Required',
     text: 'Please confirm the invitation.',
-    icon: 'warning', // Informative icon
+    icon: 'warning', 
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',
