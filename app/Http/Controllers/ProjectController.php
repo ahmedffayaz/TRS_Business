@@ -52,13 +52,17 @@ class ProjectController extends Controller
                 }else{
 
                     $user = Auth::user();
-
                     if (!$user->hasRole('client')) {
                         return abort(403, 'Not client');
                     }
-
                     if($user->business_id === $project->business->id && $user->client_id === $project->client->id){
-                        return Redirect::route('dashboard.projects.index')->with('swl_key', $encryption);
+                        $is_member = $project->members->contains($user->id);
+                        if (!$is_member) {
+                            return Redirect::route('dashboard.projects.index')->with('swl_key', $encryption);
+                        } else {
+                            session()->flash('status', 'You are already a member of this project.');
+                            return Redirect::route('dashboard.projects.index');
+                    }
                     }else{
                         return abort(403,'Not authorized');
                     }

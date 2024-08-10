@@ -299,14 +299,14 @@ class ProjectComponent extends Component
         }
     }
 
-    #[On('reject_invitation')]
+    #[On('reject_invite_link')]
     public function rejectInvitation()
     {
         session()->flash('error', 'You rejected this invitation.');
         return redirect()->route('dashboard.projects.index');
     }
 
-    #[On('accept_invitation')]
+    #[On('accept_invite_link')]
     public function acceptInvitation()
     {
         try {
@@ -317,16 +317,8 @@ class ProjectComponent extends Component
                 ->where('business_id', $decryption['business_id'])
                 ->where('slug', $decryption['slug'])->with('members')->firstOrFail();
 
-            $is_member = $project->members->contains($user->id);
-
-            if (!$is_member) {
-                $project->members()->attach($user->id);
-                session()->flash('status', 'Now you are member of project.');
-                return redirect()->route('dashboard.projects.index');
-            } else {
-                session()->flash('status', 'You are already a member of this project.');
-                return redirect()->route('dashboard.projects.index');
-            }
+            $project->members()->attach($user->id);
+            session()->flash('status', 'Now you are member of project.');
         }
 
        }catch (\Illuminate\Contracts\Encryption\DecryptException $e) {

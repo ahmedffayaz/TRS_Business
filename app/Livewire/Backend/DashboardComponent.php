@@ -4,10 +4,11 @@ namespace App\Livewire\Backend;
 
 use App\Models\Project;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
-use Livewire\Attributes\On;
+use Illuminate\Support\Facades\Redirect;
 
 class DashboardComponent extends Component
 {
@@ -17,8 +18,19 @@ class DashboardComponent extends Component
     {
         $this->encryption = session('swl_key');
         session()->forget('swl_key');
+
         if($this->encryption){
-            $this->show_swl = true;
+            $decrypted_key = Crypt::decrypt($this->encryption);
+            $project = Project::where('slug', $decrypted_key['slug'])->firstOrFail();
+            $user = Auth::user();
+            $is_member = $project->members->contains($user->id);
+            if(!$is_member) {
+                $this->show_swl = true;
+            } else {
+                $this->show_swl = false;
+                session()->flash('status', 'You are already a member of this project.');
+                return Redirect::route('dashboard.projects.index');
+        }
         }
     }
 
