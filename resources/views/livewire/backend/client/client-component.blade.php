@@ -5,8 +5,8 @@
             <h4 class="card-title">Clients</h4>
             @can('add_clients')
                 <div>
-                    <x-anchor-tag href="{{ route('dashboard.clients.create') }}" class="btn btn-primary"
-                        tabindex="0" aria-controls="table-hover" type="button">Add Client</x-anchor-tag>
+                    <x-anchor-tag href="{{ route('dashboard.clients.create') }}" class="btn btn-primary" tabindex="0"
+                        aria-controls="table-hover" type="button">Add Client</x-anchor-tag>
                 </div>
             @endcan
         </div>
@@ -14,10 +14,36 @@
             <div class="row mb-2">
                 <div class="col-md-4 col-sm-12">
                     <div class="input-group input-group-merge">
-                        <span class="input-group-text" wire:ignore id="basic-addon-search2"><i data-feather="search"></i></span>
-                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
-                            aria-describedby="basic-addon-search2" />
+                        <span class="input-group-text" wire:ignore id="basic-addon-search2"><i
+                                data-feather="search"></i></span>
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                            placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
                     </div>
+                </div>
+                <!-- Filter by Country -->
+                <div class="col-md-3 col-sm-12">
+                    <x-select-input  wire:model.defer="selected_country" placeholder="Filter by Country" wire:ignore id="selected_country" class="select2">
+                        <option value="">Select Country</option>
+                        @isset($countries)
+                            @foreach ($countries as $country)
+                                <option value="{{ $country->id }}">{{ $country->name }}</option>
+                            @endforeach
+                        @endisset
+                    </x-select-input>
+                </div>
+
+                <div class="col-md-3 col-sm-12">
+                    <x-select-input wire:model.defer="selected_client" placeholder="Filter by Client" wire:ignore id="selected_client" class="select2">
+                        <option value="">Select Business</option>
+                        @isset($all_clients)
+                            @foreach ($all_clients as $client)
+                                <option value="{{ $client->id }}">{{ $client->name }}</option>
+                            @endforeach
+                        @endisset
+                    </x-select-input>
+                </div>
+                <div class="col-md-2 col-sm-12">
+                    <button class="btn btn-secondary" wire:click="resetFilters">Reset filter</button>
                 </div>
             </div>
 
@@ -46,8 +72,7 @@
                                 <tr>
                                     <td>
                                         <x-anchor-tag href="javascript:void(0)"
-                                            wire:click="show('{{ $client?->slug }}')"
-                                        >{{ $client?->name }}</x-anchor-tag>
+                                            wire:click="show('{{ $client?->slug }}')">{{ $client?->name }}</x-anchor-tag>
                                     </td>
                                     <td>
                                         {{ $client?->country?->name }}
@@ -56,17 +81,20 @@
                                         {{ $client?->business?->name }}
                                     </td>
                                     <td>
-                                        <span class="badge rounded-pill badge-light-primary">{{ $client?->employees_count }}</span>
+                                        <span
+                                            class="badge rounded-pill badge-light-primary">{{ $client?->employees_count }}</span>
                                     </td>
                                     <td>
                                         <div class="dropdown">
                                             @can('edit_clients', 'delete_clients')
-                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
+                                                    data-bs-toggle="dropdown">
                                                     <span wire:ignore><i data-feather="more-vertical"></i></span>
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end">
                                                     @can('edit_clients')
-                                                        <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.clients.edit', $client->slug) }}">
+                                                        <x-anchor-tag class="dropdown-item"
+                                                            href="{{ route('dashboard.clients.edit', $client->slug) }}">
                                                             <span wire:ignore>
                                                                 <i data-feather="edit-2" class="me-50"></i>
                                                             </span>
@@ -85,7 +113,7 @@
                                                 </div>
                                             @else
                                                 <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
-                                                        data-bs-toggle="dropdown">
+                                                    data-bs-toggle="dropdown">
                                                     <span wire:ignore.>
                                                         <i data-feather='lock'></i>
                                                     </span>
@@ -94,7 +122,7 @@
                                         </div>
                                     </td>
                                 </tr>
-                                @empty
+                            @empty
                                 <tr class="no-hover">
                                     <td colspan="8" class="text-center py-1 fw-bold">
                                         <p>No Client Found</p>
@@ -162,7 +190,7 @@
                 <div class="mb-2">
                     <h2 class="mb-1">Employees</h2>
                 </div>
-                @foreach($clientDetail?->employees as $employee)
+                @foreach ($clientDetail?->employees as $employee)
                     <div class="col-md-4">
                         <dl class="row">
                             <dt class="col-sm-6">Name:</dt>
@@ -186,3 +214,29 @@
         @endif
     </x-main-modal>
 </div>
+@script
+    <script type="module">
+
+        $(document).ready(function() {
+            $('#selected_client, #selected_country').on('change',function() {
+                Livewire.dispatch('by_filter_rerender');
+                $('.select2').select2();
+            });
+
+            Livewire.on('selected_countries_select', (data) => {
+                var $select = $('#selected_country');
+                // Clear existing selections
+                $select.val(null).trigger('change');
+                // Set the new selections
+                $select.val(data[0].countries).trigger('change');
+            });
+
+            $(document).on('change','#selected_client', function (e) {
+                @this.set('selected_client', e.target.value);
+            });
+            $(document).on('change','#selected_country', function (e) {
+                @this.set('selected_country', e.target.value);
+            });
+        });
+    </script>
+@endscript

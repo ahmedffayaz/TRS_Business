@@ -32,6 +32,8 @@ class ClientComponent extends Component
     public $clientDetail;
 
     public ClientForm $form;
+    public $selected_country = null;
+    public $selected_client = null;
 
     public function mount()
     {
@@ -43,15 +45,23 @@ class ClientComponent extends Component
     private function getClients(): LengthAwarePaginator
     {
         $user = auth()->user();
-        $this->search ? $this->resetPage() : ''; // reset pagination while searching
+        $this->search ? $this->resetPage() : '';
         return Client::whereHas('business', function ($query) {
             $query->whereName(session('business'));
-        })->when($user->hasPermissionTo('view_clients') && $user->hasRole('client')
-        && !$user->hasRole('super-admin'), function ($query) use ($user) {
-            $query->whereHas('employees', function ($query) use ($user) {
-                $query->whereId($user->id);
-            });
-        })->with(['business', 'country', 'employees'])->withCount('employees')
+        })
+            ->when($user->hasPermissionTo('view_clients') && $user->hasRole('client') && !$user->hasRole('super-admin'), function ($query) use ($user) {
+                $query->whereHas('employees', function ($query) use ($user) {
+                    $query->whereId($user->id);
+                });
+            })
+            ->when($this->selected_country, function ($query) {
+                $query->where('country_id', $this->selected_country);
+            })
+            ->when($this->selected_client, function ($query) {
+                $query->where('id', $this->selected_client);
+            })
+            ->with(['business', 'country', 'employees'])
+            ->withCount('employees')
             ->getList($this->search, $this->columnName, $this->sortDirection)
             ->paginate($this->limitPerPage);
     }
@@ -61,8 +71,10 @@ class ClientComponent extends Component
         $countries = Country::all();
         $rateUnits = Currency::get(['code']);
         $clients = $this->getClients();
+        $all_clients = Client::sessionBusiness()->get();
+        // $this->dispatch('selected_countries_select', ['countries' => $this->selected_country]);
 
-        return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients'));
+        return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients','all_clients'));
     }
 
     public function show($slug)
@@ -101,7 +113,7 @@ class ClientComponent extends Component
                 $query->whereName(session('business'));
             })->findOrFail($id);
             $user->delete();
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'Client Deleted Successfully!']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'Client Deleted Successfully!']);
         } catch (ModelNotFoundException $exception) {
             $this->dispatch('alert', [
                 'type' => 'error',
@@ -111,5 +123,17 @@ class ClientComponent extends Component
             Log::error('Get error while delete client: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
+    }
+    public function resetFilters()
+    {
+        $this->reset(['selected_country', 'selected_client', 'search']);
+        $this->resetPage();
+    }
+
+    #[On('by_filter_rerender')]
+    public function byFilterRerender()
+    {
+        logger('here');
+        $this->render();
     }
 }
