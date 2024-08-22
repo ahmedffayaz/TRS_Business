@@ -32,6 +32,10 @@ class UserComponent extends Component
     public int $limitPerPage = 10;
     public string $dataCountType = 'total'; // Default user type
     public UserForm $form;
+    public $roleId = '';
+    public $filterStatus = '';
+    public $joinedFrom = '';
+
 
     public function mount()
     {
@@ -47,7 +51,26 @@ class UserComponent extends Component
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
-        })->getList($this->search, $this->columnName, $this->sortDirection);
+        })->when($this->roleId, function ($query) {
+            $query->whereHas('roles', function ($query) {
+                $query->where('id', $this->roleId);
+            });
+        })
+        ->when($this->filterStatus, function ($query) {
+            $isActive = $this->filterStatus === 'active'  ? 1 : 0;
+                $query->where('is_active', $isActive);
+        })
+        ->when($this->joinedFrom, function ($query) {
+            $query->whereDate('created_at', '>=', $this->joinedFrom);
+        })
+        ->when($this->joinedFrom, function ($query) {
+            $dateRange = $this->joinedFrom;
+            [$joinedFrom, $joinedTo] = explode(' to ', $dateRange);
+            $joinedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $joinedFrom)->startOfDay();
+            $joinedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $joinedTo)->endOfDay();
+            $query->whereBetween('created_at', [$joinedFrom, $joinedTo]);
+        })
+        ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
     private function getTotalUsers(): LengthAwarePaginator
@@ -67,12 +90,7 @@ class UserComponent extends Component
 
     public function getUsers()
     {
-        if ($this->dataCountType === 'total')
-            return $this->getTotalUsers();
-        else if ($this->dataCountType === 'active')
-            return $this->getActiveUsers();
-        else if ($this->dataCountType === 'archived')
-            return $this->getArchivedUsers();
+        return $this->getUserQuery()->paginate($this->limitPerPage);
     }
 
     public function render()
@@ -82,7 +100,7 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::where('name', '!=', 'client')->where('business_id', $this->business_id)->get();
         $users = $this->getUsers();
-
+        // dd($roles);
         $totalUsers = User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
@@ -320,5 +338,19 @@ class UserComponent extends Component
             Log::error('Get error while deleting user: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+    public function applyFilter($roleId,$status,$joinedFrom)
+    {
+        $this->roleId = $roleId;
+        $this->filterStatus = $status;
+        $this->joinedFrom = $joinedFrom;
+        // $this->render();
+    }
+    #[On('reset-user-filter')]
+    public function resetFilters()
+    {
+        $this->dispatch('reset-filters');
+        $this->reset(['roleId','filterStatus','joinedFrom','search']);
+        // $this->render();
     }
 }

@@ -9,10 +9,14 @@ use App\Models\Comment;
 use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
+use Illuminate\Http\File;
+use App\Models\Attachment;
 use Livewire\Attributes\On;
 use Illuminate\Http\Request;
 use Livewire\WithPagination;
+use App\Jobs\ExportTaskASPdf;
 use App\Traits\WithMainModal;
+use Livewire\WithFileUploads;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -24,9 +28,6 @@ use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Livewire\WithFileUploads;
-use App\Models\Attachment;
-use Illuminate\Http\File;
 
 class TaskDataComponent extends Component
 {
@@ -57,8 +58,14 @@ class TaskDataComponent extends Component
     public string $filePath = 'files/tasks';
     public ?array $roles;
     public  $slug = null;
+    public $developerId = '';
+    public $filterDate = '';
+    public $filterProject = '';
 
     public $editableFiles = [];
+    public $developers = [];
+    public $selectedProjects = [];
+    public $selectAll = false;
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
@@ -73,6 +80,23 @@ class TaskDataComponent extends Component
         $this->dispatch('reinitialize-icons');
         $projectId = isset($this->projectId) ? $this->projectId : null;
         return Task::hasProject($projectId)->with(['project', 'comments'])
+        ->when($this->developerId, function ($query) {
+            $query->whereHas('user', function ($query) {
+                $query->where('id', $this->developerId);
+            });
+        })
+        ->when($this->filterDate, function ($query) {
+            $dateRange = $this->filterDate;
+            [$startDate, $endDate] = explode(' to ', $dateRange);
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+            $query->whereBetween('end_date', [$startDate, $endDate]);
+        })
+        ->when($this->filterProject, function ($query) {
+           $query->whereHas('project', function ($query) {
+               $query->where('id', $this->filterProject);
+           });
+        })
             ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
@@ -121,9 +145,12 @@ class TaskDataComponent extends Component
                     $query->where('name', '!=', 'client');
                 })->get()->pluck('nameWithDesignation', 'id');
 
+       $developers = $this->developers;
+       $is_taskComponent =  isset($this->projectSlug)  ? false :  true;
+       $projectsForFilter = Task::hasProject($projectId)->with(['project'])->get();
+    //    dd($projects);
         $this->dispatch('reinitialize-icons');
-
-        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId'));
+        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId','developers','is_taskComponent','projectsForFilter'));
     }
 
     public function openModal()
@@ -678,5 +705,51 @@ class TaskDataComponent extends Component
     {
         $this->dispatch('close-main-modal');
         $this->isInviteClientModalOpen = false;
+    }
+
+    public function applyFilter($developerId,$date,$filterProject)
+    {
+        $this->developerId = $developerId;
+        $this->filterDate = $date;
+        $this->filterProject = $filterProject;
+
+        $projectId = isset($this->projectId) ? $this->projectId : null;
+        $filterProject = $filterProject ?? $projectId;
+        $developers = User::whereHas('tasks', function ($query) use ($filterProject) {
+            $query->where('project_id', $filterProject);
+        })->get();
+
+        $this->developers = $developers->isEmpty() ? null : $developers;
+
+        if($date){
+            $this->developers = null;
+        }
+    }
+    #[On('reset-task-filter')]
+    public function resetFilters()
+    {
+        $this->developers = null;
+        $this->dispatch('reset-task-filters');
+        $this->reset(['developerId','filterDate','filterProject','search']);
+    }
+
+    public function generateTaskPdf()
+    {
+        $groupedTasks =Task::with('project')->whereIn('id', $this->selectedProjects)->latest()->get()->groupBy('project.name');
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+        $fileName = 'tasks_' . uniqid() . '.pdf';
+
+        $tempDirectory = storage_path('app/public/temp/');
+        if (!is_dir($tempDirectory)) {
+            mkdir($tempDirectory, 0755, true);
+        }
+
+        $filePath = $tempDirectory . $fileName;
+        $view = 'livewire.backend.task.task-pdf';
+
+        $pdf->loadView($view, compact('groupedTasks'))->save($filePath);
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }

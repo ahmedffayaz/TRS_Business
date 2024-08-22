@@ -32,8 +32,8 @@ class ClientComponent extends Component
     public $clientDetail;
 
     public ClientForm $form;
-    public $selected_country = null;
-    public $selected_client = null;
+    public $countryId = '';
+    public $selected_company = '';
 
     public function mount()
     {
@@ -54,11 +54,11 @@ class ClientComponent extends Component
                     $query->whereId($user->id);
                 });
             })
-            ->when($this->selected_country, function ($query) {
-                $query->where('country_id', $this->selected_country);
+            ->when($this->countryId, function ($query) {
+                $query->where('country_id', $this->countryId);
             })
-            ->when($this->selected_client, function ($query) {
-                $query->where('id', $this->selected_client);
+            ->when($this->selected_company, function ($query) {
+                $query->where('id', $this->selected_company);
             })
             ->with(['business', 'country', 'employees'])
             ->withCount('employees')
@@ -71,10 +71,13 @@ class ClientComponent extends Component
         $countries = Country::all();
         $rateUnits = Currency::get(['code']);
         $clients = $this->getClients();
-        $all_clients = Client::sessionBusiness()->get();
-        // $this->dispatch('selected_countries_select', ['countries' => $this->selected_country]);
-
-        return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients','all_clients'));
+        $all_clients = Client::sessionBusiness()->orderBy('name', 'asc')->get(['id', 'name']);
+        $countryIds = Client::sessionBusiness()->pluck('country_id')->toArray();
+        $allCountries  = Country::whereIn('id', $countryIds)->orderBy('name', 'asc')->get(['id', 'name']);
+        $this->dispatch('reinitialize-select-container');
+        // $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-icons');
+        return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients','all_clients','allCountries'));
     }
 
     public function show($slug)
@@ -124,16 +127,17 @@ class ClientComponent extends Component
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong']);
         }
     }
+    #[On('reset-filter')]
     public function resetFilters()
     {
-        $this->reset(['selected_country', 'selected_client', 'search']);
-        $this->resetPage();
+        $this->reset(['countryId', 'selected_company', 'search']);
+        $this->render();
     }
-
-    #[On('by_filter_rerender')]
-    public function byFilterRerender()
+    #[On('apply-filter')]
+    public function applyFilter($countryFilter, $selectedCompany)
     {
-        logger('here');
+        $this->countryId = $countryFilter;
+        $this->selected_company = $selectedCompany;
         $this->render();
     }
 }

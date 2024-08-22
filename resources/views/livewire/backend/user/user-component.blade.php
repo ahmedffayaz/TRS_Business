@@ -18,7 +18,67 @@
             ];
         @endphp
 
-        <x-table-search :dataCounter="$dataCount" />
+        {{-- <x-table-search :dataCounter="$dataCount" /> --}}
+
+        <div class="row mb-2 d-flex justify-content-between align-items-center">
+            <div class="col-md-6 d-flex align-items-center">
+                <div class="d-flex align-items-center">
+                    <span class="">Show</span>
+                    <select class="form-select  w-auto" wire:model.live.debounce.500ms="limitPerPage" style="margin:0 4px;">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                    </select>
+                    <span class="">entries</span>
+                </div>
+                <div class="ms-1">
+                    <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore> <i data-feather="filter"></i> Filter</button>
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="input-group input-group-merge">
+                    <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                        <i data-feather="search"></i>
+                    </span>
+                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                        placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                </div>
+            </div>
+        </div>
+
+        <div id="filter-area" class="d-none mb-2" wire:ignore>
+            <div class="row">
+                <div class="col-md-3 col-sm-12">
+                    <x-select-input  placeholder="Filter by role" wire:model.defer="roleId"
+                         id="roleId" class="select2" name="roleId">
+                        <option value="">Select role</option>
+                        @isset($roles)
+                            @foreach ($roles as $role)
+                                <option value="{{ $role->id }}" class="text-capitalize">{{ ucwords($role->name) }}</option>
+                            @endforeach
+                        @endisset
+                    </x-select-input>
+                </div>
+                <div class="col-md-3 col-sm-12">
+                    <x-select-input  placeholder="Filter by status" wire:model.defer="filterStatus"
+                         id="filterStatus" class="select2" name="filterStatus">
+                            <option value="">Select status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                    </x-select-input>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <x-input type="text" class="flatpickr-range" name="joinedFrom" id="joinedFrom"  placeholder="YYYY-MM-DD to YYYY-MM-DD" wire:model.defer="joinedFrom" />
+                </div>
+                <div class="col-md-2 col-sm-12 ">
+                    <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter" wire:click="applyFilter($('#roleId').val(),$('#filterStatus').val(),$('#joinedFrom').val())" disabled>Apply</button>
+                </div>
+            </div>
+
+        </div>
 
         <div class="table-responsive">
             <table class="table table-hover">
@@ -27,6 +87,7 @@
                         <th>Users</th>
                         <th>Status</th>
                         <th>Role</th>
+                        <th>Joined at</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -61,6 +122,7 @@
                                         @endforeach
                                     @endif
                                 </td>
+                                    <td>{{  formatDate($user->created_at) }}</td>
                                 <td>
                                     <div class="dropdown position-static">
                                         @can('edit_users', 'delete_users')
@@ -261,7 +323,7 @@
 </div>
 
 @script
-    <script>
+    <script type="module">
         $(document).ready(function () {
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
@@ -319,6 +381,54 @@
             $('#roles').on('change', function(e) {
                 @this.set('form.roles', $(this).val());
             });
+
+             // Reinitialize flatpickr
+             Livewire.dispatch('flatpickr');
+            Livewire.on('reinitialize-dispatcher', () => {
+                $(document).ready(function () {
+                    Livewire.dispatch('flatpickr');
+                })
+            })
+
+            $('#filter-toggle').on('click', function() {
+                $('#filter-area').toggleClass('d-none d-block');
+                if($(this).attr('data-filter') === 'open') {
+                    $(this).attr('data-filter', 'close')
+                            .html('<i data-feather="filter"></i> Filter');
+                    Livewire.dispatch('reset-user-filter');
+                }
+            });
+
+
+            $(document).on('click', '#apply-filter', function() {
+                $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
+            });
+
+            document.addEventListener('reset-filters', function () {
+                $('#roleId').val('').trigger('change');
+                $('#filterStatus').val('').trigger('change');
+                $('#joinedFrom').val('');
+            });
+
+            function checkFilters() {
+            let roleSelected = $('#roleId').val() !== '';
+            let statusSelected = $('#filterStatus').val() !== '';
+            let dateRangeEntered = $('#joinedFrom').val() !== '';
+
+            if (roleSelected || statusSelected || dateRangeEntered) {
+                $('#apply-filter').prop('disabled', false);
+            } else {
+                $('#apply-filter').prop('disabled', true);
+            }
+        }
+
+        // Monitor changes in the dropdowns and date range input
+        $('#roleId, #filterStatus, #joinedFrom').on('change keyup', function() {
+            checkFilters();
+        });
+
+        // Initial check
+        checkFilters();
         })
     </script>
 @endscript
