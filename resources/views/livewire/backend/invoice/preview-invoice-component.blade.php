@@ -4,6 +4,9 @@
         .logo {
             height: 70px;
         }
+        .bold {
+            font-weight: bolder
+        }
     </style>
 @endpush
 <div>
@@ -43,18 +46,46 @@
                 <!-- Address and Contact starts -->
                 <div class="card-body invoice-padding pt-0">
                     <div class="row invoice-spacing">
-                        <div class="col-xl-8 p-0">
-                            <h6 class="mb-2">Invoice To:</h6>
-                            <p>{{ $client[0] }}</p>
-                            <p>{{ $client[1] }}</p>
+                        <div class="col-md-4 mb-lg-1">
+                            <h6 class="invoice-to-title bold mb-2">Invoice To:</h6>
+                            <div class="invoice-customer">
+                                <p>{{ $client[0] }}</p>
+                                <p>{{ $client[1] }}</p>
+                            </div>
                         </div>
-                        <div class="col-xl-4 p-0 mt-xl-0 mt-2">
-                            <h6 class="mb-2">Payment Details:</h6>
+
+                        <!-- Project Details Column (center aligned) -->
+                        <div class="col-md-4 mb-lg-1">
+                            <h6 class="invoice-to-title bold mb-2">Project Details:</h6>
+                            <div class="invoice-customer">
+                                <!-- Add project details here if needed -->
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td class="pe-1">Project Name:</td>
+                                            <td>{{ ucwords($project->name) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pe-1">Project Type:</td>
+                                            <td>{{ ucwords($project->type->value) }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="pe-1">Project Status:</td>
+                                            <td>{{ ucwords($project->status->value) }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Payment Details Column -->
+                        <div class="col-md-4 mb-lg-1">
+                            <h6 class="mb-2 bold">Payment Details:</h6>
                             <table>
                                 <tbody>
                                     <tr>
                                         <td class="pe-1">Total Due:</td>
-                                        <td><span class="fw-bold">$12,110.55</span></td>
+                                        <td><strong>$12,110.55</strong></td>
                                     </tr>
                                     <tr>
                                         <td class="pe-1">Bank name:</td>

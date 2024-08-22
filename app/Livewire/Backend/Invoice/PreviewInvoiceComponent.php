@@ -12,6 +12,7 @@ class PreviewInvoiceComponent extends Component
     public $data = [];
     public $client = [];
     public $invoice_number;
+    public $project;
     public function mount(Request $request)
     {
         foreach ($request->data['task'] as $data) {
@@ -23,6 +24,7 @@ class PreviewInvoiceComponent extends Component
 
         $this->invoice_number = $request->invoice_number;
         $project = Project::where('id', $request->data['project_id'])->with('client')->first();
+        $this->project = $project;
         $this->client[] = $project?->client?->name;
         $this->client[] =  $project?->client?->address;
     }
