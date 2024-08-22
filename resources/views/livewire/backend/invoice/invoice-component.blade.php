@@ -71,11 +71,11 @@
                                                     <span wire:ignore><i data-feather="more-vertical">open</i></span>
                                                 </button>
                                                 <div class="dropdown-menu dropdown-menu-end">
+                                                    @if($invoice->status->value != 'draft')
                                                     <x-anchor-tag class="dropdown-item" href="{{ asset($invoice?->file) }}" target="_blank">
                                                         <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
                                                         <span>View Invoice</span>
                                                     </x-anchor-tag>
-
                                                     @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="resendEmail({{ $invoice?->id }})">
                                                             <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
@@ -101,7 +101,12 @@
                                                         <span wire:ignore><i data-feather="dollar-sign" class="me-50"></i></span>
                                                         <span>Payments</span>
                                                     </x-anchor-tag>
-
+                                                    @else
+                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="show_draft({{ $invoice?->id }})">
+                                                        <span wire:ignore><i data-feather="edit" class="me-50"></i></span>
+                                                        <span>Edit</span>
+                                                    </x-anchor-tag>
+                                                    @endif
                                                     @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('bill_invoices'))
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation({{ $invoice?->id }})">
                                                             <span wire:ignore><i data-feather="trash" class="me-50"></i></span>

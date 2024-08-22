@@ -22,6 +22,8 @@ class CreateInvoiceDataTable extends Migration
 			$table->foreign('task_id')->references('id')->on('tasks')->onDelete('restrict');
 
 			$table->integer('time');
+			$table->float('qty')->nullable();
+
 			$table->decimal('rate_per_hour')->nullable();
 			$table->decimal('amount')->nullable();
             $table->text('comments');

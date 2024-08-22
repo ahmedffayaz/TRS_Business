@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Auth\LoginComponent;
+use App\Livewire\Backend\Invoice\EditInvoiceComponent;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Backend\RoleComponent;
 use App\Livewire\Auth\RegisterComponent;
@@ -38,6 +39,7 @@ use App\Http\Controllers\AttachmentsController;
 use App\Livewire\Backend\Leaves\LeaveComponent;
 use App\Livewire\Backend\User\ProfileComponent;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProjectController;
 use App\Livewire\Backend\Client\ClientComponent;
 use App\Livewire\Backend\Task\TaskDataComponent;
 use App\Livewire\Backend\Task\ViewTaskComponent;
@@ -56,10 +58,13 @@ use App\Livewire\Backend\Business\CreateBusinessComponent;
 use App\Livewire\Backend\Business\SelectBusinessComponent;
 use App\Livewire\Backend\Cms\Businesses\BusinessComponent;
 use App\Livewire\Backend\Cms\Dashboard\CmsDashboardComponent;
+use App\Livewire\Backend\Invoice\PreviewInvoiceComponent;
 use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Models\Business;
+use App\Models\Invoice;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
@@ -138,6 +143,9 @@ Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])
 
             Route::prefix('invoices')->name('invoices.')->group(function () {
                 Route::get('/', InvoiceComponent::class)->name('index');
+                Route::get('/view-draft/{id}', EditInvoiceComponent::class);
+                Route::get('/preview/invoice', PreviewInvoiceComponent::class)->name('preview');
+
             });
             Route::get('/invoices/create', CreateInvoiceComponent::class)->name('create-invoice');
 

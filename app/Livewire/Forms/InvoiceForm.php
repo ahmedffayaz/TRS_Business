@@ -19,7 +19,6 @@ class InvoiceForm extends Form
     public ?string $due_at;
     public ?string $date;
     public $deduction;
-
     public  $description;
     public ?array $quantity;
     public ?array $rate;
