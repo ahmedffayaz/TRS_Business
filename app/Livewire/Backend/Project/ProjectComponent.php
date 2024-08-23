@@ -17,6 +17,8 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use App\Livewire\Forms\ProjectForm;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -37,10 +39,17 @@ class ProjectComponent extends Component
     public ProjectForm $form;
     public array $roles = [];
     public $slug = null;
+    public $encryption;
+    public $show_swl = false;
 
     public function mount()
     {
         $this->business_id = Business::whereName(session('business'))->first()->id;
+        $this->encryption = session('swl_key');
+        session()->forget('swl_key');
+        if($this->encryption){
+            $this->show_swl = true;
+        }
     }
 
     private function getProjectQuery()
@@ -288,5 +297,32 @@ class ProjectComponent extends Component
             Log::error('Get error while restore project: ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+
+    #[On('reject_invite_link')]
+    public function rejectInvitation()
+    {
+        session()->flash('error', 'You rejected this invitation.');
+        return redirect()->route('dashboard.projects.index');
+    }
+
+    #[On('accept_invite_link')]
+    public function acceptInvitation()
+    {
+        try {
+        $decryption = Crypt::decrypt($this->encryption);
+        if (Auth::check()) {
+            $user = Auth::user();
+            $project = Project::where('client_id', $decryption['client_id'])
+                ->where('business_id', $decryption['business_id'])
+                ->where('slug', $decryption['slug'])->with('members')->firstOrFail();
+
+            $project->members()->attach($user->id);
+            session()->flash('status', 'Now you are member of project.');
+        }
+
+       }catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+        session()->flash('error', 'Invalid data. Please try again.');
+       }
     }
 }

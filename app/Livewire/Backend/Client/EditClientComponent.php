@@ -123,7 +123,7 @@ class EditClientComponent extends Component
                     ]);
                 }
 
-                DB::beginTransaction();
+                $is_active = isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true ? UserStatus::ACTIVE->value : UserStatus::INACTIVE->value;
                 $user = User::create([
                     'first_name' => $first_name,
                     'last_name' => $this->form->last_name[$index],
@@ -132,7 +132,7 @@ class EditClientComponent extends Component
                     'password' =>  '*&^%$#@!~~!@#$%^&*',
                     'account_type' => AccountType::CLIENT->value,
                     'client_id' => $client->id,
-                    'is_active' => UserStatus::ACTIVE->value
+                    'is_active' => $is_active,
                 ]);
 
                 $clientRoleId = Role::whereBusinessId($business_id)->whereName('client')->pluck('id')->toArray();
@@ -142,7 +142,7 @@ class EditClientComponent extends Component
                     $broker = Password::broker();
                     $broker->sendResetLink(['email' => $this->form->email[$index]]);
                 }
-                DB::commit();
+
             }
         } else {
             $this->dispatch('alert', [

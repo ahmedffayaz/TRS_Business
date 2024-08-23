@@ -17,13 +17,14 @@ class InvoiceForm extends Form
     public ?array $task;
     public ?array $generic_comments;
     public ?string $due_at;
+    public ?string $date;
     public $deduction;
-    public $notes;
 
-    public ?array $description;
+    public  $description;
     public ?array $quantity;
     public ?array $rate;
     public ?array $amount;
+    public $currency ;
 
     public function rules(): array
     {
@@ -35,14 +36,15 @@ class InvoiceForm extends Form
             'generic_comments' => 'nullable|array',
             'due_at' => 'required|date',
             'deduction' => 'nullable|numeric',
-            'notes' => 'nullable|string'
+            'description' => 'nullable|string',
+            'currency' => 'required|string'
         ];
 
         // Add custom validation rule for total_amount
         if (!is_null($this->total_amount)) {
-            $rules['total_amount'] = 'required|numeric|min:0.01'; // Adjust min value as needed
+            $rules['total_amount'] = 'required|numeric|min:0.01';
         } else {
-            $rules['total_amount'] = 'nullable'; // Adjust min value as needed
+            $rules['total_amount'] = 'nullable';
         }
 
         return $rules;
@@ -57,7 +59,8 @@ class InvoiceForm extends Form
             'total_amount' => 'task comment',
             'due_at' => 'due date',
             'deduction' => 'adjustment amount',
-            'notes' => 'notes'
+            'description' => 'notes',
+            'currency' => 'required|string'
         ];
     }
 

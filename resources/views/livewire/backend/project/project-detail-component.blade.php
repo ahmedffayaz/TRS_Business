@@ -11,8 +11,8 @@
     <section class="row">
         <div class="col-md-6">
             <div class="result-toggler">
-                <h1 class="fs-3">{{ $project?->name }} (
-                    <x-anchor-tag href="#" class="fw-bold" :value="$project?->client?->name" /> )
+                <h1 class="fs-3 text-capitalize">{{ $project?->name }} (
+                    <x-anchor-tag href="#" class="fw-bold text-capitalize" :value="$project?->client?->name" /> )
                 </h1>
             </div>
         </div>

@@ -271,7 +271,7 @@
             </div>
         </x-main-modal>
     @elseif ($isInviteClientModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInviteClientModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="Share link" modalSize="modal-default">
             @include('livewire.backend.project.invite-client')
         </x-main-modal>
     @else
@@ -306,9 +306,9 @@
                     tasks.push($(this).val());
                 });
 
-                // window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
+                window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
 
-                    Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
+                    // Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();
             });
 

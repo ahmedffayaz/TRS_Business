@@ -12,11 +12,14 @@ use App\Models\Project;
 use Livewire\Component;
 use Illuminate\Http\File;
 use App\Models\Attachment;
+
 use Livewire\Attributes\On;
+use App\Mail\InvitationMail;
 use Illuminate\Http\Request;
 use Livewire\WithPagination;
 use App\Jobs\ExportTaskASPdf;
 use App\Traits\WithMainModal;
+use Illuminate\Support\Carbon;
 use Livewire\WithFileUploads;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +28,8 @@ use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -58,9 +63,8 @@ class TaskDataComponent extends Component
     public $files;
     public ?array $projectRevenue;
     public string $filePath = 'files/tasks';
-    public ?array $roles;
     public  $slug = null;
-    public $developerId = '';
+     public $developerId = '';
     public $filterDate = '';
     public $filterProject = '';
 
@@ -68,6 +72,12 @@ class TaskDataComponent extends Component
     public $developers = [];
     public $selectedProjects = [];
     public $selectAll = false;
+   public $generatedLink;
+    public $client_name = null;
+
+    public $editableFiles = [];
+    public $email;
+
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
@@ -665,8 +675,10 @@ class TaskDataComponent extends Component
     #[On('open-invite-client-modal')]
     public function openInviteClientModal($data)
     {
-        $this->roles = $data['roles'];
         $this->slug = $data['slug'];
+        $this->client_name = $data['client_name'];
+        $project = Project::where('slug',$data['slug'] )->firstOrFail();
+        $this->generatedLink = $project->invite_link;
         $this->isInviteClientModalOpen = true;
         $this->dispatch('open-main-modal');
     }
@@ -676,8 +688,40 @@ class TaskDataComponent extends Component
         $this->dispatch('close-main-modal');
         $this->isInviteClientModalOpen = false;
     }
+   public function generateLink($slug)
+    {
+        $expiresAt = Carbon::now()->addWeeks(2);
+        $encryptedKey = Crypt::encrypt([
+            'slug' => $slug,
+            'expires_at' => $expiresAt->timestamp
+        ]);
 
-    public function applyFilter($developerId,$date,$filterProject)
+        $link = url("/invite/{$encryptedKey}");
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = $link;
+        $project->save();
+        $this->generatedLink =  $link;
+    }
+
+    public function deleteLink($slug)
+    {
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = null;
+        $project->save();
+        $this->generatedLink = null;
+    }
+
+    public function sendInvitationByEmail($slug)
+    {
+        $this->validate([
+            'email' => 'required|email',
+        ]);
+        $this->generateLink($slug);
+        Mail::to($this->email)->queue(new InvitationMail($this->generatedLink,$slug));
+
+        session()->flash('status', 'Invitation link sent successfully!');
+    }
+   public function applyFilter($developerId,$date,$filterProject)
     {
         $this->developerId = $developerId;
         $this->filterDate = $date;
