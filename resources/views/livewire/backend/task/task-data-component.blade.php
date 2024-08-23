@@ -180,7 +180,7 @@
             </div>
         </x-main-modal>
     @elseif ($isInviteClientModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInviteClientModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="Share link" modalSize="modal-default">
             @include('livewire.backend.project.invite-client')
         </x-main-modal>
     @else

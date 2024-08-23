@@ -3,14 +3,14 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered {{$modalSize}}">
         <div class="modal-content">
-            <div class="modal-header {{ empty($modalTitle) ? 'bg-transparent' : '' }}">
+            <div class="modal-header @if(empty($modalTitle)) bg-white @endif">
                 @if (!empty($modalTitle))
                     <h4 class="modal-title" id="myModalLabel1">{{ $modalTitle }}</h4>
                 @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                     wire:click="{{ $closeModal ? $closeModal : 'closeMainModal' }}"></button>
             </div>
-            <div class="modal-body px-sm-5 pb-5">
+            <div class="modal-body px-sm-2 pb-2">
                 {{ $slot }}
             </div>
         </div>

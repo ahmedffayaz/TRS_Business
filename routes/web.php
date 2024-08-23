@@ -62,11 +62,12 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
+use App\Http\Controllers\ProjectController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
     Route::get('/login', LoginComponent::class)->name('login');
-    Route::get('/register', RegisterComponent::class)->name('register');
+    Route::get('/register/{encryption}', RegisterComponent::class)->name('register');
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
@@ -236,4 +237,4 @@ Route::get('/cron/process/invoices', [InvoicesController::class, 'process'])->na
 Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('user.save.contract');
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
 
-Route::get('/invite/{encryptedRoleId}/{slug}', [ProjectController::class, 'invite']);
+Route::get('/invite/{encrypted}', [ProjectController::class, 'invite']);

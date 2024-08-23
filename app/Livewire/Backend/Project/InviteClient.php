@@ -7,6 +7,7 @@ use Livewire\Component;
 class InviteClient extends Component
 {
     public $showModal = false;
+    public $generatedLink;
 
     protected $listeners = ['openInviteClientModal'];
 

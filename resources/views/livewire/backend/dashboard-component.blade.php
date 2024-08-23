@@ -4,6 +4,17 @@
     </div>
     <div class="content-body">
         <section id="dashboard-ecommerce">
+            @if (session()->has('status'))
+            <div class="alert alert-success p-1" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 3000)">
+                {{ session('status') }}
+            </div>
+        @endif
+        @if (session()->has('error'))
+        <div class="alert alert-error alert-danger p-1" x-data="{ show: true }" x-show="show"
+            x-init="setTimeout(() => show = false, 3000)">
+            {{ session('error') }}
+        </div>
+    @endif
             <div class="row match-height">
                 <!-- Statistics Card -->
                 <div class="col-12">
@@ -79,3 +90,23 @@
         </section>
     </div>
 </div>
+@if($show_swl)
+<script type="module">
+  window.Swal.fire({
+    title: 'Confirmation Required',
+    text: 'Please confirm the invitation.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Accept',
+    cancelButtonText: 'Reject',
+  }).then((result) => {
+    if (result.isConfirmed) {
+        Livewire.dispatch('accept_invitation_dashboard')
+    } else {
+        Livewire.dispatch('reject_invitation_dashboard')
+    }
+  });
+</script>
+@endif

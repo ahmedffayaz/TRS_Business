@@ -40,7 +40,8 @@ class Project extends Model
         'hourly_rate',
         'currency',
         'type',
-        'last_updated_at'
+        'last_updated_at',
+       ' invite_link',
     ];
 
     protected $casts = [
