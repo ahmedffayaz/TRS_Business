@@ -10,12 +10,6 @@
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 <!--  email -->
-{{-- <div style="display: flex; align-items: center;" class="gap-1 mb-2 mt-2">
-        <input type="email" id="invite-email" class="form-control @error('email') is-invalid @enderror" style="flex: 1;" placeholder="Enter email address" wire:model="email">
-
-        <button class="btn btn-primary" id="share-email-button" >Share</button>
-    </div>
-    @error('email')<span class="invalid-feedback">{{ $message }}</span> @enderror --}}
 <div class="row mt-1 mb-1">
     <div class="col-md-9">
         <input type="email" wire:model="email" class="form-control @error('email') is-invalid @enderror"

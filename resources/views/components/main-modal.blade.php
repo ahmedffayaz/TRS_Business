@@ -3,7 +3,7 @@
     aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered {{$modalSize}}">
         <div class="modal-content">
-            <div class="modal-header @if(!empty($modalTitle)) @else bg-white @endif">
+            <div class="modal-header @if(empty($modalTitle)) bg-white @endif">
                 @if (!empty($modalTitle))
                     <h4 class="modal-title" id="myModalLabel1">{{ $modalTitle }}</h4>
                 @endif

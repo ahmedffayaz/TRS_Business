@@ -55,10 +55,10 @@ class RegisterComponent extends Component
             Log::warning('No client roles found for business ID ' . $this->business_id);
         }
 
-        $projects = Project::where('client_id', $this->client_id)
+        $projects = Project::with('members')->where('client_id', $this->client_id)
             ->where('business_id', $this->business_id)->get();
             foreach ($projects as $project) {
-                $project->members()->attach($user->id);
+                $project->members->attach($user->id);
             }
 
         session()->flash('status', 'Registration successful!');

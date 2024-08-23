@@ -111,7 +111,7 @@ class CreateClientComponent extends Component
                     ]);
                 }
 
-                isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true ? $is_active = UserStatus::ACTIVE->value : $is_active = UserStatus::INACTIVE->value;
+                $is_active = isset($this->form->send_email[$index]) && $this->form->send_email[$index] == true ? UserStatus::ACTIVE->value : UserStatus::INACTIVE->value;
                 $user = User::create([
                     'first_name' => $first_name,
                     'last_name' => $this->form->last_name[$index],
