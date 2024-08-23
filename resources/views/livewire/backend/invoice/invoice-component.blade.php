@@ -1,5 +1,10 @@
 <div>
     @section('breadcrumbs', Breadcrumbs::render('invoices'))
+    @if (Session::has('success'))
+    <div class="alert alert-success p-1">
+        {{ Session::get('success') }}
+    </div>
+    @endif
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Invoices</h4>

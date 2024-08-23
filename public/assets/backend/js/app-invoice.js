@@ -60,11 +60,11 @@ $(function () {
     });
   }
 
-  if (dueDate.length) {
-    dueDate.flatpickr({
-      defaultDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 5)
-    });
-  }
+//   if (dueDate.length) {
+//     dueDate.flatpickr({
+//       defaultDate: new Date(date.getFullYear(), date.getMonth(), date.getDate() + 5)
+//     });
+//   }
 
   // Country Select2
   if (countrySelect.length) {

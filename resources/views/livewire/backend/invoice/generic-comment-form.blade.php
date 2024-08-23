@@ -34,9 +34,9 @@
 
     <div class="col-md-2">
         <x-input-label for="amount" class="required" value="Amount" />
-        <x-input type="number" :class="$errors->has('invoiceForm.generic_comments.{{ $key }}.amount')
-            ? 'error amount' : 'amount'" placeholder="Amount" id="{{ $key }}"
-            wire:model="invoiceForm.generic_comments.{{ $key }}.amount"
+        <x-input type="number" wire:ignore :class="$errors->has('invoiceForm.generic_comments.{{ $key }}.amount')
+            ? 'error generic-amount' : 'generic-amount'" placeholder="Amount" id="{{ $key }}" data-unit="{{ isset($tasks[0]) ? $tasks[0]->project?->currency : null }}"
+            wire:model="invoiceForm.generic_comments.{{ $key }}.amount" data-generic-amount=""
             data-msg="Please enter amount" min="1" autofocus required />
         @error('invoiceForm.generic_comments.{{ $key }}.amount')
             <x-input-error :message="$message" />
@@ -53,23 +53,3 @@
     </div>
 </div>
 
-@script
-<script type="module">
-    $(document).ready(function (event) {
-        $(document).on('keyup change', '.quantity, .rate', function () {
-            const row = $(this).closest('.row');
-            const quantity = Number(row.find('.quantity').val().trim());
-            const rate = Number(row.find('.rate').val().trim());
-
-            if (!isNaN(quantity) && !isNaN(rate)) {  // Validate both values are numbers
-                const amount = quantity * rate;
-                const toFixedAmount = amount.toFixed(2);
-                const amountId = row.find('.amount').attr('id');
-                @this.set('invoiceForm.generic_comments.' + amountId + '.amount', toFixedAmount);  // Update amount with 2 decimal places
-            } else {
-                row.find('.amount').val('');  // Clear amount if invalid values entered
-            }
-        });
-    });
-</script>
-@endscript
