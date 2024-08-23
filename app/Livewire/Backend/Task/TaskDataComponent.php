@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Task;
 
+use App\Jobs\FilesUploadJob;
 use Exception;
 use App\Models\Task;
 use App\Models\User;
@@ -28,6 +29,8 @@ use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Livewire\WithFileUploads;
+use App\Models\Attachment;
 
 class TaskDataComponent extends Component
 {
@@ -191,22 +194,7 @@ class TaskDataComponent extends Component
                 'end_date' => $validated['end_date'],
             ]);
 
-            if (!empty($validated['attachments'])) {
-
-                foreach($validated['attachments'] as $attachment) {
-
-                    $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
-                    Attachment::create([
-                        'name' => $attachment['name'],
-                        'tmpFilename' =>$attachment['tmpFilename'],
-                        'mimes' => $attachment['extension'],
-                        'file' => $path,
-                        'size' => $attachment['size'],
-                        'attachmentable_id' => $task->id,
-                        'attachmentable_type' => Task::class,
-                    ]);
-                }
-            }
+            if (!empty($validated['attachments'])) dispatch(new FilesUploadJob($validated['attachments'], $task->id));
 
             DB::commit();
             $this->closeModal();
@@ -269,24 +257,7 @@ class TaskDataComponent extends Component
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date']
             ]);
-            if (!empty($validated['attachments'])) {
-
-                foreach ($validated['attachments'] as $attachment) {
-                    if(!array_key_exists('id', $attachment)) {
-                        $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
-                        Attachment::create([
-                            'name' => $attachment['name'],
-                            'tmpFilename' =>$attachment['tmpFilename'],
-                            'mimes' => $attachment['extension'],
-                            'file' => $path,
-                            'size' => $attachment['size'],
-                            'attachmentable_id' => $task->id,
-                            'attachmentable_type' => Task::class,
-                        ]);
-                    }
-                }
-            }
-
+            if (!empty($validated['attachments'])) dispatch(new FilesUploadJob($validated['attachments'], $task->id));
 
             DB::commit();
             $this->closeModal();
