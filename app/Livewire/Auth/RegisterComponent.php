@@ -58,7 +58,7 @@ class RegisterComponent extends Component
         $projects = Project::with('members')->where('client_id', $this->client_id)
             ->where('business_id', $this->business_id)->get();
             foreach ($projects as $project) {
-                $project->members->attach($user->id);
+                $project->members()->attach($user->id);
             }
 
         session()->flash('status', 'Registration successful!');
