@@ -29,8 +29,7 @@ use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Livewire\WithFileUploads;
-use App\Models\Attachment;
+
 
 class TaskDataComponent extends Component
 {
