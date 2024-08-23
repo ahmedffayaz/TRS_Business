@@ -16,16 +16,13 @@
 
         .comment-cell {
             overflow: hidden;
-            /* Clearfix to contain floated elements */
             text-align: center;
-            /* Center align text if needed */
         }
 
         .comment-cell img {
             float: left;
             margin-right: 8px;
             height: 25px;
-            /* Space between the image and the text */
         }
 
         .comment-cell span {
@@ -34,7 +31,6 @@
 
         .custom-width {
             width: 120px;
-            /* Adjust width as needed */
         }
 
         .card-min-height {
@@ -100,11 +96,9 @@
                                     </div>
                                 </div>
 
-                                <!-- Project Details Column (center aligned) -->
                                 <div class="col-md-4 mb-lg-1">
                                     <h6 class="invoice-to-title bold">Project Details:</h6>
                                     <div class="invoice-customer">
-                                        <!-- Add project details here if needed -->
                                         <table>
                                             <tbody>
                                                 <tr>
@@ -154,10 +148,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Address and Contact ends -->
-
-                        <!-- Product Details starts -->
 
                         <div class="">
                             <div class="card-table table-responsive card-min-height">
@@ -263,17 +253,14 @@
                             </div>
                             <div class="row mb-1 mt-1 ms-1">
                                 @foreach ($inputs as $key => $value)
-                                    {{-- @php $key = $key; @endphp --}}
                                     @include('livewire.backend.invoice.generic-comment-form', ['key' => $key])
                                 @endforeach
                             </div>
                         </div>
-                        <!-- Product Details ends -->
 
                         <!-- Invoice Total starts -->
                         <div class="card-body invoice-padding">
                             <div class="row invoice-sales-total-wrapper">
-                                <!-- First Column -->
                                 <div class="col-md-6 d-flex align-items-start">
                                     <div class="mb-2">
                                         <span wire:ignore>
@@ -307,7 +294,6 @@
                                     </div>
                                 </div>
 
-                                <!-- Second Column -->
                                 <div class="col-md-6 d-flex align-items-start justify-content-end">
                                     <div class="invoice-total-wrapper">
                                         <div class="invoice-total-item">
@@ -432,10 +418,9 @@
                     $('#select-all-comments').prop('checked', allChecked);
 
                     let selectAllCheckbox = $(this);
-                    let taskId = selectAllCheckbox.attr('id').split('-')[3]; // Extract task ID from the checkbox id
+                    let taskId = selectAllCheckbox.attr('id').split('-')[3];
                     let isChecked = selectAllCheckbox.is(':checked');
 
-                    // Select all comments for the specific task
                     $('.task-' + taskId).each(function() {
                         $(this).prop('checked', isChecked).trigger('change');
                     });
@@ -527,7 +512,6 @@
                     calculateTaskTimeAndCost(taskID);
                 });
 
-                // Function to calculate task time and cost
                 function calculateTaskTimeAndCost(taskID) {
                     const unit = $(`[name="task[${taskID}][unit]"]`).val();
                     @this.set(`invoiceForm.task.${taskID}.unit`, unit);
@@ -560,7 +544,6 @@
                 }
 
                 function formatCurrency(amount, currency) {
-                    // Default to 'USD' if currency is undefined or empty
                     const currencyCode = (currency && (currency === "EURO" ? "EUR" : currency === "Pound" ? "GBP" : currency)) || "USD";
                     try {
                         return new Intl.NumberFormat('en-US', {

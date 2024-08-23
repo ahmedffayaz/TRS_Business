@@ -4,6 +4,7 @@
         .logo {
             height: 70px;
         }
+
         .bold {
             font-weight: bolder
         }
@@ -166,10 +167,9 @@
                                 <div class="invoice-total-item">
                                     <p class="invoice-total-title">Adjustment:</p>
                                     @if (isset($data['deduction']))
-                                    <p class="invoice-total-amount">
-                                        {{ currencies($project->currency) }}&nbsp;{{ number_format($data['deduction'] ?? 0 ,2) }}
-                                      </p>
-
+                                        <p class="invoice-total-amount">
+                                            {{ currencies($project->currency) }}&nbsp;{{ number_format($data['deduction'] ?? 0, 2) }}
+                                        </p>
                                     @endif
                                 </div>
                                 <div class="invoice-total-item">

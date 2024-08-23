@@ -16,16 +16,13 @@
 
         .comment-cell {
             overflow: hidden;
-            /* Clearfix to contain floated elements */
             text-align: center;
-            /* Center align text if needed */
         }
 
         .comment-cell img {
             float: left;
             margin-right: 8px;
             height: 25px;
-            /* Space between the image and the text */
         }
 
         .comment-cell span {
@@ -34,7 +31,6 @@
 
         .custom-width {
             width: 120px;
-            /* Adjust width as needed */
         }
 
         .card-min-height {
@@ -155,8 +151,6 @@
 
                         <!-- Address and Contact ends -->
 
-                        <!-- Product Details starts -->
-
                         <div class="">
                             <div class="card-table table-responsive card-min-height">
                                 <table class="table table-hover">
@@ -194,19 +188,19 @@
                                                     </td>
                                                     <td>
                                                         @if ($task->project->type === \App\Enums\Project\ProjectType::FIXED)
-                                                        <div class="input-group input-group-merge custom-width">
-                                                            <span class="input-group-text">{{ currencies($task->project->currency) }}</span>
-                                                            <input type="number" class="form-control task-amount" aria-label="" name="task[{{ $task->id }}][task_amount]"
-                                                                id="task_amount_{{ $task->id }}" wire:ignore wire:model="invoiceForm.task.{{ $task->id }}.task_amount"
-                                                                value="{{ $task->project->hourly_rate }}" />
-                                                        </div>
+                                                            <div class="input-group input-group-merge custom-width">
+                                                                <span class="input-group-text">{{ currencies($task->project->currency) }}</span>
+                                                                <input type="number" class="form-control task-amount" aria-label=""
+                                                                    name="task[{{ $task->id }}][task_amount]" id="task_amount_{{ $task->id }}" wire:ignore
+                                                                    wire:model="invoiceForm.task.{{ $task->id }}.task_amount" value="{{ $task->project->hourly_rate }}" />
+                                                            </div>
                                                         @else
-                                                        <div class="input-group input-group-merge custom-width">
-                                                            <span class="input-group-text">{{ currencies($task->project->currency) }}</span>
-                                                            <input type="number" class="form-control task-amount" aria-label=""
-                                                                name="task[{{ $task->id }}][rate_per_hour]" id="task_amount_{{ $task->id }}"
-                                                                wire:model="invoiceForm.task.{{ $task->id }}.task_amount" value="{{ $task->project->hourly_rate }}" />
-                                                        </div>
+                                                            <div class="input-group input-group-merge custom-width">
+                                                                <span class="input-group-text">{{ currencies($task->project->currency) }}</span>
+                                                                <input type="number" class="form-control task-amount" aria-label=""
+                                                                    name="task[{{ $task->id }}][rate_per_hour]" id="task_amount_{{ $task->id }}"
+                                                                    wire:model="invoiceForm.task.{{ $task->id }}.task_amount" value="{{ $task->project->hourly_rate }}" />
+                                                            </div>
                                                         @endif
                                                     </td>
                                                     <td>
@@ -235,7 +229,6 @@
                                                             <input type="checkbox" data-time="{{ $comment?->time }}" id="toggle-comment-{{ $comment?->id }}"
                                                                 class="form-check-input ms-5 toggle-comment task-{{ $task?->id }}" data-task-id="{{ $task?->id }}"
                                                                 aria-label="" name="task[{{ $task?->id }}][comments][{{ $comment?->id }}]"
-                                                                {{-- wire:model="invoiceForm.task.{{ $task?->id }}.comments.{{ $comment?->id }}" --}}
                                                                 data-comment-id="{{ $comment?->id }}" value="{{ $comment?->id }}"
                                                                 {{ in_array($comment->id, $invoiceDataTaskCommentIds) ? 'checked' : '' }} />
                                                             <span class="mx-1">{{ $comment->description }}</span>
@@ -265,7 +258,6 @@
                                 @endforeach
                             </div>
                         </div>
-                        <!-- Product Details ends -->
 
                         <!-- Invoice Total starts -->
                         <div class="card-body invoice-padding">
@@ -309,28 +301,26 @@
                                     <div class="invoice-total-wrapper">
                                         <div class="invoice-total-item">
                                             <p class="invoice-total-title">Adjustment: </p>
-                                            <x-input type="" name="deduction" id="deduction"
-                                            data-unit="{{ isset($task) ? $tasks->project?->currency : null }}"
-                                            :class="$errors->has('invoiceForm.deduction')? 'error adjustment-amount' : 'adjustment-amount'"
-                                            data-unit="{{ isset($tasks[0]) ? $tasks[0]->project?->currency : null }}"
-                                            wire:model="invoiceForm.deduction" autocomplete="off" min="0"
-                                            step="0.01" />
+                                            <x-input type="" name="deduction" id="deduction" data-unit="{{ isset($task) ? $tasks->project?->currency : null }}"
+                                                :class="$errors->has('invoiceForm.deduction') ? 'error adjustment-amount' : 'adjustment-amount'" data-unit="{{ isset($tasks[0]) ? $tasks[0]->project?->currency : null }}"
+                                                wire:model="invoiceForm.deduction" autocomplete="off" min="0" step="0.01" />
                                             @error('invoiceForm.deduction')
                                                 <x-input-error :message="$message" />
                                             @enderror
                                         </div>
                                         <div class="invoice-total-item mt-1">
                                             <p class="invoice-total-title">Subtotal:</p>
-                                            <p class="invoice-total-amount">  {{ currencies($invoiceForm->currency) . ' ' . number_format(($invoiceForm->total_amount), 2) }}</p>
+                                            <p class="invoice-total-amount"> {{ currencies($invoiceForm->currency) . ' ' . number_format($invoiceForm->total_amount, 2) }}
+                                            </p>
                                         </div>
                                         <hr class="my-50" />
                                         <div class="invoice-total-item">
                                             <p class="invoice-total-title">Total:</p>
                                             <p wire:ignore class="invoice-total-amount total-cost">
-                                                @if(isset($invoiceForm->deduction))
-                                                {{ currencies($invoiceForm->currency) . ' ' . number_format(($invoiceForm->total_amount)-$invoice->deduction, 2) }}
+                                                @if (isset($invoiceForm->deduction))
+                                                    {{ currencies($invoiceForm->currency) . ' ' . number_format($invoiceForm->total_amount - $invoice->deduction, 2) }}
                                                 @else
-                                                {{ currencies($invoiceForm->currency) . ' ' . number_format($invoiceForm->total_amount ,2 ) }}
+                                                    {{ currencies($invoiceForm->currency) . ' ' . number_format($invoiceForm->total_amount, 2) }}
                                             </p>
                                             @endif
                                             <input type="hidden" wire:model="invoiceForm.total_amount">
@@ -387,7 +377,6 @@
 <!-- Invoice Add Right ends -->
 </div>
 </form>
-<!-- /Add New Customer Sidebar -->
 </section>
 </div>
 @push('scripts')
@@ -395,7 +384,6 @@
     @script
         <script type="module">
             $(document).ready(function() {
-                // Reinitialize icons and flatpickr
                 Livewire.dispatch('feather-icons');
                 Livewire.on('reinitialize-icons', () => {
                     Livewire.dispatch('feather-icons');
@@ -434,10 +422,9 @@
                     $('#select-all-comments').prop('checked', allChecked);
 
                     let selectAllCheckbox = $(this);
-                    let taskId = selectAllCheckbox.attr('id').split('-')[3]; // Extract task ID from the checkbox id
+                    let taskId = selectAllCheckbox.attr('id').split('-')[3];
                     let isChecked = selectAllCheckbox.is(':checked');
 
-                    // Select all comments for the specific task
                     $('.task-' + taskId).each(function() {
                         $(this).prop('checked', isChecked).trigger('change');
                     });
@@ -487,7 +474,7 @@
                         return;
                     }
 
-                    const unit = taskRow.find(`[name="task[${taskId}][unit]"]`).val(); // Get unit from task row
+                    const unit = taskRow.find(`[name="task[${taskId}][unit]"]`).val();
                     if ($(this).is(':checked')) {
                         @this.set(`invoiceForm.task.${taskId}.comments.${commentId}`, true);
                         grandTotal[taskId] = calculateTaskTimeAndCost(taskId);
@@ -522,14 +509,13 @@
 
                 $(document).on('keyup change', '.task-amount', function(event) {
                     const taskAmountID = $(this).attr('id');
-                    const taskID = taskAmountID.split('_')[2]; // Assuming the format is 'task_amount_<id>'
+                    const taskID = taskAmountID.split('_')[2];
                     const hiddenTaskInput = $(this).closest('.task-' + taskID + '-row').find('input[name^="task[' + taskID + ']"]');
                     const taskValue = hiddenTaskInput.val();
 
                     calculateTaskTimeAndCost(taskID);
                 });
 
-                // Function to calculate task time and cost
                 function calculateTaskTimeAndCost(taskID) {
                     const unit = $(`[name="task[${taskID}][unit]"]`).val();
                     @this.set(`invoiceForm.task.${taskID}.unit`, unit);
@@ -562,7 +548,6 @@
                 }
 
                 function formatCurrency(amount, currency) {
-                    // Default to 'USD' if currency is undefined or empty
                     const currencyCode = (currency && (currency === "EURO" ? "EUR" : currency === "Pound" ? "GBP" : currency)) || "USD";
                     try {
                         return new Intl.NumberFormat('en-US', {
@@ -571,7 +556,7 @@
                         }).format(amount);
                     } catch (error) {
                         console.error(`Error formatting currency: ${currencyCode}`, error);
-                        return amount; // Return the amount as is if there's an error
+                        return amount;
                     }
                 }
             });
