@@ -75,7 +75,6 @@ class ClientComponent extends Component
         $countryIds = Client::sessionBusiness()->pluck('country_id')->toArray();
         $allCountries  = Country::whereIn('id', $countryIds)->orderBy('name', 'asc')->get(['id', 'name']);
         $this->dispatch('reinitialize-select-container');
-        // $this->dispatch('feather-icons');
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.client.client-component', compact('countries', 'rateUnits', 'clients','all_clients','allCountries'));
     }

@@ -18,8 +18,6 @@
             ];
         @endphp
 
-        {{-- <x-table-search :dataCounter="$dataCount" /> --}}
-
         <div class="row mb-2 d-flex justify-content-between align-items-center">
             <div class="col-md-6 d-flex align-items-center">
                 <div class="d-flex align-items-center">

@@ -3,6 +3,7 @@
 namespace App\Livewire\Backend\User;
 
 use Exception;
+use Carbon\Carbon;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Client;
@@ -66,8 +67,8 @@ class UserComponent extends Component
         ->when($this->joinedFrom, function ($query) {
             $dateRange = $this->joinedFrom;
             [$joinedFrom, $joinedTo] = explode(' to ', $dateRange);
-            $joinedFrom = \Carbon\Carbon::createFromFormat('Y-m-d', $joinedFrom)->startOfDay();
-            $joinedTo = \Carbon\Carbon::createFromFormat('Y-m-d', $joinedTo)->endOfDay();
+            $joinedFrom = Carbon::createFromFormat('Y-m-d', $joinedFrom)->startOfDay();
+            $joinedTo = Carbon::createFromFormat('Y-m-d', $joinedTo)->endOfDay();
             $query->whereBetween('created_at', [$joinedFrom, $joinedTo]);
         })
         ->getList($this->search, $this->columnName, $this->sortDirection);
@@ -100,7 +101,6 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::where('name', '!=', 'client')->where('business_id', $this->business_id)->get();
         $users = $this->getUsers();
-        // dd($roles);
         $totalUsers = User::sessionBusiness()->where(function($query){
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
@@ -344,13 +344,11 @@ class UserComponent extends Component
         $this->roleId = $roleId;
         $this->filterStatus = $status;
         $this->joinedFrom = $joinedFrom;
-        // $this->render();
     }
     #[On('reset-user-filter')]
     public function resetFilters()
     {
         $this->dispatch('reset-filters');
         $this->reset(['roleId','filterStatus','joinedFrom','search']);
-        // $this->render();
     }
 }

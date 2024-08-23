@@ -11,7 +11,6 @@ document.addEventListener("livewire:initialized", () => {
             var $this = $(this);
             $this.wrap('<div class="position-relative"></div>');
             $this.select2({
-                // placeholder: "Select Value",
                 dropdownAutoWidth: true,
                 dropdownParent: $this.parent(),
                 width: '100%',

@@ -118,7 +118,6 @@
                                 <th>Project</th>
                             @else
                                 <th></th>
-                                {{-- <th class="text-nowrap">ID</th> --}}
                             @endif
                             <th class="text-nowrap">p</th>
                             <th class="text-nowrap">Title</th>
@@ -324,8 +323,6 @@
             });
 
             $("#apply-filter").on('click', function() {
-                console.log('apply-filter');
-
                 $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
             });
 
