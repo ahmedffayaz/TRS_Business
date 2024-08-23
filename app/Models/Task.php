@@ -40,7 +40,15 @@ class Task extends Model
             $query->where(function ($subQuery) use ($search) {
                 $subQuery->where('name', 'LIKE', '%' . $search . '%')
                     ->orWhere('description', 'LIKE', '%' . $search . '%')
-                    ->orWhere('priority', 'LIKE', '%' . $search . '%');
+                    ->orWhere('priority', 'LIKE', '%' . $search . '%')
+                    ->orWhere('end_date', 'LIKE', '%' . $search . '%')
+                    ->orWhereHas('project', function ($query) use ($search) {
+                        $query->where('projects.name', 'LIKE', '%' . $search . '%');
+                    })
+                    ->orWhereHas('user', function ($query) use ($search) {
+                        $query->where('users.first_name', 'LIKE', '%' . $search . '%')
+                            ->orWhere('users.last_name', 'LIKE', '%' . $search . '%');
+                    });
             });
         }
 

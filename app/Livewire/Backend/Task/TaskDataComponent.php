@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Backend\Task;
 
+use App\Jobs\FilesUploadJob;
 use Exception;
 use App\Models\Task;
 use App\Models\User;
@@ -9,10 +10,17 @@ use App\Models\Comment;
 use App\Models\Invoice;
 use App\Models\Project;
 use Livewire\Component;
+use Illuminate\Http\File;
+use App\Models\Attachment;
+
 use Livewire\Attributes\On;
+use App\Mail\InvitationMail;
 use Illuminate\Http\Request;
 use Livewire\WithPagination;
+use App\Jobs\ExportTaskASPdf;
 use App\Traits\WithMainModal;
+use Illuminate\Support\Carbon;
+use Livewire\WithFileUploads;
 use App\Livewire\Forms\TaskForm;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -20,13 +28,13 @@ use App\Livewire\Forms\InvoiceForm;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Enums\Invoice\InvoiceStatus;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Crypt;
 use App\Jobs\SendCreateProjectInvoice;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Livewire\WithFileUploads;
-use App\Models\Attachment;
-use Illuminate\Http\File;
+
 
 class TaskDataComponent extends Component
 {
@@ -55,10 +63,21 @@ class TaskDataComponent extends Component
     public $files;
     public ?array $projectRevenue;
     public string $filePath = 'files/tasks';
-    public ?array $roles;
     public  $slug = null;
+     public $developerId = '';
+    public $filterDate = '';
+    public $filterProject = '';
 
     public $editableFiles = [];
+    public $developers = [];
+    public $selectedProjects = [];
+    public $selectAll = false;
+   public $generatedLink;
+    public $client_name = null;
+
+    public $editableFiles = [];
+    public $email;
+
     public function mount($project = null, $projectSlug = null)
     {
         $this->projectId = $project ? $project : null;
@@ -73,6 +92,23 @@ class TaskDataComponent extends Component
         $this->dispatch('reinitialize-icons');
         $projectId = isset($this->projectId) ? $this->projectId : null;
         return Task::hasProject($projectId)->with(['project', 'comments'])
+        ->when($this->developerId, function ($query) {
+            $query->whereHas('user', function ($query) {
+                $query->where('id', $this->developerId);
+            });
+        })
+        ->when($this->filterDate, function ($query) {
+            $dateRange = $this->filterDate;
+            [$startDate, $endDate] = explode(' to ', $dateRange);
+            $startDate = \Carbon\Carbon::createFromFormat('Y-m-d', $startDate)->startOfDay();
+            $endDate = \Carbon\Carbon::createFromFormat('Y-m-d', $endDate)->endOfDay();
+            $query->whereBetween('end_date', [$startDate, $endDate]);
+        })
+        ->when($this->filterProject, function ($query) {
+           $query->whereHas('project', function ($query) {
+               $query->where('id', $this->filterProject);
+           });
+        })
             ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
@@ -121,9 +157,12 @@ class TaskDataComponent extends Component
                     $query->where('name', '!=', 'client');
                 })->get()->pluck('nameWithDesignation', 'id');
 
+       $developers = $this->developers;
+       $is_taskComponent =  isset($this->projectSlug)  ? false :  true;
+       $projectsForFilter = Task::hasProject($projectId)->with(['project'])->get();
+    //    dd($projects);
         $this->dispatch('reinitialize-icons');
-
-        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId'));
+        return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId','developers','is_taskComponent','projectsForFilter'));
     }
 
     public function openModal()
@@ -164,22 +203,7 @@ class TaskDataComponent extends Component
                 'end_date' => $validated['end_date'],
             ]);
 
-            if (!empty($validated['attachments'])) {
-
-                foreach($validated['attachments'] as $attachment) {
-
-                    $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
-                    Attachment::create([
-                        'name' => $attachment['name'],
-                        'tmpFilename' =>$attachment['tmpFilename'],
-                        'mimes' => $attachment['extension'],
-                        'file' => $path,
-                        'size' => $attachment['size'],
-                        'attachmentable_id' => $task->id,
-                        'attachmentable_type' => Task::class,
-                    ]);
-                }
-            }
+            if (!empty($validated['attachments'])) dispatch(new FilesUploadJob($validated['attachments'], $task->id));
 
             DB::commit();
             $this->closeModal();
@@ -242,24 +266,7 @@ class TaskDataComponent extends Component
                 'start_date' => $validated['start_date'],
                 'end_date' => $validated['end_date']
             ]);
-            if (!empty($validated['attachments'])) {
-
-                foreach ($validated['attachments'] as $attachment) {
-                    if(!array_key_exists('id', $attachment)) {
-                        $path = Storage::disk('public')->put($this->filePath, new File($attachment['path']));
-                        Attachment::create([
-                            'name' => $attachment['name'],
-                            'tmpFilename' =>$attachment['tmpFilename'],
-                            'mimes' => $attachment['extension'],
-                            'file' => $path,
-                            'size' => $attachment['size'],
-                            'attachmentable_id' => $task->id,
-                            'attachmentable_type' => Task::class,
-                        ]);
-                    }
-                }
-            }
-
+            if (!empty($validated['attachments'])) dispatch(new FilesUploadJob($validated['attachments'], $task->id));
 
             DB::commit();
             $this->closeModal();
@@ -668,8 +675,10 @@ class TaskDataComponent extends Component
     #[On('open-invite-client-modal')]
     public function openInviteClientModal($data)
     {
-        $this->roles = $data['roles'];
         $this->slug = $data['slug'];
+        $this->client_name = $data['client_name'];
+        $project = Project::where('slug',$data['slug'] )->firstOrFail();
+        $this->generatedLink = $project->invite_link;
         $this->isInviteClientModalOpen = true;
         $this->dispatch('open-main-modal');
     }
@@ -678,5 +687,83 @@ class TaskDataComponent extends Component
     {
         $this->dispatch('close-main-modal');
         $this->isInviteClientModalOpen = false;
+    }
+   public function generateLink($slug)
+    {
+        $expiresAt = Carbon::now()->addWeeks(2);
+        $encryptedKey = Crypt::encrypt([
+            'slug' => $slug,
+            'expires_at' => $expiresAt->timestamp
+        ]);
+
+        $link = url("/invite/{$encryptedKey}");
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = $link;
+        $project->save();
+        $this->generatedLink =  $link;
+    }
+
+    public function deleteLink($slug)
+    {
+        $project = Project::where('slug', $slug)->firstOrFail();
+        $project->invite_link = null;
+        $project->save();
+        $this->generatedLink = null;
+    }
+
+    public function sendInvitationByEmail($slug)
+    {
+        $this->validate([
+            'email' => 'required|email',
+        ]);
+        $this->generateLink($slug);
+        Mail::to($this->email)->queue(new InvitationMail($this->generatedLink,$slug));
+
+        session()->flash('status', 'Invitation link sent successfully!');
+    }
+   public function applyFilter($developerId,$date,$filterProject)
+    {
+        $this->developerId = $developerId;
+        $this->filterDate = $date;
+        $this->filterProject = $filterProject;
+
+        $projectId = isset($this->projectId) ? $this->projectId : null;
+        $filterProject = $filterProject ?? $projectId;
+        $developers = User::whereHas('tasks', function ($query) use ($filterProject) {
+            $query->where('project_id', $filterProject);
+        })->get();
+
+        $this->developers = $developers->isEmpty() ? null : $developers;
+
+        if($date){
+            $this->developers = null;
+        }
+    }
+    #[On('reset-task-filter')]
+    public function resetFilters()
+    {
+        $this->developers = null;
+        $this->dispatch('reset-task-filters');
+        $this->reset(['developerId','filterDate','filterProject','search']);
+    }
+
+    public function generateTaskPdf()
+    {
+        $groupedTasks =Task::with('project')->whereIn('id', $this->selectedProjects)->latest()->get()->groupBy('project.name');
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+        $fileName = 'tasks_' . uniqid() . '.pdf';
+
+        $tempDirectory = storage_path('app/public/temp/');
+        if (!is_dir($tempDirectory)) {
+            mkdir($tempDirectory, 0755, true);
+        }
+
+        $filePath = $tempDirectory . $fileName;
+        $view = 'livewire.backend.task.task-pdf';
+
+        $pdf->loadView($view, compact('groupedTasks'))->save($filePath);
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }

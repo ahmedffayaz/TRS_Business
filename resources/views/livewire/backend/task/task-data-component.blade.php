@@ -3,6 +3,10 @@
         <div class="card-header">
             <h4 class="card-title">Tasks</h4>
             <div>
+                @can('add_tasks')
+                        <x-anchor-tag href="#" class="btn btn-outline-secondary me-1" tabindex="0"
+                            type="button" wire:click="generateTaskPdf" value="Export as PDF" id="export-pdf-button"  wire:ignore />
+                @endcan
                 @if ($projectId && auth()->user()->can('add_invoices'))
                     <x-anchor-tag href="#" class="btn btn-primary me-1 add-invoice" tabindex="0" aria-controls="table-hover"
                         type="button" value="Create Invoice" />
@@ -22,17 +26,98 @@
                 ];
             @endphp
 
-            <x-table-search :dataCounter="$dataCount" />
+
+            <div class="row mb-2 d-flex justify-content-between align-items-center">
+                <div class="col-md-6 d-flex align-items-center">
+                    <!-- Adjust column sizes and spacing -->
+                    <div class="d-flex align-items-center">
+                        <span class="">Show</span>
+                        <select class="form-select w-auto" wire:model.live.debounce.500ms="limitPerPage">
+                            <option value="10">10</option>
+                            <option value="15">15</option>
+                            <option value="20">20</option>
+                            <option value="25">25</option>
+                            <option value="30">30</option>
+                            <option value="35">35</option>
+                        </select>
+                        <span class="">entries</span>
+                    </div>
+                    <div class="ms-1">
+
+                            <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore>
+                                <i data-feather="filter"></i> Filter
+                            </button>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-12">
+                    <div class="input-group input-group-merge">
+                        <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                            <i data-feather="search"></i>
+                        </span>
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                            placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                    </div>
+                </div>
+            </div>
+
+            <div id="filter-area" class="d-none mb-2" wire:ignore.self>
+                <div class="row">
+                    @if($is_taskComponent)
+                    <div class="col-md-4 col-sm-12">
+                        <x-select-input  placeholder="Filter by project" wire:model.live="filterProject" id="filterProject" class="select2">
+                            <option value="">Select project</option>
+                            @isset($projectsForFilter)
+                            @php
+                                $sortedProjects = $projectsForFilter->unique('project_id')->sortBy(function($task) {
+                                    return $task->project?->name;
+                                });
+                            @endphp
+                                @foreach ($sortedProjects as $project)
+                                    <option value="{{ $project?->project?->id  }}">{{ ucwords($project?->project?->name) }}</option>
+                                @endforeach
+                            @endisset
+                        </x-select-input>
+                    </div>
+                    @endif
+                    <div class="col-md-3 col-sm-12">
+                        <x-select-input  placeholder="Filter by developer" wire:model.defer="developerId" id="developerId" class="select2" >
+                            <option value="">Select developer</option>
+                            @if($developers)
+                                @foreach ($developers as $developer)
+                                    <option value="{{ $developer->id }}">{{ ucwords($developer->fullName) }}</option>
+                                @endforeach
+                            @else
+                                @foreach ($tasks->unique('user_id') as $task)
+                                   <option value="{{ $task?->user?->id }}">{{ ucwords($task->user->fullName) }}</option>
+                               @endforeach
+                            @endif
+                        </x-select-input>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <x-input type="text" class="flatpickr-range" name="filterDate" id="filterDate"  placeholder="YYYY-MM-DD to YYYY-MM-DD" wire:model.defer="filterDate" />
+                    </div>
+
+                    <div class="col-md-2 col-sm-12 align-self-end">
+                        <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter" wire:click="applyFilter($('#developerId').val(),$('#filterDate').val(),$('#filterProject').val())" disabled>Apply</button>
+                    </div>
+                </div>
+
+            </div>
 
             <div class="card-table table-responsive card-min-height">
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            @if($is_taskComponent)
+                            <th style="width:1%;">
+                                <x-input-checkbox type="checkbox" id="select-all-checkbox"
+                                     statusClass="form-check-primary" :labelValue="__('')" />
+                            </th>
+                            @endif
                             @if (!$projectId)
                                 <th>Project</th>
                             @else
                                 <th></th>
-                                <th class="text-nowrap">ID</th>
                             @endif
                             <th class="text-nowrap">p</th>
                             <th class="text-nowrap">Title</th>
@@ -46,16 +131,22 @@
                     <tbody>
                         @forelse ($tasks as $task)
                             <tr>
+                                @if($is_taskComponent)
+                               <td style="width:1%;">
+                                    <x-input-checkbox type="checkbox" id="selected_projects{{$task?->id }}" name="selected_projects[]"
+                                        :value="$task?->id" statusClass="form-check-primary" :labelValue="__('')" wire:model="selectedProjects"   class="project-checkbox" />
+                               </td>
+                               @endif
                                 @if (!$projectId)
                                     <td>{{ $task?->project?->name }}</td>
                                 @else
                                     <td>
                                         @if (count($task?->billableComments) > 0)
                                             <x-input-checkbox type="checkbox" id="daily-reports_{{ $task?->id }}" name="tasks[]"
-                                                :value="$task?->id" statusClass="form-check-success" :labelValue="__('')" />
+                                                :value="$task?->id" statusClass="form-check-success" :labelValue="__('')" wire:model="selectedTasks" class="project-checkbox"/>
                                         @endif
                                     </td>
-                                    <td class="text-nowrap">{{ $task?->id }}</td>
+
                                 @endif
                                 <td class="text-nowrap"><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
                                 <td class="text-nowrap">
@@ -180,7 +271,7 @@
             </div>
         </x-main-modal>
     @elseif ($isInviteClientModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInviteClientModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="Share link" modalSize="modal-default">
             @include('livewire.backend.project.invite-client')
         </x-main-modal>
     @else
@@ -192,10 +283,13 @@
 @script
     <script type="module">
         $(document).ready(function () {
+            Livewire.dispatch('flatpickr');
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
                 $(document).ready(function () {
                 Livewire.dispatch('feather-icons');
+                Livewire.dispatch('select-container');
+                Livewire.dispatch('flatpickr');
                 });
             });
 
@@ -217,6 +311,91 @@
                     // Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();
             });
+
+
+            $('#filter-toggle').on('click', function() {
+                $('#filter-area').toggleClass('d-none d-block');
+                if($(this).attr('data-filter') === 'open') {
+                    $(this).attr('data-filter', 'close')
+                            .html('<i data-feather="filter"></i> Filter');
+                    Livewire.dispatch('reset-task-filter');
+                }
+            });
+
+            $("#apply-filter").on('click', function() {
+                $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
+            });
+
+            document.addEventListener('reset-task-filters', function () {
+                $('#filterProject').val('').trigger('change');
+                $('#developerId').val('').trigger('change');
+                $('#filterDate').val('').trigger('change');
+            });
+
+            $(document).on('change', '#filterProject, #developerId, #filterDate', function() {
+
+                checkDropdowns();
+            });
+
+            function checkDropdowns() {
+                let projectSelected = $('#filterProject').val() !== '';
+                let developerSelected = $('#developerId').val() !== '';
+                let dateSelected = $('#filterDate').val() !== '';
+
+                if (projectSelected || developerSelected || dateSelected) {
+                    $('#apply-filter').prop('disabled', false);
+                } else {
+                    $('#apply-filter').prop('disabled', true);
+                }
+            }
+            checkDropdowns();
+
+            function toggleExportButton() {
+                if ($('.project-checkbox:checked').length > 0) {
+                    $('#export-pdf-button').show();
+                } else {
+                    $('#export-pdf-button').hide();
+                }
+            }
+
+            // Attach the change event to the "Select All" checkbox
+            $(document).on('change', '#select-all-checkbox', function() {
+                const isChecked = $(this).is(':checked');
+                var ids = [];
+
+                $(document).find('.project-checkbox').each(function() {
+                    $(this).prop('checked', isChecked); // Check/uncheck all checkboxes
+                    if (isChecked) {
+                        ids.push($(this).val()); // Add ID if "Select All" is checked
+                    }
+                });
+
+                // Update the selectedProjects property in Livewire component
+                @this.set('selectedProjects', isChecked ? ids : []);
+                toggleExportButton();
+            });
+
+            // Attach the change event to individual checkboxes
+            $(document).on('change', '.project-checkbox', function() {
+                toggleExportButton();
+
+                // If all checkboxes are checked, check "Select All" checkbox
+                const allChecked = $('.project-checkbox').length === $('.project-checkbox:checked').length;
+                $('#select-all-checkbox').prop('checked', allChecked);
+
+                // Update the selectedProjects property in Livewire component
+                var ids = [];
+                $(document).find('.project-checkbox:checked').each(function() {
+                    ids.push($(this).val());
+                });
+
+                @this.set('selectedProjects', ids);
+
+                toggleExportButton();
+            });
+
+            // Initial check on page load
+            toggleExportButton();
         });
     </script>
 @endscript

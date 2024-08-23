@@ -11,7 +11,6 @@ document.addEventListener("livewire:initialized", () => {
             var $this = $(this);
             $this.wrap('<div class="position-relative"></div>');
             $this.select2({
-                placeholder: "Select Value",
                 dropdownAutoWidth: true,
                 dropdownParent: $this.parent(),
                 width: '100%',
@@ -155,6 +154,10 @@ document.addEventListener("livewire:initialized", () => {
     // dispatch flatpickr
     Livewire.on('flatpickr', function (data) {
         flatpickr('.flatpickr-basic');
+        flatpickr('.flatpickr-range',{
+             mode: "range",
+             maxDate: 'today',
+        });
     });
 
     // Digital signature pad

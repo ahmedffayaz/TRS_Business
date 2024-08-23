@@ -135,6 +135,45 @@ class EmailTemplateService
                 'business_id' => $business_id,
                 'created_at' => now(),
                 'updated_at' => now()
+            ],
+            [
+                'title' => 'Invitation to join project',
+                'detail' => 'Sent to client sub users',
+                'key' => 'invitation_mail',
+                'subject' => 'Invitation to join project',
+                'keywords' => '{{SITE_TITLE}}, {{SITE_URL}}, {{CLIENT_NAME}}, {{CLIENT_EMAIL}}, {{PROJECT}}, {{INVOICE_NUMBER}},{{COMPANY_EMAIL}},{{COMPANY_SKYPE}},{{CEO_NAME}},{{INVITE_LINK}}',
+                'body' => "<table style='width: 100%' cellpadding='0' cellspacing='0' role='presentation'>
+    <tr>
+        <td class='sm-px-24' style='mso-line-height-rule: exactly; border-radius: 4px; background-color: #ffffff; padding: 48px; text-align: left; font-family: Montserrat, -apple-system, \"Segoe UI\", sans-serif; font-size: 16px; line-height: 24px; color: #626262;'>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; font-size: 20px; font-weight: 600;'>Dear Members,</p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; margin: 0; margin-bottom: 24px;'>
+                You have been invited to join the project. Please use the link below to accept the invitation and join the project:
+            </p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; margin: 0; margin-bottom: 24px;'>
+                <a href=\"{{INVITE_LINK}}\" style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; color: #1a73e8;'>Join</a>
+            </p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly;'>
+                We look forward to collaborating with you.
+            </p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
+                Regards,
+            </p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
+                {{CEO_NAME}}<br>CEO
+            </p>
+            <p style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly; margin-top: 6px; margin-bottom: 20px; font-size: 16px; line-height: 24px;'>
+                <a href='{{SITE_URL}}' style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly;'>{{SITE_TITLE}}</a><br>
+                <span style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly;'>Email: </span>
+                <a href='mailto:{{COMPANY_EMAIL}}' style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly;'>{{COMPANY_EMAIL}}</a><br>
+                <span style='font-family: \"Montserrat\", sans-serif; mso-line-height-rule: exactly;'>Skype: {{COMPANY_SKYPE}}</span>
+            </p>
+        </td>
+    </tr>
+</table>",
+                'status' => EmailStatus::ENABLE->value,
+                'business_id' => $business_id,
+                'created_at' => now(),
+                'updated_at' => now()
             ]
         ];
 

@@ -17,9 +17,10 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\InvoicesController;
 use App\Http\Controllers\ProjectsController;
 use App\Livewire\Backend\DashboardComponent;
+use App\Livewire\Backend\Task\TaskComponent;
 use App\Livewire\Backend\User\UserComponent;
 use App\Http\Controllers\CompaniesController;
-use App\Livewire\Backend\Task\TaskComponent;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -49,6 +50,7 @@ use App\Livewire\Backend\Project\ProjectComponent;
 use App\Livewire\Backend\User\UserProfileComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
+use App\Livewire\Backend\Email\EmailSettingComponent;
 use App\Livewire\Backend\Client\CreateClientComponent;
 use App\Livewire\Backend\Email\EmailTemplateComponent;
 use App\Livewire\Backend\Business\EditBusinessComponent;
@@ -65,11 +67,12 @@ use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
 use App\Models\Business;
 use App\Models\Invoice;
+use App\Http\Controllers\ProjectController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
     Route::get('/login', LoginComponent::class)->name('login');
-    Route::get('/register', RegisterComponent::class)->name('register');
+    Route::get('/register/{encryption}', RegisterComponent::class)->name('register');
     Route::get('/forgot-password', ForgotPasswordComponent::class)->name('password.request');
     Route::get('/password/reset/{token}', ResetPasswordComponent::class)->name('password.reset');
 });
@@ -155,6 +158,7 @@ Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])
             Route::get('update-password', UpdatePasswordComponent::class)->name('update-password');
 
             Route::get('emails', EmailTemplateComponent::class)->name('emails');
+            Route::get('email/settings', EmailSettingComponent::class)->name('emails.settings');
         });
         Route::post('upload-digital-image', [TermsConditionAcceptComponent::class , 'uploadDigitalImage'])->name('upload-digital-image');
     });
@@ -241,4 +245,4 @@ Route::get('/cron/process/invoices', [InvoicesController::class, 'process'])->na
 Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('user.save.contract');
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
 
-Route::get('/invite/{encryptedRoleId}/{slug}', [ProjectController::class, 'invite']);
+Route::get('/invite/{encrypted}', [ProjectController::class, 'invite']);
