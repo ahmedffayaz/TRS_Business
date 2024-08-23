@@ -30,7 +30,7 @@
         }
 
         .custom-width {
-            width: 120px;
+            width: 135px;
         }
 
         .card-min-height {

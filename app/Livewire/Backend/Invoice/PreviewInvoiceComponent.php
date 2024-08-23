@@ -24,6 +24,9 @@ class PreviewInvoiceComponent extends Component
 
         $this->invoice_number = $request->invoice_number;
         $project = Project::where('id', $request->data['project_id'])->with('client')->first();
+
+        if(empty($project)) abort(404);
+
         $this->project = $project;
         $this->client[] = $project?->client?->name;
         $this->client[] =  $project?->client?->address;

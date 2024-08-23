@@ -33,7 +33,6 @@ class CreateInvoiceComponent extends Component
 
     public $invoice_number;
 
-    public $CommentVisible = false;
     public $taskVisibility = [];
     public function mount(Request $request)
     {
@@ -115,8 +114,8 @@ class CreateInvoiceComponent extends Component
                         if (is_array($taskComments)) {
                             foreach ($taskComments as $commentId => $value) {
                                 $time = floatval($time);
-                                $comment = Comment::findOrFail($commentId);
-                                $comment->update(['invoiced_at' => now()]);
+                                $comment = Comment::find($commentId);
+                                if($comment) $comment->update(['invoiced_at' => now()]);
                                 $comments[] = $comment->id;
                             }
                         }
@@ -247,7 +246,7 @@ class CreateInvoiceComponent extends Component
                 'notes' => $validated['description'],
                 'due_at' => $validated['due_at'],
                 'billed_at' => null,
-                'status' => InvoiceStatus::Draft,
+                'status' => InvoiceStatus::DRAFT,
 
             ]);
 
@@ -260,7 +259,10 @@ class CreateInvoiceComponent extends Component
                         $comments = [];
                         foreach ($task['comments'] as $commentId => $value) {
                             $time = floatval($time);
-                            $comment = Comment::findOrFail($commentId);
+                            $comment = Comment::whereId($commentId)->first();
+
+                            if(empty($comment)) return;
+
                             $comment->update(['invoiced_at' => now()]);
                             $comments[] = $comment->id;
                         }
@@ -285,7 +287,7 @@ class CreateInvoiceComponent extends Component
                 }
             }
             // generate Invoice
-            $invoice->update(['status' => InvoiceStatus::Draft->value]);
+            $invoice->update(['status' => InvoiceStatus::DRAFT->value]);
             $invoice = $invoice->with(['invoiceData.task'])->find($invoice->id);
             foreach ($invoice->invoiceData as $key => $record) {
                 $comments = Comment::whereIn('id', explode(',', $record->comments))->get();
@@ -322,7 +324,6 @@ class CreateInvoiceComponent extends Component
     public function preview(Request $request)
     {
         $previewUrl = route('dashboard.invoices.preview', ['data' => $this->invoiceForm, 'invoice_number' => $this->invoice_number]); // Adjust according to your route
-        // Emit the URL to the frontend
         $this->dispatch('previewUrl', ['url' => $previewUrl]);
     }
     public function addGenericCommentsFields($i)

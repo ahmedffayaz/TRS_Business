@@ -154,7 +154,10 @@ class EditInvoiceComponent extends Component
                         if (is_array($taskComments)) {
                             foreach ($taskComments as $commentId => $value) {
                                 $time = floatval($time);
-                                $comment = Comment::findOrFail($commentId);
+                                $comment = Comment::whereId($commentId)->first();
+
+                                if(empty($comment)) return;
+
                                 $comment->update(['invoiced_at' => now()]);
                                 $comments[] = $comment->id;
                             }
@@ -277,7 +280,6 @@ class EditInvoiceComponent extends Component
     }
     public function showElement($taskId)
     {
-        // dd($taskId);
         $this->taskVisibility[$taskId] = true;
         $this->dispatch('reinitialize-dispatcher');
     }

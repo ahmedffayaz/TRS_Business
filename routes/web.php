@@ -65,9 +65,6 @@ use App\Livewire\Backend\KnowledgeBase\KnowledgeBaseComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionComponent;
 use App\Livewire\Backend\TermsCondition\TermsConditionAcceptComponent;
 use App\Livewire\Backend\KnowledgeBase\SearchKnowledgeBaseKeywordComponent;
-use App\Models\Business;
-use App\Models\Invoice;
-use App\Http\Controllers\ProjectController;
 
 Route::middleware(['guest'])->group(function () {
     Route::get('/', LoginComponent::class);
