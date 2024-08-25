@@ -25,10 +25,9 @@ class ProjectSeeder extends Seeder
 
 
         // Create projects
-        ProjectFactory::new()->count(300)->create()->each(function ($project) use ($userIds) {
-            $randomUserIds = mt_rand(1, count($userIds));
+        ProjectFactory::new()->count(10)->create()->each(function ($project) use ($userIds) {
             // Attach users as members to the project
-            $project->members()->attach($randomUserIds);
+            $project->members()->attach($userIds);
        });
     }
 }

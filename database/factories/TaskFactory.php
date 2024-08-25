@@ -4,8 +4,9 @@ namespace Database\Factories;
 
 use Carbon\Carbon;
 use App\Models\Task;
-use App\Models\Project;
+use App\Models\User;
 
+use App\Models\Project;
 use Faker\Factory as Faker;
 use App\Enums\Task\TaskPriority;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -18,17 +19,21 @@ class TaskFactory extends Factory
     public function definition(): array
     {
         $faker = Faker::create();
-        $isCompleted = $faker->boolean(20);
+        $isCompleted = $faker->boolean(90);
         $completeDate = Carbon::now()->subDays($faker->numberBetween(0, 14))->format('Y-m-d');
 
         // Retrieve a random project along with a random user associated with that project
         $project = Project::inRandomOrder()->with('members')->first();
         $projectMembersIds = $project?->members->pluck('id')->toArray();
+        $developerIds = User::whereIn('id', $projectMembersIds)
+                        ->role('developer') // Assuming you have a role called 'developer'
+                        ->pluck('id')
+                        ->toArray();
 
         return [
             'name' => $faker->sentence($faker->numberBetween(3, 6)),
             'description' => $faker->realText(150),
-            'user_id' => $faker->randomElement($projectMembersIds),
+            'user_id' => $faker->randomElement($developerIds),
             'project_id' => $project->id,
             'priority' => $faker->randomElement([
                 TaskPriority::LOW->value,

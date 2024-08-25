@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Schema;
 
 class TaskSeeder extends Seeder
 {
-    public static $count = 900;
-    public static $chunk = 200;
+    public static $count = 60;
+    public static $chunk = 20;
 
     /**
      * Run the database seeds.
@@ -19,9 +19,16 @@ class TaskSeeder extends Seeder
     public function run()
     {
         Schema::disableForeignKeyConstraints();
-        Task::truncate();
+        // Task::truncate();
         Schema::enableForeignKeyConstraints();
 
-        TaskFactory::new()->count(self::$chunk)->create();
+        $total = self::$count;
+        $chunkSize = self::$chunk;
+
+        while ($total > 0) {
+            $currentChunk = $total >= $chunkSize ? $chunkSize : $total;
+            TaskFactory::new()->count($currentChunk)->create();
+            $total -= $currentChunk;
+        }
     }
 }

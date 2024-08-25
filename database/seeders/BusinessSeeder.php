@@ -4,13 +4,14 @@ namespace Database\Seeders;
 
 use App\Models\Role;
 use App\Models\Client;
+use App\Models\Country;
 use App\Models\Business;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use App\Enums\Business\BusinessType;
+use Database\Factories\ClientFactory;
 use Illuminate\Support\Facades\Schema;
 use Database\Factories\BusinessFactory;
-use Database\Factories\ClientFactory;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class BusinessSeeder extends Seeder
@@ -32,35 +33,35 @@ class BusinessSeeder extends Seeder
                 'slug' => 'the-right-software',
 				'address' => 'Office 6-B1, Silk Center, Rehmanabad Metro Stop, Murree Road',
 				'city' => 'Rawalpindi',
-				'country_id' => 1,
+                'country_id' =>  Country::where('name', 'Pakistan')->first()->id,
 				'postal_code' => '43600',
 				'invoice_prefix' => 'trs_',
                 'invoice_serial' => 'dks78ds',
                 'created_at' => now(),
                 'updated_at' => now()
             ),
-			array(
-				'name' => 'Dev Provider',
-                'slug' => 'dev-provider',
-				'address' => 'Office 6-B1, Silk Center, Rehmanabad Metro Stop, Murree Road',
-				'city' => 'Rawalpindi',
-				'country_id' => 1,
-				'postal_code' => '43600',
-				'invoice_prefix' => 'dev_pro_',
-                'invoice_serial' => 'd25s78ds',
-                'created_at' => now(),
-                'updated_at' => now()
-            )
+			// array(
+			// 	'name' => 'Dev Provider',
+            //     'slug' => 'dev-provider',
+			// 	'address' => 'Office 6-B1, Silk Center, Rehmanabad Metro Stop, Murree Road',
+			// 	'city' => 'Rawalpindi',
+			// 	'country_id' =>  Country::where('name', 'Pakistan')->first()->id,
+			// 	'postal_code' => '43600',
+			// 	'invoice_prefix' => 'dev_pro_',
+            //     'invoice_serial' => 'd25s78ds',
+            //     'created_at' => now(),
+            //     'updated_at' => now()
+            // )
         );
 
         Business::insert($businesses);
 
 
-        $businessFactory = BusinessFactory::new()->count(10)->create();
+        // $businessFactory = BusinessFactory::new()->count(10)->create();
 
-        // For each business, create some clients
-        $businessFactory->each(function ($business) {
-            ClientFactory::new()->count(10)->create();
-        });
+        // // For each business, create some clients
+        // $businessFactory->each(function ($business) {
+        //     ClientFactory::new()->count(10)->create();
+        // });
     }
 }
