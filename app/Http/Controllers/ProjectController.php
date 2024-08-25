@@ -36,7 +36,7 @@ class ProjectController extends Controller
             if($project->invite_link == null){
                 abort(403, 'Invite link deleted.');
             }
-            $logo = Storage::disk('public')->exists($project->business->logo) ? 'storage/'.$project->business->logo : cmsLogo();
+            $logo =  ($project->business->logo != null)  &&  Storage::disk('public')->exists($project->business->logo) ? 'storage/'.$project->business->logo : cmsLogo();
 
             if($project){
                 $encryption = Crypt::encrypt([
