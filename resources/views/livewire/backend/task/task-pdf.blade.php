@@ -104,7 +104,7 @@
             <tr>
                 <td style="width: 33%; vertical-align: middle; text-align: left;">
                     @if($src)
-                        <img class="logo" src="{{ $src }}" alt="Business Logo" style="max-width: 200px; height: 40px;" width="200" height="45" />
+                        <img class="logo" src="{{ $src }}" alt="Business Logo" style="max-width: 170px; height: 40px;" width="170" height="45" />
                     @endif
                 </td>
                 <td style="text-align: center; vertical-align: middle; width: 33%;">
