@@ -4,93 +4,133 @@ namespace App\Livewire\Backend\Invoice;
 
 use App\Enums\Invoice\InvoiceStatus;
 use App\Jobs\SendCreateProjectInvoice;
-use App\Models\Task;
-use Livewire\Component;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Livewire\Forms\InvoiceForm;
 use App\Models\Business;
 use App\Models\Comment;
 use App\Models\Invoice;
+use App\Models\Task;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Component;
+use Illuminate\Http\Request;
 
-class CreateInvoiceComponent extends Component
+class EditInvoiceComponent extends Component
 {
+    public InvoiceForm $invoiceForm;
+    public array $client = [];
+    public $DraftInvoiceNumber;
 
-    public $tasks = [];
-    public $selectedTasks = [];
-
+    public $id;
     public $i;
     public $inputs = [];
-    public array $client = [];
-    public InvoiceForm $invoiceForm;
     public $project;
-    public $business;
 
-    public $invoice_number;
-
+    public $totalGenericAmount;
     public $taskVisibility = [];
-    public function mount(Request $request)
+    public function mount($id)
     {
-        if ($request->has('tasks')) {
-            $taskIds = explode(',', $request->query('tasks'));
+        $this->id = $id;
+        $invoiceDraft = Invoice::where('id', $id)->first();
+        $this->invoiceForm->due_at = $invoiceDraft?->due_at;
+        $this->invoiceForm->deduction = $invoiceDraft?->deduction;
+        $this->invoiceForm->total_amount = $invoiceDraft?->total;
+        $this->invoiceForm->currency = $invoiceDraft?->currency;
+        $this->invoiceForm->description = $invoiceDraft?->notes;
+        $this->invoiceForm->project_id = $invoiceDraft?->project_id;
+        $this->DraftInvoiceNumber = $invoiceDraft->invoice_number;
 
-            $this->tasks = Task::with(['project.client.country', 'comments'])
-                ->whereIn('id', $taskIds)
-                ->whereHas('comments', function ($query) {
-                    $query->whereNull('deleted_at');
-                })
-                ->get();
-            foreach ($this->tasks as $task) {
-                $this->invoiceForm->task[$task->id]['task_amount'] = $task->project?->hourly_rate;
-                $this->invoiceForm->task[$task->id]['price'] = $task->price;
-                $this->invoiceForm->task[$task->id]['name'] = $task->name;
-                $this->client[] = $task->project->client->name;
-                $this->client[] = $task->project->client->address;
-                $this->invoiceForm->project_id = $task->project?->id;
-                $this->invoiceForm->currency = $task->project?->currency;
-                $this->business = $task->project?->client?->business;
-                $this->project = $task->project;
-            }
-            $this->invoiceForm->due_at = Carbon::now()->addDays(7)->format('Y-m-d');
-            $this->selectedTasks = $this->tasks;
+        $invoiceDataCollection = $invoiceDraft->invoiceData->where('invoice_id', $invoiceDraft->id);
+
+        $invoiceData = $invoiceDataCollection->first();
+        $taskId = $invoiceData->task_id;
+        $this->invoiceForm->id = $id;
+        $this->invoiceForm->isUpdate = true;
+
+        $invoice = Invoice::with(['invoiceData.task', 'project'])
+            ->whereHas('invoiceData')
+            ->where('id', $id)
+            ->first();
+        $draftInvoiceNumber = $invoice->invoice_number;
+        $draftDueAt = $invoice->due_at;
+        foreach ($invoice->invoiceData->whereNotNull('task_id') as $invoiceData) {
+            // Access the task related to each invoiceData
+            $task = $invoiceData->task;
+            $this->client[] = $task?->project?->client?->name;
+            $this->client[] = $task?->project?->client?->address;
+            $this->invoiceForm->task[$task?->id]['task_amount'] = $invoiceData?->rate_per_hour;
+            $this->invoiceForm->task[$task?->id]['unit'] =  $this->invoiceForm->currency;
+            $this->invoiceForm->task[$task?->id]['time'] = $invoiceData->time;
+            $this->invoiceForm->task[$task?->id]['amount'] = $invoiceData->amount;
         }
-        $this->invoice_number = $this->generateUniqueInvoiceNumber();
-        $this->inputs = [];
+
+        $index = 0;
+        foreach ($invoice->invoiceData->whereNull('task_id') as $invoiceData) {
+            $this->invoiceForm->generic_comments[$index]['description'] = $invoiceData?->comments;
+            $this->invoiceForm->generic_comments[$index]['quantity'] = $invoiceData?->qty;
+            $this->invoiceForm->generic_comments[$index]['amount'] = $invoiceData?->amount;
+            $this->invoiceForm->generic_comments[$index]['rate'] = $invoiceData?->rate_per_hour;
+            array_push($this->inputs, $index);
+            $this->totalGenericAmount += $invoiceData?->amount;
+            $index++; // Increment the index
+        }
         $this->i = 0;
+        $this->dispatch('reinitialize-feather-icons');
+        $this->dispatch('reinitialize-dispatcher');
     }
     public function render()
     {
+        $this->dispatch('reinitialize-feather-icons');
         $this->dispatch('reinitialize-dispatcher');
+        $invoice = Invoice::where('id', $this->id)->with('invoiceData')->first();
         $business = Business::findOrFail(session('business_details.id'));
-        return view('livewire.backend.invoice.create-invoice-component')->with([
-            'tasks' => $this->selectedTasks,
-            'business' => $business
+        $tasks = Task::whereHas('invoiceData', function ($query) {
+            $query->whereHas('invoice', function ($query) {
+                $query->where('id', $this->id);
+            });
+        })->with(['comments', 'project'])->get();
+        $this->project = $invoice->project;
+        $invoiceDataTaskCommentIds = [];
+        foreach ($invoice->invoiceData as $data) {
+            if (!empty($data->task_id)) {
+                $comments = explode(',', $data->comments);
+                $comments = array_map('trim', $comments);
+                foreach ($comments as $comment) {
+                    $invoiceDataTaskCommentIds[] = $comment;
+                }
+            }
+        }
+        return view('livewire.backend.invoice.edit-invoice-component')->with([
+            'tasks' => $tasks,
+            'business' => $business,
+            'invoice' => $invoice,
+            'invoiceDataTaskCommentIds' => $invoiceDataTaskCommentIds
         ]);
     }
-    private function generateUniqueInvoiceNumber()
+    public function addGenericCommentsFields($i)
     {
-        $invoiceNumber = $this->business?->invoice_prefix . $this->business?->invoice_serial;
-        $serialLength = strlen($this->business?->invoice_serial);
-        $serial = (int) $this->business?->invoice_serial + 1;
-        $newSerial = str_pad($serial, $serialLength, '0', STR_PAD_LEFT);
-        $this->business->update([
-            'invoice_serial' => $newSerial,
-        ]);
-        return $invoiceNumber;
+        $this->i = $i + 1;
+        array_push($this->inputs, $this->i);
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
+    }
+    public function removeGenericCommentsFields($key)
+    {
+        unset($this->inputs[$key]);
+        $this->invoiceForm->generic_comments[$key] = [];
+        $this->dispatch('feather-icons');
+        $this->dispatch('reinitialize-feather-icons');
     }
     public function store()
     {
         $validated = $this->invoiceForm->validate();
         try {
+            $invoice = Invoice::where('id', $this->id)->first();
             DB::beginTransaction();
-            $invoice = Invoice::create([
-                'project_id' => $validated['project_id'],
-                'invoice_number' => $this->invoice_number,
+            $invoice->update([
+                'invoice_number' => $this->DraftInvoiceNumber,
                 'currency' => $validated['currency'],
                 'deduction' => $validated['deduction'],
                 'total' => $validated['total_amount'],
@@ -114,8 +154,11 @@ class CreateInvoiceComponent extends Component
                         if (is_array($taskComments)) {
                             foreach ($taskComments as $commentId => $value) {
                                 $time = floatval($time);
-                                $comment = Comment::find($commentId);
-                                if($comment) $comment->update(['invoiced_at' => now()]);
+                                $comment = Comment::whereId($commentId)->first();
+
+                                if(empty($comment)) return;
+
+                                $comment->update(['invoiced_at' => now()]);
                                 $comments[] = $comment->id;
                             }
                         }
@@ -231,114 +274,9 @@ class CreateInvoiceComponent extends Component
             }
         }
     }
-
-    public function draft()
-    {
-        $validated = $this->invoiceForm->validate();
-        try {
-            DB::beginTransaction();
-            $invoice = Invoice::create([
-                'project_id' => $validated['project_id'],
-                'invoice_number' => $this->invoice_number,
-                'currency' => $validated['currency'],
-                'deduction' => $validated['deduction'],
-                'total' => $validated['total_amount'],
-                'notes' => $validated['description'],
-                'due_at' => $validated['due_at'],
-                'billed_at' => null,
-                'status' => InvoiceStatus::DRAFT,
-
-            ]);
-
-            $projectCost = 0;
-            if (isset($validated['task'])) {
-                foreach ($validated['task'] as $key => $task) {
-                    if (array_key_exists('time', $task)) {
-                        $time = 0;
-                        $time = $task['time'];
-                        $comments = [];
-                        foreach ($task['comments'] as $commentId => $value) {
-                            $time = floatval($time);
-                            $comment = Comment::whereId($commentId)->first();
-
-                            if(empty($comment)) return;
-
-                            $comment->update(['invoiced_at' => now()]);
-                            $comments[] = $comment->id;
-                        }
-                        $ratePerHour = null;
-                        $totalCost = 0;
-                        if ($this?->project?->type->value === 'hourly') {
-                            $totalCost = $this->project->hourly_rate * ($time / 60);
-                            $ratePerHour = $this->project->hourly_rate;
-                        } else if ($this?->project?->type?->value === 'fixed') {
-                            $totalCost = $task['task_amount'];
-                        }
-
-                        $projectCost += $totalCost;
-                        $invoice->invoiceData()->create([
-                            'task_id' => $key,
-                            'time' => $time ?? '',
-                            'rate_per_hour' => $ratePerHour,
-                            'amount' => $totalCost,
-                            'comments' => implode(',', $comments)
-                        ]);
-                    }
-                }
-            }
-            // generate Invoice
-            $invoice->update(['status' => InvoiceStatus::DRAFT->value]);
-            $invoice = $invoice->with(['invoiceData.task'])->find($invoice->id);
-            foreach ($invoice->invoiceData as $key => $record) {
-                $comments = Comment::whereIn('id', explode(',', $record->comments))->get();
-                if ($record->task) {
-                    $record->task->setRelation('comments', $comments);
-                }
-            }
-            if (isset($validated['generic_comments'])) {
-                foreach ($validated['generic_comments'] as $comment) {
-                    $invoice->invoiceData()->create([
-                        'time' => $comment['quantity'] ? $comment['quantity'] * 60 : 0,
-                        'qty' => $comment['quantity'],
-                        'rate_per_hour' => $comment['rate'],
-                        'amount' => $comment['amount'],
-                        'comments' => $comment['description']
-                    ]);
-                }
-            }
-
-            $deduction = ($projectCost === 0) ? 0 : $validated['deduction'];
-            $invoice->update([
-                'total' => $projectCost + ($projectCost === 0 && $validated['deduction'] > 0 ? $validated['deduction'] : 0),
-                'deduction' => $deduction,
-            ]);
-            DB::commit();
-            session()->flash('success', 'Draft created successfully.');
-            return redirect()->route('dashboard.invoices.index');
-        } catch (\Exception $exception) {
-            DB::rollBack();
-            Log::error('Get error while draft invoice: ' . $exception->getMessage());
-            $this->dispatch('alert', ['type' => 'error', 'message' => "Something went wrong"]);
-        }
-    }
     public function preview(Request $request)
     {
-        $previewUrl = route('dashboard.invoices.preview', ['data' => $this->invoiceForm, 'invoice_number' => $this->invoice_number]); // Adjust according to your route
-        $this->dispatch('previewUrl', ['url' => $previewUrl]);
-    }
-    public function addGenericCommentsFields($i)
-    {
-        $this->i = $i + 1;
-        array_push($this->inputs, $this->i);
-        $this->dispatch('feather-icons');
-        $this->dispatch('reinitialize-feather-icons');
-    }
-    public function removeGenericCommentsFields($key)
-    {
-        unset($this->inputs[$key]);
-
-        $this->dispatch('feather-icons');
-        $this->dispatch('reinitialize-feather-icons');
+        return redirect()->route('dashboard.invoices.preview', ['data' => $this->invoiceForm, 'invoice_number' => $this->invoice_number]);
     }
     public function showElement($taskId)
     {

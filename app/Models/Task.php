@@ -131,4 +131,8 @@ class Task extends Model
 	{
 		return $query->whereNull('completed_at');
 	}
+    public function invoiceData()
+    {
+        return $this->hasMany(InvoiceData::class);
+    }
 }

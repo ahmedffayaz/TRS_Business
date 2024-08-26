@@ -215,6 +215,8 @@ function formatInvoiceStatus($status) : string
             $formattedStatus = "<span class='badge rounded-pill badge-light-danger'>{$s}</span>";
             break;
         case 'processing':
+            $formattedStatus = "<span class='badge rounded-pill badge-light-info'>{$s}</span>";
+            break;
         case 'processed':
             $formattedStatus = "<span class='badge rounded-pill badge-light-info'>{$s}</span>";
             break;
@@ -224,6 +226,10 @@ function formatInvoiceStatus($status) : string
         case 'paid':
             $formattedStatus = "<span class='badge rounded-pill badge-light-success'>{$s}</span>";
             break;
+         case 'draft':
+             $formattedStatus = "<span class='badge rounded-pill badge-light-primary'>{$s}</span>";
+             break;
+
     }
     return $formattedStatus;
 }

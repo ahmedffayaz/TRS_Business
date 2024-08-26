@@ -13,7 +13,7 @@ class InvoiceData extends Model
 	 *
 	 * @var array
 	 */
-	protected $fillable = ['invoice_id', 'task_id', 'comments', 'time', 'rate_per_hour', 'amount'];
+	protected $fillable = ['invoice_id', 'task_id', 'comments', 'time', 'qty', 'rate_per_hour', 'amount'];
 
 	/**
 	 * @return BelongsTo

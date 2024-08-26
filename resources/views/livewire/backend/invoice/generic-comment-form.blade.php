@@ -1,4 +1,4 @@
-@php $key = $key +1; @endphp
+
 <div class="row mb-1">
     <div class="col-md-5">
         <x-input-label for="description" class="required" value="Description" />
@@ -44,9 +44,9 @@
     </div>
 
     <div class="col-md-1">
-        <x-anchor-tag class="btn btn-icon btn-outline-danger delete-user-fields mt-2" href="javascript:void(0);"
+        <x-anchor-tag class="btn btn-icon btn-outline-danger delete-user-fields delete-comment" href="javascript:void(0);"
             wire:click="removeGenericCommentsFields({{ $key }})">
-            <span wire.ignore.>
+            <span wire.ignore>
                 <i data-feather="trash-2"></i>
             </span>
         </x-anchor-tag>

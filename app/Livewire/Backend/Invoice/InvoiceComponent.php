@@ -21,6 +21,7 @@ use App\Jobs\SendPaymentReceivedEmail;
 use Illuminate\Support\Facades\Storage;
 use App\Jobs\SendPaymentConfirmationEmail;
 use App\Livewire\Forms\InvoicePaymentForm;
+use App\Models\Business;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -422,5 +423,9 @@ class InvoiceComponent extends Component
             Log::error('Get error while delete invoice and invoice id is ' . $id . ' ' . $exception->getMessage());
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
+    }
+    public function show_draft($id)
+    {
+        return redirect("/dashboard/invoices/view-draft/{$id}");
     }
 }
