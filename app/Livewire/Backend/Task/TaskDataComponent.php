@@ -72,7 +72,7 @@ class TaskDataComponent extends Component
     public $developers = [];
     public $selectedProjects = [];
     public $selectAll = false;
-   public $generatedLink;
+    public $generatedLink;
     public $client_name = null;
     public $email;
 
@@ -158,7 +158,7 @@ class TaskDataComponent extends Component
        $developers = $this->developers;
        $is_taskComponent =  isset($this->projectSlug)  ? false :  true;
        $projectsForFilter = Task::hasProject($projectId)->with(['project'])->get();
-    //    dd($projects);
+
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.task.task-data-component', compact('tasks', 'totalTasks', 'totalActiveTasks', 'totalArchivedTasks', 'projects', 'members', 'projectId','developers','is_taskComponent','projectsForFilter'));
     }
