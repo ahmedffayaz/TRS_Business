@@ -95,8 +95,7 @@
         style="width: 100%; max-width: 100%; display: flex; justify-content: center; align-items: center;">
         @php
             $business_details = session('business_details');
-            $logoPath = 'public/' . $business_details['logo'];
-            $src = ($business_details['logo'] != null && Storage::exists($logoPath)) ?  'storage/' . $business_details['logo'] : null;
+            $src = ($business_details['logo'] != null && Storage::disk('public')->exists($business_details['logo'])) ?  'storage/' . $business_details['logo'] : null;
         @endphp
 
         <table
