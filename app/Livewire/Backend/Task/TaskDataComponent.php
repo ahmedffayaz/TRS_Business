@@ -74,7 +74,6 @@ class TaskDataComponent extends Component
     public $selectAll = false;
    public $generatedLink;
     public $client_name = null;
-
     public $email;
 
     public function mount($project = null, $projectSlug = null)
