@@ -253,8 +253,8 @@
                     @enderror
                 </div>
                 <div class="col-md-12 mb-1">
-                    <x-input-label for="address" class="required" value="Company name" />
-                    <x-textarea type="text" id="address" :class="$errors->has('form.clientAddress') ? 'error' : ''" placeholder="Enter company name" wire:model="form.clientAddress"
+                    <x-input-label for="address" class="required" value="Address" />
+                    <x-textarea type="text" id="address" :class="$errors->has('form.clientAddress') ? 'error' : ''" placeholder="Enter address" wire:model="form.clientAddress"
                         value="{{ $clientDetail?->address }}" />
                     @error('form.clientAddress')
                         <x-input-error :message="$message" />
