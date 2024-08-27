@@ -1,15 +1,24 @@
+@push('styles')
+    <style>
+        .comment-icon {
+            float: left;
+            margin-right: 8px;
+            height: 25px;
+        }
+    </style>
+@endpush
 <div>
     <div class="card">
         <div class="card-header">
             <h4 class="card-title">Tasks</h4>
             <div>
                 @can('add_tasks')
-                        <x-anchor-tag href="#" class="btn btn-outline-secondary me-1" tabindex="0"
-                            type="button" wire:click="generateTaskPdf" value="Export as PDF" id="export-pdf-button"  wire:ignore />
+                    <x-anchor-tag href="#" class="btn btn-outline-secondary me-1" tabindex="0" type="button"
+                        wire:click="generateTaskPdf" value="Export as PDF" id="export-pdf-button" wire:ignore />
                 @endcan
                 @if ($projectId && auth()->user()->can('add_invoices'))
-                    <x-anchor-tag href="#" class="btn btn-primary me-1 add-invoice" tabindex="0" aria-controls="table-hover"
-                        type="button" value="Create Invoice" />
+                    <x-anchor-tag href="#" class="btn btn-primary me-1 add-invoice" tabindex="0"
+                        aria-controls="table-hover" type="button" value="Create Invoice" />
                 @endif
                 @can('add_tasks')
                     <x-anchor-tag href="#" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
@@ -22,7 +31,7 @@
                 $dataCount = [
                     'total' => $totalTasks,
                     'active' => $totalActiveTasks,
-                    'archived' => $totalArchivedTasks
+                    'archived' => $totalArchivedTasks,
                 ];
             @endphp
 
@@ -43,10 +52,11 @@
                         <span class="">entries</span>
                     </div>
                     <div class="ms-1">
-
+                        @role('admin')
                             <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore>
                                 <i data-feather="filter"></i> Filter
                             </button>
+                        @endrole
                     </div>
                 </div>
                 <div class="col-md-4 col-sm-12">
@@ -62,67 +72,78 @@
 
             <div id="filter-area" class="d-none mb-2" wire:ignore.self>
                 <div class="row">
-                    @if($is_taskComponent)
-                    <div class="col-md-4 col-sm-12">
-                        <x-select-input  placeholder="Filter by project" wire:model.live="filterProject" id="filterProject" class="select2">
-                            <option value="">Select project</option>
-                            @isset($projectsForFilter)
-                            @php
-                                $sortedProjects = $projectsForFilter->unique('project_id')->sortBy(function($task) {
-                                    return $task->project?->name;
-                                });
-                            @endphp
-                                @foreach ($sortedProjects as $project)
-                                    <option value="{{ $project?->project?->id  }}">{{ ucwords($project?->project?->name) }}</option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </div>
+                    @if ($is_taskComponent)
+                        <div class="col-md-4 col-sm-12">
+                            <x-select-input placeholder="Filter by project" wire:model.live="filterProject"
+                                id="filterProject" class="select2">
+                                <option value="">Select project</option>
+                                @isset($projectsForFilter)
+                                    @php
+                                        $sortedProjects = $projectsForFilter
+                                            ->unique('project_id')
+                                            ->sortBy(function ($task) {
+                                                return $task->project?->name;
+                                            });
+                                    @endphp
+                                    @foreach ($sortedProjects as $project)
+                                        <option value="{{ $project?->project?->id }}">
+                                            {{ ucwords($project?->project?->name) }}</option>
+                                    @endforeach
+                                @endisset
+                            </x-select-input>
+                        </div>
                     @endif
                     <div class="col-md-3 col-sm-12">
-                        <x-select-input  placeholder="Filter by developer" wire:model.defer="developerId" id="developerId" class="select2" >
+                        <x-select-input placeholder="Filter by developer" wire:model.defer="developerId"
+                            id="developerId" class="select2">
                             <option value="">Select developer</option>
-                            @if($developers)
+                            @if ($developers)
                                 @foreach ($developers as $developer)
                                     <option value="{{ $developer->id }}">{{ ucwords($developer->fullName) }}</option>
                                 @endforeach
                             @else
                                 @foreach ($tasks->unique('user_id') as $task)
-                                   <option value="{{ $task?->user?->id }}">{{ ucwords($task->user->fullName) }}</option>
-                               @endforeach
+                                    <option value="{{ $task?->user?->id }}">{{ ucwords($task->user->fullName) }}
+                                    </option>
+                                @endforeach
                             @endif
                         </x-select-input>
                     </div>
                     <div class="col-md-3 col-sm-12">
-                        <x-input type="text" class="flatpickr-range" name="filterDate" id="filterDate"  placeholder="YYYY-MM-DD to YYYY-MM-DD" wire:model.defer="filterDate" />
+                        <x-input type="text" class="flatpickr-range" name="filterDate" id="filterDate"
+                            placeholder="YYYY-MM-DD to YYYY-MM-DD" wire:model.defer="filterDate" />
                     </div>
 
                     <div class="col-md-2 col-sm-12 align-self-end">
-                        <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter" wire:click="applyFilter($('#developerId').val(),$('#filterDate').val(),$('#filterProject').val())" disabled>Apply</button>
+                        <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter"
+                            wire:click="applyFilter($('#developerId').val(),$('#filterDate').val(),$('#filterProject').val())"
+                            disabled>Apply</button>
                     </div>
                 </div>
 
             </div>
 
-            <div class="card-table table-responsive card-min-height">
+            <div class="card-table table-responsive card-min-height" style="overflow-x: hidden;">
                 <table class="table table-hover">
                     <thead>
                         <tr>
-                            @if($is_taskComponent)
-                            <th style="width:1%;">
-                                <x-input-checkbox type="checkbox" id="select-all-checkbox"
-                                     statusClass="form-check-primary" :labelValue="__('')" />
-                            </th>
-                            @endif
-                            @if (!$projectId)
-                                <th>Project</th>
-                            @else
-                                <th></th>
-                            @endif
-                            <th class="text-nowrap">p</th>
-                            <th class="text-nowrap">Title</th>
+                            @role('admin')
+                                @if ($is_taskComponent)
+                                    <th style="padding: .72rem .7rem;">
+                                        <x-input-checkbox type="checkbox" id="select-all-checkbox"
+                                            statusClass="form-check-primary" :labelValue="__('')" />
+                                    </th>
+                                @endif
+                                @if (!$projectId)
+                                    {{-- <th>Project</th> --}}
+                                @else
+                                    <th></th>
+                                @endif
+                            @endrole
+                            {{-- <th class="text-nowrap">p</th> --}}
+                            <th class="text-nowrap" style="padding: .72rem .72rem;">Title</th>
                             <th class="text-nowrap">Deadline</th>
-                            <th class="text-nowrap">Assigned To</th>
+                            {{-- <th class="text-nowrap">Assigned To</th> --}}
                             <th class="text-nowrap">Time Spent</th>
                             <th class="text-nowrap">Status</th>
                             <th class="text-nowrap">Actions</th>
@@ -131,60 +152,98 @@
                     <tbody>
                         @forelse ($tasks as $task)
                             <tr>
-                                @if($is_taskComponent)
-                               <td style="width:1%;">
-                                    <x-input-checkbox type="checkbox" id="selected_projects{{$task?->id }}" name="selected_projects[]"
-                                        :value="$task?->id" statusClass="form-check-primary" :labelValue="__('')" wire:model="selectedProjects"   class="project-checkbox" />
-                               </td>
-                               @endif
-                                @if (!$projectId)
-                                    <td>{{ $task?->project?->name }}</td>
-                                @else
-                                    <td>
-                                        @if (count($task?->billableComments) > 0)
-                                            <x-input-checkbox type="checkbox" id="daily-reports_{{ $task?->id }}" name="tasks[]"
-                                                :value="$task?->id" statusClass="form-check-success" :labelValue="__('')" wire:model="selectedTasks" class="project-checkbox"/>
-                                        @endif
-                                    </td>
+                                @role('admin')
+                                    @if ($is_taskComponent)
+                                        <td style="padding: .72rem .7rem;">
+                                            <x-input-checkbox type="checkbox" id="selected_projects{{ $task?->id }}"
+                                                name="selected_projects[]" :value="$task?->id"
+                                                statusClass="form-check-primary" :labelValue="__('')"
+                                                wire:model="selectedProjects" class="project-checkbox" />
+                                        </td>
+                                    @endif
+                                    @if (!$projectId)
+                                        {{-- <td>{{ $task?->project?->name }}</td> --}}
+                                    @else
+                                        <td style="padding: .72rem .5rem;">
+                                            @if (count($task?->billableComments) > 0)
+                                                <x-input-checkbox type="checkbox" id="daily-reports_{{ $task?->id }}"
+                                                    name="tasks[]" :value="$task?->id" statusClass="form-check-success"
+                                                    :labelValue="__('')" wire:model="selectedTasks"
+                                                    class="project-checkbox" />
+                                            @endif
+                                        </td>
+                                    @endif
+                                @endrole
 
-                                @endif
-                                <td class="text-nowrap"><span wire:ignore>{!! priorityToIcon($task?->priority) !!}</span></td>
-                                <td class="text-nowrap">
-                                    <div class="d-flex flex-column">
-                                        @if (is_null($task?->deleted_at))
-                                            <x-anchor-tag href="{{ route('dashboard.tasks.view', $task->id) }}" class="user_name text-truncate text-body">
-                                                <span class="fw-bolder">{{ $task?->name }}</span>
-                                            </x-anchor-tag>
-                                        @else
-                                            <span class="fw-bolder">{{ $task?->name }}</span>
-                                        @endif
-                                    </div>
-                                </td>
-                                <td class="text-nowrap">{{ formatDate($task?->end_date) }}</td>
-                                <td class="text-nowrap">
-                                    <div class="design-group">
-                                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
-                                            title="{{ $task?->user?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
+
+                                <td class="text-nowrap" style="padding: .72rem .72rem;">
+                                    <div class="d-flex align-items-center">
+                                        <div data-bs-toggle="tooltip" data-popup="tooltip-custom"
+                                            data-bs-placement="bottom" title="{{ $task?->user?->fullName }}"
+                                            class="avatar bg-light-{{ randomColors() }} pull-up me-2">
                                             @if ($task?->user?->avatar)
-                                                <img src="{{ getUserAvatar($task?->user) }}" alt="Avatar" width="33" height="33" />
+                                                <img src="{{ getUserAvatar($task?->user) }}" alt="Avatar"
+                                                    width="33" height="33" />
                                             @else
                                                 <div class="avatar-content">{{ $task?->user?->avatarName }}</div>
                                             @endif
                                         </div>
+                                        <div>
+                                            <div class="d-flex flex-row align-items-center">
+                                                @if (is_null($task?->deleted_at))
+                                                    <x-anchor-tag
+                                                        href="{{ route('dashboard.tasks.view', $task->id) }}"
+                                                        style="color: inherit;"
+                                                        class="user_name text-truncate text-body fw-bolder">
+                                                        <span class="fw-bolder">{{ ucwords($task?->name) }}</span>
+                                                    </x-anchor-tag>
+
+                                                    <span class="ms-1">{{ $task->comments->count() }}</span>
+                                                    <img class="comment-icon"
+                                                        src="{{ asset('assets/images/Comment icon.png') }}"
+                                                        data-bs-toggle="tooltip" data-bs-placement="top"
+                                                        title="This task have {{ $task->comments->count() }} comments" />
+
+                                                    <span wire:ignore data-bs-toggle="tooltip"
+                                                        data-bs-placement="bottom"
+                                                        title="Task priority: {{ ucwords($task?->priority) }}">
+                                                        {!! priorityToIcon($task?->priority) !!}
+                                                    </span>
+                                                @else
+                                                    <span class="fw-bolder">{{ $task?->name }}</span>
+                                                @endif
+                                            </div>
+                                            <div class="d-flex flex-row">
+                                                <small class="emp_post text-muted"><strong>Project:</strong>
+                                                    {{ $task?->project?->name }}</small>
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
+
+
+                                <td class="text-nowrap">{{ formatDate($task?->end_date) }}</td>
 
                                 <td class="text-nowrap">{{ formatTime($task?->comments?->sum('time')) }}</td>
                                 <td class="text-nowrap">
                                     @if ($task?->completed_at)
-                                    <span wire:ignore><i data-feather="check-square" class="text-success"></i></span>
+                                        <span class='badge badge-light-success text-capitalize'
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Task Completed">Completed</span>
+                                    @else
+                                        <span class='badge badge-light-warning text-capitalize'
+                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                            title="Task Incompleted">Incomplete</span>
                                     @endif
                                 </td>
                                 <td class="text-nowrap">
                                     <div class="dropdown">
-                                        @if ((auth()->user()->hasPermissionTo('edit_tasks') || auth()->user()->hasPermissionTo('delete_tasks')
-                                            || auth()->user()->hasPermissionTo('view_tasks')
-                                            || auth()->user()->hasPermissionTo('mark_completed')) && is_null($task?->deleted_at))
+                                        @if (
+                                            (auth()->user()->hasPermissionTo('edit_tasks') ||
+                                                auth()->user()->hasPermissionTo('delete_tasks') ||
+                                                auth()->user()->hasPermissionTo('view_tasks') ||
+                                                auth()->user()->hasPermissionTo('mark_completed')) &&
+                                                is_null($task?->deleted_at))
                                             <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                                 data-bs-toggle="dropdown">
                                                 <span wire:ignore><i data-feather="more-vertical">open</i></span>
@@ -193,33 +252,39 @@
                                                 @can('edit_tasks')
                                                     <x-anchor-tag class="dropdown-item" href="#"
                                                         wire:click="edit({{ $task?->id }})">
-                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                        <span wire:ignore><i data-feather="edit-2"
+                                                                class="me-50"></i></span>
                                                         <span>Edit</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('view_tasks')
-                                                    <x-anchor-tag class="dropdown-item" href="{{ route('dashboard.tasks.view', $task?->id) }}">
+                                                    <x-anchor-tag class="dropdown-item"
+                                                        href="{{ route('dashboard.tasks.view', $task?->id) }}">
                                                         <span wire:ignore><i data-feather="eye" class="me-50"></i></span>
                                                         <span>View</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('mark_completed')
-                                                    <x-anchor-tag class="dropdown-item" href="#" wire:click="markComplete({{ $task?->id }})">
-                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                    <x-anchor-tag class="dropdown-item" href="#"
+                                                        wire:click="markComplete({{ $task?->id }})">
+                                                        <span wire:ignore><i data-feather="edit-2"
+                                                                class="me-50"></i></span>
                                                         <span>Mark Complete</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @can('delete_tasks')
                                                     <x-anchor-tag class="dropdown-item" href="#"
                                                         wire:click="archiveConfirmation({{ $task?->id }})">
-                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                        <span wire:ignore><i data-feather="trash"
+                                                                class="me-50"></i></span>
                                                         <span>Archive</span>
                                                     </x-anchor-tag>
                                                 @endcan
                                                 @if (auth()->user()->hasPermissionTo('delete_tasks') && empty($task?->user_id) && empty($task?->completed_at))
                                                     <x-anchor-tag class="dropdown-item" href="#"
                                                         wire:click="deleteConfirmation({{ $task?->id }})">
-                                                        <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                        <span wire:ignore><i data-feather="trash"
+                                                                class="me-50"></i></span>
                                                         <span>Delete</span>
                                                     </x-anchor-tag>
                                                 @endif
@@ -235,7 +300,7 @@
                                     </div>
                                 </td>
                             </tr>
-                            @empty
+                        @empty
                             <tr class="no-hover">
                                 <td colspan="8" class="text-center py-1 fw-bold text-nowrap">
                                     <p>No Task Found</p>
@@ -282,18 +347,19 @@
 
 @script
     <script type="module">
-        $(document).ready(function () {
+        $(document).ready(function() {
             Livewire.dispatch('flatpickr');
             // Reinitialize icons
             Livewire.on('reinitialize-icons', () => {
-                $(document).ready(function () {
-                Livewire.dispatch('feather-icons');
-                Livewire.dispatch('select-container');
-                Livewire.dispatch('flatpickr');
+                $(document).ready(function() {
+                    Livewire.dispatch('feather-icons');
+                    Livewire.dispatch('select-container');
+                    Livewire.dispatch('flatpickr');
+
                 });
             });
 
-            $(document).on('click', '.add-invoice', function (event) {
+            $(document).on('click', '.add-invoice', function(event) {
                 event.preventDefault();
                 window.Swal.fire({
                     text: 'Please wait..',
@@ -308,25 +374,26 @@
 
                 window.location.href = `/dashboard/invoices/create?tasks=${tasks}`;
 
-                    // Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
+                // Livewire.dispatch('open-invoice-modal', {'tasks' : tasks});
                 window.Swal.close();
             });
 
 
             $('#filter-toggle').on('click', function() {
                 $('#filter-area').toggleClass('d-none d-block');
-                if($(this).attr('data-filter') === 'open') {
+                if ($(this).attr('data-filter') === 'open') {
                     $(this).attr('data-filter', 'close')
-                            .html('<i data-feather="filter"></i> Filter');
+                        .html('<i data-feather="filter"></i> Filter');
                     Livewire.dispatch('reset-task-filter');
                 }
             });
 
             $("#apply-filter").on('click', function() {
-                $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
+                $('#filter-toggle').attr('data-filter', 'open').html(
+                    '<i data-feather="x"></i> Remove filter');
             });
 
-            document.addEventListener('reset-task-filters', function () {
+            document.addEventListener('reset-task-filters', function() {
                 $('#filterProject').val('').trigger('change');
                 $('#developerId').val('').trigger('change');
                 $('#filterDate').val('').trigger('change');

@@ -51,10 +51,16 @@ class InvoiceComponent extends Component
     private function getInvoiceQuery()
     {
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-
+        $user = auth()->user();
         return Invoice::whereHas('project', function ($query) {
             $query->sessionBusiness();
-        })->getList($this->search, $this->columnName, $this->sortDirection);
+        })
+            ->when($user->hasRole('client'), function ($query) use ($user) {
+                $query->whereHas('project.client', function ($query) use ($user) {
+                    $query->where('id', $user->client_id);
+                });
+            })
+            ->getList($this->search, $this->columnName, $this->sortDirection);
     }
 
     private function getTotalInvoices(): LengthAwarePaginator
@@ -180,10 +186,22 @@ class InvoiceComponent extends Component
                         'business_logo' => $invoice?->project?->business?->logo
                     ];
 
-                    $filteredKeywords = ['{{DATE}}', '{{CLIENT_NAME}}', '{{CLIENT_EMAIL}}',
-                        '{{PROJECT}}', '{{INVOICE_NUMBER}}', '{{AMOUNT}}'];
-                    $filteredKeywordsValue = [$data['payment_date'], $data['first_name'], $user->email,
-                        $invoice?->project?->name, $data['invoice_number'], $data['received_amount']];
+                    $filteredKeywords = [
+                        '{{DATE}}',
+                        '{{CLIENT_NAME}}',
+                        '{{CLIENT_EMAIL}}',
+                        '{{PROJECT}}',
+                        '{{INVOICE_NUMBER}}',
+                        '{{AMOUNT}}'
+                    ];
+                    $filteredKeywordsValue = [
+                        $data['payment_date'],
+                        $data['first_name'],
+                        $user->email,
+                        $invoice?->project?->name,
+                        $data['invoice_number'],
+                        $data['received_amount']
+                    ];
 
                     // Dispatch email to client
                     dispatch(new SendPaymentConfirmationEmail($data, $user->email, $filteredKeywords, $filteredKeywordsValue));
@@ -208,13 +226,13 @@ class InvoiceComponent extends Component
         $invoice = getInvoiceRecord($data['invoice_id']);
         $pdf = App::make('dompdf.wrapper');
         $pdf->setOptions(['isPhpEnabled' => true])->setPaper('a4', 'portrait');
-        $fileName ='Payment_invoice'.$data['payment_id']. '_'.$data['invoice_id']. '.pdf';
+        $fileName = 'Payment_invoice' . $data['payment_id'] . '_' . $data['invoice_id'] . '.pdf';
         if (!Storage::disk('public')->exists(getStoragePath('payment'))) {
             Storage::disk('public')->makeDirectory(getStoragePath('payment'));
         }
         $payments = public_path('storage/' . getStoragePath('payment')) . '/' . $fileName;
         $view = 'livewire.backend.invoice.payment-pdf';
-        $pdf->loadView($view,compact('data', 'issueDate'))->save($payments);
+        $pdf->loadView($view, compact('data', 'issueDate'))->save($payments);
 
         $invoicePayment->update([
             'file' => 'storage/' . getStoragePath('payment') . '/' . $fileName,
@@ -298,17 +316,25 @@ class InvoiceComponent extends Component
         try {
             $data = Invoice::whereHas('project', function ($query) {
                 $query->sessionBusiness();
-            })->with(['project' => function ($query) {
-                $query->with(['client' => function ($query) {
-                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'business_id')
-                    ->with(['business' => function ($query) {
-                        $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
-                    }]);
-                }, 'business' => function ($query) {
-                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
-                }]);
-            }, 'invoiceData.task:name,id'])
-            ->whereStatus(InvoiceStatus::PROCESSED->value)->whereId($id)->first();
+            })->with([
+                        'project' => function ($query) {
+                            $query->with([
+                                'client' => function ($query) {
+                                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'business_id')
+                                        ->with([
+                                            'business' => function ($query) {
+                                                $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
+                                            }
+                                        ]);
+                                },
+                                'business' => function ($query) {
+                                    $query->select('id', 'name', 'address', 'city', 'postal_code', 'logo');
+                                }
+                            ]);
+                        },
+                        'invoiceData.task:name,id'
+                    ])
+                ->whereStatus(InvoiceStatus::PROCESSED->value)->whereId($id)->first();
 
             $fileName = $data->invoice_number . '.pdf';
 
@@ -360,10 +386,28 @@ class InvoiceComponent extends Component
 
     public function render()
     {
+        $user = auth()->user();
         $invoices = $this->getInvoices();
-        $totalInvoices = Invoice::withTrashed()->count();
-        $activeInvoices = Invoice::count();
-        $archivedInvoices = Invoice::onlyTrashed()->count();
+
+        $totalInvoices = Invoice::withTrashed()
+            ->when($user->hasRole('client'), function ($query) use ($user) {
+                $query->whereHas('project.client', function ($query) use ($user) {
+                    $query->where('id', $user->client_id);
+                });
+            })->count();
+
+        $activeInvoices = Invoice::when($user->hasRole('client'), function ($query) use ($user) {
+            $query->whereHas('project.client', function ($query) use ($user) {
+                $query->where('id', $user->client_id);
+            });
+        })->count();
+
+        $archivedInvoices = Invoice::onlyTrashed()->when($user->hasRole('client'), function ($query) use ($user) {
+            $query->whereHas('project.client', function ($query) use ($user) {
+                $query->where('id', $user->client_id);
+            });
+        })->count();
+        
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.invoice.invoice-component', compact('invoices', 'totalInvoices', 'activeInvoices', 'archivedInvoices'));
     }
@@ -413,7 +457,8 @@ class InvoiceComponent extends Component
             DB::commit();
             $this->dispatch('alert', [
                 'type' => 'success',
-                'message' => 'Invoice deleted successfully.']);
+                'message' => 'Invoice deleted successfully.'
+            ]);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error while delete invoice and invoice id is ' . $id . ' ' . $exception->getMessage());

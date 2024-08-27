@@ -1,4 +1,4 @@
-@props(['length'])
+@props(['length' , 'value' => null])
 <div>
     <textarea {!! $attributes->merge(['class' => 'form-control']) !!}>{{ $value ?? $slot }}</textarea>
     @isset($length)
