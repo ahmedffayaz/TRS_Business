@@ -243,3 +243,6 @@ Route::post('/save-contract', [UsersController::class, 'saveContract'])->name('u
 Route::post('/signature/upload', [UsersController::class, 'uploadDigitalSignature'])->name('signature.upload');
 
 Route::get('/invite/{encrypted}', [ProjectController::class, 'invite']);
+Route::get('/view-pdf', function(){
+    return view('livewire.backend.invoice.invoice-pdf');
+});
