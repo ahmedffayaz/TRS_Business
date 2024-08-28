@@ -39,10 +39,12 @@
                 </x-nav>
                 @endcan
                 <li class=" nav-item">
+                    @can('view_users')
                     <a class="d-flex align-items-center" href="#">
                         <i data-feather="shield"></i>
                         <span class="menu-title text-truncate" data-i18n="Companies &amp; Permissions">Users</span>
                     </a>
+                    @endcan
                     <ul class="menu-content">
                         <li>
                             @can('view_users')

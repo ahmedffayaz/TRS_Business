@@ -89,6 +89,10 @@
             </div>
         </section>
     </div>
+
+
+    <div id='calendar'></div>
+
 </div>
 @if($show_swl)
 <script type="module">
@@ -110,3 +114,56 @@
   });
 </script>
 @endif
+@push('scripts')
+<script type="module">
+    document.addEventListener('DOMContentLoaded', function(){
+        const calendarEl = document.getElementById('calendar')
+        const calendar = new Calendar(calendarEl, {
+            plugins: [dayGridPlugin],
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                 right: 'dayGridMonth,dayGridWeek,dayGridDay'
+            },
+            initialView: 'dayGridWeek',
+            allDaySlot: false,
+            nowIndicator: true,
+            editable: false,
+            resizable: false,
+            nextDayThreshold: '00:00:00',
+            fixedWeekCount: false,
+            showNonCurrentDates: false,
+            displayEventTime: false,
+            // events: {
+            //         url: 'https://cms.therightsw.com/dashboard/events?type=' + 'task',
+            //         method: 'GET',
+            //         success: function success() {
+            //             setTimeout(function () {
+            //             $(document).find('[data-toggle="tooltip"]').tooltip();
+            //             }, 500);
+            //         },
+            //         failure: function failure() {
+            //             alert('there was an error while fetching events!');
+            //         }
+            //     },
+            events: [
+            {
+                "id": 1,
+                "title": "First Line<br>Second Line",
+                "start": "2024-08-28",
+                "end": null,
+                "allDay": true,
+                "editable": true,
+                "className": "badge-soft-warning",
+
+            }
+        ],
+
+      eventContent: function( info ) {
+          return {html: info.event.title};
+      }
+        })
+        calendar.render()
+    });
+</script>
+@endpush
