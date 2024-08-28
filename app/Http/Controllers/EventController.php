@@ -14,28 +14,29 @@ class EventController extends Controller
     //
     public function events()
     {
+        $user = auth()->user();
         $start = Carbon::parse(request()->get('start'))->format('Y-m-d');
         $end = Carbon::parse(request()->get('end'))->format('Y-m-d');
         $events = [];
         if (request('type') == 'task') {
-            if ($this->auth_user->hasRole('admin')) {
+            if ($user->hasRole('admin')) {
                 $projects = Project::whereBetween('start_date', [$start, $end])->get();
-                $comments = Comment::with('to_user', 'from_user', 'task')
+                $comments = Comment::with('to_user', 'fromUser', 'task')
                     ->whereIn('type', ['assigned', 'removed', 'time'])
                     ->whereBetween('dated', [$start, $end])->get();
             } else {
-                $projects = Project::whereHas('members', function (Builder $query) {
-                    $query->where('user_id', $this->auth_user->id);
+                $projects = Project::whereHas('members', function (Builder $query) use($user){
+                    $query->where('user_id', $user->id);
                 })->get();
                 $tasks = [];
                 foreach ($projects as $project) {
                     $tasks = array_merge($tasks, $project->tasks->pluck('id')->toArray());
                 }
-                $comments = Comment::with('to_user', 'from_user', 'task', 'task.project')
+                $comments = Comment::with('to_user', 'fromUser', 'task', 'task.project')
                     ->whereHas('task', function (Builder $query) use ($tasks) {
                         $query->whereIn('task_id', $tasks);
                     })->whereIn('type', ['assigned', 'removed', 'time'])
-                    ->where('from', $this->auth_user->id)
+                    ->where('from', $user->id)
                     ->whereBetween('dated', [$start, $end])->get();
             }
             foreach ($projects as $project) {
@@ -79,7 +80,7 @@ class EventController extends Controller
                     'end' => $end_date,
                     'editable' => true,
                     'user_id' => $record->user->id,
-                    'auth_user_id' => $this->auth_user->id,
+                    'auth_user_id' => $user->id,
                     'color' => $record->is_working == '1' ? '#38c172' : '#e3342f',
                     'borderColor' => $record->is_working == '1' ? 'green' : 'red',
                     'evt' => $record,
@@ -95,22 +96,23 @@ class EventController extends Controller
     private function generateEventTitle($comment)
     {
         if ($comment->type === 'assigned') {
-            return '<div class="flex-space-between">
-                        <div  class="calendar-avatar" data-toggle="tooltip"  data-original-title="' . fullName($comment->to_user) . '">' . nameToImage($comment->to_user) . '</div>
-                        <div class="m-badge m-badge--success m-badge--wide">assigned</div>
+            return '<div class="d-flex justify-content-between align-items-center">
+                        <div class="calendar-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->to_user->name . '">' . getInitials($comment->to_user) . '</div>
+                        <span class="badge bg-success">assigned</span>
                     </div><br/>' . optional($comment->task)->name;
         } else if ($comment->type === 'removed') {
-            return '<div class="flex-space-between">
-                        <div  class="calendar-avatar" data-toggle="tooltip" data-original-title="' . fullName($comment->to_user) . '">' . nameToImage($comment->to_user) . '</div>
-                        <div class="m-badge m-badge--danger m-badge--wide">removed</div>
+            return '<div class="d-flex justify-content-between align-items-center">
+                        <div class="calendar-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->to_user->name . '">' . getInitials($comment->to_user) . '</div>
+                        <span class="badge bg-danger">removed</span>
                     </div><br/>' . optional($comment->task)->name;
         } else {
-            return '<div class="flex-space-between">
-                        <div class="calendar-avatar bg-info" data-toggle="tooltip" data-original-title="' . fullName($comment->from_user) . '">' . nameToImage($comment->from_user) . '</div>
-                        <div  class="calendar-avatar" data-toggle="tooltip" data-original-title="' . $comment->task->project->name . '">' . getInitials($comment->task->project->name) . '</div>
-                        <span class="badge py-2 px-3 m-0" data-toggle="tooltip" data-original-title="' . $comment->description . '">&nbsp;</span>
-                        <div class="m-badge m-badge--success m-badge--wide">' . formatTime($comment->time) . '</div>
-                    </div><span class="fc-description" style="display: none;"><br />' . $comment->description . '</span>';
+            return '<div class="event-title"><div class="d-flex justify-content-between align-items-center">
+                        <div class="calendar-avatar bg-info" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->fromUser->name . '">' . getInitials($comment->fromUser) . '</div>
+                        <div class="calendar-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->task->project->name . '">' . getInitials($comment->task->project->name) . '</div>
+                        <span class="badge bg-success">' . formatTime($comment->time) . '</span>
+                    </div>
+                    <span class="fc-description text-wrap d-none"><br />' . $comment->description . '</span></div>';
         }
     }
+
 }

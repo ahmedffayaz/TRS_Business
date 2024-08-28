@@ -323,3 +323,29 @@ function getFullName($user)
 {
     return ucwords("{$user->first_name} {$user->last_name}");
 }
+
+function getInitials($input)
+{
+    if (is_object($input) && isset($input->first_name) && isset($input->last_name)) {
+        // Assume input is a user object
+        $firstName = $input->first_name;
+        $lastName = $input->last_name;
+
+        $initials = ($firstName ? $firstName[0] : '') . ($lastName ? $lastName[0] : '');
+    } elseif (is_string($input)) {
+        // Assume input is a project name string
+        $words = explode(' ', $input);
+        $initials = '';
+
+        if (count($words) > 1) {
+            $initials = $words[0][0] . $words[count($words) - 1][0];
+        } elseif (count($words) === 1) {
+            $initials = $words[0][0];
+        }
+    } else {
+        // Handle unexpected input
+        $initials = '';
+    }
+
+    return strtoupper($initials);
+}
