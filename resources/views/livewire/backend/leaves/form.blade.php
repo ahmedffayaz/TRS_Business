@@ -4,9 +4,6 @@
         $halfLeave = \App\Enums\Leave\LeaveType::HALF_LEAV->value;
         $workFromHome = \App\Enums\Leave\LeaveType::WORK_FROM_HOME->value;
     @endphp
-    <div class="text-center mb-2">
-        <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} Leave</h1>
-    </div>
     <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'createLeave' }}">
         <div class="row mb-1">
             <div class="col-md-4">

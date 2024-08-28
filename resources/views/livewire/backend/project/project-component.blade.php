@@ -130,7 +130,7 @@
         </div>
 
         @can('add_projects')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Project">
             @include('livewire.backend.project.form')
         </x-main-modal>
         @endcan
@@ -144,7 +144,7 @@
   window.Swal.fire({
     title: 'Confirmation Required',
     text: 'Please confirm the invitation.',
-    icon: 'warning', 
+    icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#3085d6',
     cancelButtonColor: '#d33',

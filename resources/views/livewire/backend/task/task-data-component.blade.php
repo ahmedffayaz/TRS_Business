@@ -251,13 +251,13 @@
 
     @if ($isTaskModalOpen)
         @can('add_tasks')
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task">
                 @include('livewire.backend.task.form')
             </x-main-modal>
         @endcan
     @elseif($isAddInvoiceModalOpen)
         @can('add_invoices')
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInvoiceModal">
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeInvoiceModal" modalTitle="Create Invoice">
                 @include('livewire.backend.invoice.form')
             </x-main-modal>
         @endcan

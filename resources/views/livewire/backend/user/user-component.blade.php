@@ -166,10 +166,7 @@
         </div>
     </div>
     @can('add_users')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-            <div class="text-center mb-2">
-                <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} User</h1>
-            </div>
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} User">
             <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
                 <div class="row">
                     <div class="col-md-6 mb-1">

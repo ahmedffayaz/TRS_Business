@@ -91,7 +91,7 @@
     </div>
 
     @can('add_tasks')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task Time">
             @include('livewire.backend.comment.form')
         </x-main-modal>
     @endcan

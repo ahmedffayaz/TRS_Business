@@ -156,7 +156,7 @@
         </x-main-modal>
         @else
         @can('view_leaves')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Leave">
             @include('livewire.backend.leaves.form')
         </x-main-modal>
         @endcan

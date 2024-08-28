@@ -1,6 +1,3 @@
-<div class="text-center mb-2">
-    <h1 class="mb-1">{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Question</h1>
-</div>
 <form wire:submit.prevent="{{ $questionForm->isUpdate ? 'updateKnowledgeBase(' . $questionForm->id . ')' : 'storeKnowledgeBase' }}">
     <div class="row">
         <div class="col-md-6">

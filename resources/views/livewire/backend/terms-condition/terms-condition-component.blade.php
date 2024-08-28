@@ -90,10 +90,7 @@
             </div>
         </div>
     </div>
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-        <div class="text-center mb-2">
-            <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Terms & Conditions </h1>
-        </div>
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Terms & Conditions">
         <div class="row">
             <div class="col-md-6">
                 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
