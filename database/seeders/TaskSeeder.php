@@ -19,7 +19,6 @@ class TaskSeeder extends Seeder
     public function run()
     {
         Schema::disableForeignKeyConstraints();
-        // Task::truncate();
         Schema::enableForeignKeyConstraints();
 
         $total = self::$count;

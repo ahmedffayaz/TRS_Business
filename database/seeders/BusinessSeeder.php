@@ -40,28 +40,9 @@ class BusinessSeeder extends Seeder
                 'created_at' => now(),
                 'updated_at' => now()
             ),
-			// array(
-			// 	'name' => 'Dev Provider',
-            //     'slug' => 'dev-provider',
-			// 	'address' => 'Office 6-B1, Silk Center, Rehmanabad Metro Stop, Murree Road',
-			// 	'city' => 'Rawalpindi',
-			// 	'country_id' =>  Country::where('name', 'Pakistan')->first()->id,
-			// 	'postal_code' => '43600',
-			// 	'invoice_prefix' => 'dev_pro_',
-            //     'invoice_serial' => 'd25s78ds',
-            //     'created_at' => now(),
-            //     'updated_at' => now()
-            // )
         );
 
         Business::insert($businesses);
 
-
-        // $businessFactory = BusinessFactory::new()->count(10)->create();
-
-        // // For each business, create some clients
-        // $businessFactory->each(function ($business) {
-        //     ClientFactory::new()->count(10)->create();
-        // });
     }
 }
