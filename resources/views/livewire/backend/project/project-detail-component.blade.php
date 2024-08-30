@@ -38,8 +38,6 @@
                 <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Deliver Project')"
                     tabindex="0" aria-controls="table-hover" type="button" wire:ignore. />
                 @endif
-
-                <x-anchor-tag href="{{ route('dashboard.projects.index') }}" class="btn btn-primary" value="Back" />
             </div>
         </div>
     </section>

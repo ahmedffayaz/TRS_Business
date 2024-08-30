@@ -1,7 +1,4 @@
 <div>
-    <div class="text-center mb-2">
-        <h1 class="mb-1">Create Invoice</h1>
-    </div>
     <div class="mb-1">
         <b>{{ $project?->name }} - ({{ $project?->client?->name }}) - ({{ $project?->client?->business?->name }})</b>
     </div>

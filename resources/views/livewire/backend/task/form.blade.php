@@ -1,7 +1,4 @@
 <div>
-    <div class="text-center mb-2">
-        <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} Task</h1>
-    </div>
     <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" enctype="multipart/form-data">
         <div class="row mb-1">
             @if (!$projectId)

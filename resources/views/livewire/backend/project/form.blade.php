@@ -1,7 +1,4 @@
 <div>
-    <div class="text-center mb-2">
-        <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} Project</h1>
-    </div>
     <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
         <div class="row mb-1">
             <div class="col-md-6">

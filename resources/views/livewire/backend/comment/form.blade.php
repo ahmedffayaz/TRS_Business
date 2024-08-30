@@ -3,9 +3,6 @@
         $minutes = \App\Enums\Comment\CommentUnit::MINUTES->value;
         $hours = \App\Enums\Comment\CommentUnit::HOURS->value;
     @endphp
-    <div class="text-center mb-2">
-        <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} Task Time</h1>
-    </div>
     <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
         <div class="row mb-1">
             <div class="col-md-12">
