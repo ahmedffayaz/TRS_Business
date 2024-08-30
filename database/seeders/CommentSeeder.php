@@ -16,6 +16,6 @@ class CommentSeeder extends Seeder
      */
     public function run()
     {
-        CommentFactory::new()->count(self::$chunk)->create();
+        CommentFactory::new()->count(30)->create();
     }
 }
