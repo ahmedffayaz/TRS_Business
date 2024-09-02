@@ -48,6 +48,7 @@ use App\Livewire\Backend\UpdatePasswordComponent;
 use App\Livewire\Backend\Invoice\InvoiceComponent;
 use App\Livewire\Backend\Project\ProjectComponent;
 use App\Livewire\Backend\User\UserProfileComponent;
+use App\Livewire\Backend\CalendarDashboardComponent;
 use App\Livewire\Backend\Client\EditClientComponent;
 use App\Livewire\Backend\User\UserContractComponent;
 use App\Livewire\Backend\Email\EmailSettingComponent;
@@ -88,6 +89,7 @@ Route::middleware(['auth', 'verified', 'user-account-type', 'set_session_data'])
     Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
         Route::middleware(['terms.acceptance'])->group(function () {
             Route::get('/', DashboardComponent::class)->name('home');
+            Route::get('calendar', CalendarDashboardComponent::class)->name('home.calendar');
 
             // Businesses routes
             Route::prefix('businesses')->name('businesses.')->middleware('permission:add_businesses|edit_businesses')->group(function () {

@@ -24,12 +24,35 @@
         <div class="shadow-bottom"></div>
         <div class="main-menu-content">
             <ul class="navigation navigation-main" id="main-menu-navigation" data-menu="menu-navigation">
-                <x-nav class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }} nav-item">
+
+                <li class="nav-item {{ request()->routeIs('dashboard.home*') ? 'has-sub sidebar-group-active open' : '' }}" style="">
+                    <a class="d-flex align-items-center" href="#">
+                        <i data-feather="home"></i>
+                        <span class="menu-title text-truncate" data-i18n="Dashboards">Dashboards</span>
+                        <span class="badge badge-light-warning rounded-pill ms-auto me-1">2</span>
+                    </a>
+                    <ul class="menu-content">
+                        <li>
+                            <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.home') ? 'active' : '' }}" href="{{ url('dashboard') }}">
+                                 <i data-feather="circle"></i>
+                                <span class="menu-item text-truncate" data-i18n="Analytics">Analytics</span>
+                            </x-anchor-tag>
+                        </li>
+                        <li>
+                            <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.home.calendar') ? 'active' : '' }}" href="{{ route('dashboard.home.calendar') }}">
+                                <i data-feather="circle"></i>
+                                <span class="menu-item text-truncate" data-i18n="eCommerce">Calendar</span>
+                            </x-anchor-tag>
+                        </li>
+                    </ul>
+                </li>
+
+                {{-- <x-nav class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }} nav-item">
                     <x-anchor-tag class="d-flex align-items-center" href="{{ url('dashboard') }}">
                         <i data-feather="home"></i>
                         <span class="menu-title text-truncate" data-i18n="Dashboard">Dashboard</span>
                     </x-anchor-tag>
-                </x-nav>
+                </x-nav> --}}
                 @can('view_clients')
                 <x-nav class="{{ request()->routeIs('dashboard.clients.index') ? 'active' : '' }} nav-item">
                     <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.clients.index') }}">

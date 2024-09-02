@@ -123,6 +123,8 @@ class PermissionsSeeder extends Seeder
         // Email permissions
         Permission::create(['group' => 'email', 'name' => 'view_emails', 'title' => 'Email Reports']);
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
+        // calendar permissions
+        Permission::create(['group' => 'Calendar', 'name' => 'view_tasks_in_calendar', 'title' => 'View Tasks in Calendar']);
 
         $superAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
 		$superAdminRole->permissions()->sync(Permission::pluck('id')->all());
