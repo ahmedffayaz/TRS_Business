@@ -178,6 +178,8 @@ class User extends Authenticatable
         }
     }
 
+ 
+
     public function getStatusAttribute()
     {
         return $this->is_active ? 'Active' : 'Inactive';
