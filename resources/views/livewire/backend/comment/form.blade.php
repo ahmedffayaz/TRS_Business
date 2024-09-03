@@ -3,7 +3,6 @@
         $minutes = \App\Enums\Comment\CommentUnit::MINUTES->value;
         $hours = \App\Enums\Comment\CommentUnit::HOURS->value;
     @endphp
-    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
         <div class="row mb-1">
             <div class="col-md-12">
                 <span wire:ignore.>
@@ -70,17 +69,6 @@
                 </div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <x-button class="btn-primary me-1" type="submit" tabindex="4"
-                    wire:loading.attr="disabled">
-                        <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
-                    <x-button-loader />
-                </x-button>
-            </div>
-        </div>
-    </form>
 </div>
 
 

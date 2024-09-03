@@ -1,32 +1,12 @@
 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
     <x-input type="hidden" wire:model="form.business_id" />
     <div class="row mb-1">
-        <div class="col-md-12">
+        <div class="col-md-6">
             <x-input-label for="name" class="required" value="Name" />
             <x-input type="text" name="name" id="name"
                 :class="$errors->has('form.name') ? 'error' : ''"
                 placeholder="Enter company name" wire:model="form.name" />
             @error('form.name')
-                <x-input-error :message="$message" />
-            @enderror
-        </div>
-    </div>
-    <div class="row mb-1">
-        <div class="col-md-12">
-            <x-input-label for="address" value="Street Address" />
-            <x-textarea id="address" data-length="200" length="200" rows="3"
-                :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'"
-                placeholder="Enter street address" wire:model="form.address" />
-            @error('form.address')
-                <x-input-error :message="$message" />
-            @enderror
-        </div>
-    </div>
-    <div class="row mb-1">
-        <div class="col-md-6">
-            <x-input-label for="city" class="required" value="City" />
-            <x-input type="text" name="city" id="city" :class="$errors->has('form.city') ? 'error' : ''" placeholder="Enter city" wire:model="form.city" />
-            @error('form.city')
                 <x-input-error :message="$message" />
             @enderror
         </div>
@@ -49,8 +29,16 @@
             @enderror
         </div>
     </div>
+
     <div class="row mb-1">
-        <div class="col-md-12">
+        <div class="col-md-6">
+            <x-input-label for="city" class="required" value="City" />
+            <x-input type="text" name="city" id="city" :class="$errors->has('form.city') ? 'error' : ''" placeholder="Enter city" wire:model="form.city" />
+            @error('form.city')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+        <div class="col-md-6">
             <x-input-label for="postal_code" value="Postal Code" />
             <x-input type="number" name="postal_code" id="postal_code"
                 :class="$errors->has('form.postal_code') ? 'error' : ''"
@@ -91,15 +79,25 @@
             @enderror
         </div>
     </div>
-
+    <div class="row mb-1">
+        <div class="col-md-12">
+            <x-input-label for="address" value="Street Address" />
+            <x-textarea id="address" data-length="200" length="200" rows="3"
+                :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'"
+                placeholder="Enter street address" wire:model="form.address" />
+            @error('form.address')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+    </div>
     <div class="add-user">
         <div class="d-flex mb-1">
             <div class="col-md-6">
                 <div class="d-flex">
-                    <div class="col-md-6">
-                        <x-input-label for="first_name" value="Add User" />
+                    <div class="col-md-2">
+                        <x-input-label for="first_name" value="Add Employee" />
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-2 me-3">
                         <div class="form-check form-switch form-check-success">
                             <x-input type="checkbox" class="form-check-input" id="add-user"
                                 name="add_user" wire:click="form.add_user" wire:model="form.add_user" />
@@ -132,9 +130,6 @@
                         wire:model="form.phone.0" />
                 </div>
                 <div class="col-md-2 px-md-1 pt-1">
-                    {{-- <x-input-label for="password" value="Password" />
-                    <x-input type="text"  name="password[]" placeholder="Enter password"
-                        wire:model="form.password.0" /> --}}
                         <x-input-label for="send_email" value="Allow login" title="This setting allows the user to log in if enabled." />
                         <div class="form-check form-switch form-check-success">
                             <input type="hidden" name="send_email[0]" value="false">
@@ -184,11 +179,6 @@
                     <x-input type="text"  name="phone[]" placeholder="Enter phone number" required
                         wire:model="form.phone.{{ $key + 1 }}" />
                 </div>
-                {{-- <div class="col-md-2 px-md-1">
-                    <x-input-label for="password" value="Password" />
-                    <x-input type="text"  name="password[]" placeholder="Enter password"
-                        wire:model="form.password.{{ $key + 1 }}" />
-                </div> --}}
                 <div class="col-md-2 px-md-1 pt-1">
                     <x-input-label for="send_email_{{ $key + 1 }}" value="Allow login" title="This setting allows the user to log in if enabled." />
                     <div class="form-check form-switch form-check-success">

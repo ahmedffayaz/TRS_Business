@@ -6,12 +6,12 @@
     <h1 class="mb-1"> Role Name: {{ ucwords($roleName) }}</h1>
     <p>Viewing role permissions.</p>
 </div>
-<div class="row">
+<div class="row ms-1">
     @foreach ($permissionList as $group => $permissions)
      <tr>
-        <td class="text-nowrap fw-bolder">{{ ucwords($group) }}</td>
+        <td class="text-nowrap fw-bolder"><p class="fw-bolder">{{ ucwords($group) }}</p></td>
         <td>
-            <div class="ms-5 d-flex row" wire:ignore>
+            <div class="ms-5 d-flex row text-center" wire:ignore>
                 @foreach ($permissions as $permission)
                     <div class="col-4 mb-1 me-3 me-lg-5">
                             <span class="badge badge-light-primary badge-pill">

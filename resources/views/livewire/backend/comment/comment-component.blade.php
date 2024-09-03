@@ -15,7 +15,19 @@
                     </div>
 
                     {{-- table search section --}}
-                    <x-table-search :dataCounter="[]" />
+                    <div class="container-fluid ms-2">
+                        <div class="row mb-2 d-flex justify-content-end align-items-center">
+                            <div class="col-md-4 col-sm-12">
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                                        <i data-feather="search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                                        placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="card-table table-responsive card-min-height">
                         <table class="table table-hover">
@@ -91,7 +103,7 @@
     </div>
 
     @can('add_tasks')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task Time">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task Time" buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonStatus="true">
             @include('livewire.backend.comment.form')
         </x-main-modal>
     @endcan

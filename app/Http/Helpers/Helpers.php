@@ -24,9 +24,30 @@ function cmsLogo() : string
     $cmsLogo = Setting::where('name', 'cms_logo')->first();
     return isset($cmsLogo) && Storage::disk('public')->exists('cms/images/' . $cmsLogo->value)
         ? asset('storage/cms/images/' . $cmsLogo->value)
-        : asset('trs_logo.svg');
+        : asset('trs_logo_complete.svg');
 }
 
+function darkModeCMSLogo() : string
+{
+    $cmsLogo = Setting::where('name', 'cms_logo')->first();
+    return isset($cmsLogo) && Storage::disk('public')->exists('cms/images/' . $cmsLogo->value)
+        ? asset('storage/cms/images/' . $cmsLogo->value)
+        : asset('trs_logo_complete_dark_mode.png');
+}
+function shortCMSLogo() : string
+{
+    $cmsLogo = Setting::where('name', 'cms_logo')->first();
+    return isset($cmsLogo) && Storage::disk('public')->exists('cms/images/' . $cmsLogo->value)
+        ? asset('storage/cms/images/' . $cmsLogo->value)
+        : asset('logo.svg');
+}
+function darkShortCMSLogo()
+{
+    $cmsLogo = Setting::where('name', 'cms_logo')->first();
+    return isset($cmsLogo) && Storage::disk('public')->exists('cms/images/' . $cmsLogo->value)
+        ? asset('storage/cms/images/' . $cmsLogo->value)
+        : asset('TRS Logo dark version.png');
+}
 function favicon($favicon = null)
 {
     if ($favicon && Auth::check()) {

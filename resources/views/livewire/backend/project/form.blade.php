@@ -1,6 +1,13 @@
 <div>
-    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
         <div class="row mb-1">
+            <div class="col-md-6">
+                <x-input-label for="name" class="required" value="Name" />
+                <x-input type="text" name="name" id="name" :class="$errors->has('form.name') ? 'error' : ''"
+                    placeholder="Enter project name" wire:model="form.name" />
+                @error('form.name')
+                    <x-input-error :message="$message" />
+                @enderror
+            </div>
             <div class="col-md-6">
                 <span wire:ignore.>
                     <x-input-label for="client" class="required" value="Client" />
@@ -15,53 +22,6 @@
                     </x-select-input>
                 </span>
                 @error('form.client_id')
-                    <x-input-error :message="$message" />
-                @enderror
-            </div>
-
-            <div class="col-md-6">
-                <x-input-label for="name" class="required" value="Name" />
-                <x-input type="text" name="name" id="name" :class="$errors->has('form.name') ? 'error' : ''"
-                    placeholder="Enter project name" wire:model="form.name" />
-                @error('form.name')
-                    <x-input-error :message="$message" />
-                @enderror
-            </div>
-        </div>
-
-        <div class="row mb-5">
-            <div class="col-md-12 mb-2">
-                <span wire:ignore.>
-                    <x-input-label for="description" :value="__('Description')" />
-                    <div x-data
-                        x-ref="quillEditor"
-                        x-init="
-                            toolbarOptions = [
-                                [
-                                    'bold', 'italic',
-                                    'underline',
-                                    'blockquote',
-                                    'code-block',
-                                    { 'header': 1 },
-                                    { 'header': 2 },
-                                    { 'list': 'ordered'},
-                                    { 'list': 'bullet' },
-                                    { 'align': [] },
-                                    'link'
-                                ],
-                            ];
-                            quill = new Quill($refs.quillEditor, {modules: {
-                                toolbar: toolbarOptions
-                            },theme: 'snow'});
-                            quill.on('text-change', function () {
-                                data = quill.root.innerHTML;
-                                @this.set('form.description', data)
-                            });
-                        "
-                        wire:model.debounce.2000ms="form.description"
-                    >{!! $form->description !!}</div>
-                </span>
-                @error('form.description')
                     <x-input-error :message="$message" />
                 @enderror
             </div>
@@ -91,7 +51,7 @@
         </div>
 
         <div class="row mb-1">
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <x-input-label for="fixed-price" class="required" value="Type" />
                 <x-input-radio labelName="Fixed Price" name="typ" id="fixed-price" value="fixed" :isChecked=false
                     wireModel="form.type" />
@@ -100,7 +60,7 @@
                 @enderror
             </div>
 
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <x-input-label for="hours-basis" />
                 <x-input-radio labelName="Hourly Basis" name="type" id="hourly-basis" value="hourly" :isChecked=false
                     wireModel="form.type" />
@@ -212,7 +172,7 @@
                 <span wire:ignore.>
                     <x-select-input name="members" id="members"
                         :class="$errors->has('form.members') ? 'error select2' : 'select2'" multiple wire:model="form.members">
-                        <option value="">--Select Members--</option>
+                        <option value="" disabled>--Select Members--</option>
                         @isset($members)
                             @foreach ($members as $member)
                                 <option value="{{ $member?->id }}">{{ $member?->name }} - {{ implode(', ', $member->roles->pluck('title')->toArray()) }}</option>
@@ -244,7 +204,43 @@
                 </div>
             </div>
         </div>
-
+        <div class="row mb-5">
+            <div class="col-md-12 mb-2">
+                <span wire:ignore.>
+                    <x-input-label for="description" :value="__('Description')" />
+                    <div x-data
+                        x-ref="quillEditor"
+                        x-init="
+                            toolbarOptions = [
+                                [
+                                    'bold', 'italic',
+                                    'underline',
+                                    'blockquote',
+                                    'code-block',
+                                    { 'header': 1 },
+                                    { 'header': 2 },
+                                    { 'list': 'ordered'},
+                                    { 'list': 'bullet' },
+                                    { 'align': [] },
+                                    'link'
+                                ],
+                            ];
+                            quill = new Quill($refs.quillEditor, {modules: {
+                                toolbar: toolbarOptions
+                            },theme: 'snow'});
+                            quill.on('text-change', function () {
+                                data = quill.root.innerHTML;
+                                @this.set('form.description', data)
+                            });
+                        "
+                        wire:model.debounce.2000ms="form.description"
+                    >{!! $form->description !!}</div>
+                </span>
+                @error('form.description')
+                    <x-input-error :message="$message" />
+                @enderror
+            </div>
+        </div>
         <div class="row mb-1">
             <div class="col-md-12">
                 <x-input-label for="reports" value="Attachments" />
@@ -253,17 +249,6 @@
                 @enderror
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                    wire:loading.attr="disabled">
-                    <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
-                    <x-button-loader />
-                </x-button>
-            </div>
-        </div>
-    </form>
 </div>
 
 @script

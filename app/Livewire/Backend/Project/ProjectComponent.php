@@ -94,8 +94,8 @@ class ProjectComponent extends Component
     public function render()
     {
         $projects = $this->getProjects();
-        $totalProjects = Project::sessionBusiness()->withTrashed()->count();
-        $activeProjects = Project::sessionBusiness()->count();
+        $totalProjects =  $this->getTotalProjects()->count();
+        $activeProjects = $this->getActiveProjects()->count();
         $archivedProjects = Project::sessionBusiness()->onlyTrashed()->count();
         $clients = Client::select('id', 'business_id', 'name')->sessionBusiness()->get();
         $members = User::sessionBusiness()->get();

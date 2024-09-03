@@ -31,7 +31,6 @@
             @endphp
 
             <x-table-search :dataCounter="$dataCount" />
-
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -125,12 +124,28 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $projects->links('components.pagination') }}
+            </div>
+            <div class="pagination-container d-flex justify-content-between align-items-center mt-2">
+                <div class="d-flex align-items-center ms-2">
+                    <span class="">Show</span>
+                    <select class="form-select w-auto" wire:model.live.debounce.500ms="limitPerPage">
+                        <option value="10">10</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="30">30</option>
+                        <option value="35">35</option>
+                    </select>
+                    <span class="">entries</span>
+                </div>
+                <div>
+                    {{ $projects->links('components.pagination') }}
+                </div>
             </div>
         </div>
 
         @can('add_projects')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Project">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Project" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" buttonStatus="true">
             @include('livewire.backend.project.form')
         </x-main-modal>
         @endcan
