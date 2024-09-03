@@ -138,13 +138,15 @@ class DashboardComponent extends Component
 
         if ($this->user->hasRole('client')) {
 
-            return User::where('client_id', $this->user->client_id)->where('is_active', 1)->whereHas('roles', function ($query) {
-                $query->where('name', '=', 'client'); })->count();
+            return User::where('client_id', $this->user->client_id)->status('Active')->whereHas('roles', function ($query) {
+                $query->where('name', '=', 'client');
+            })->count();
 
         } elseif ($this->user->hasRole('admin')) {
 
-            return User::where('business_id', $this->user->business_id)->where('is_active', 1)->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client'); })->count();
+            return User::where('business_id', $this->user->business_id)->status('Active')->whereHas('roles', function ($query) {
+                $query->where('name', '!=', 'client');
+            })->count();
         }
 
         return 0;
@@ -152,10 +154,10 @@ class DashboardComponent extends Component
 
     public function getProjectCount()
     {
-        if($this->user->hasRole('client')) {
+        if ($this->user->hasRole('client')) {
 
             return Project::where('client_id', $this->user->client_id)->where('business_id', $this->user->business_id)->count();
-        }elseif($this->user->hasRole('admin')) {
+        } elseif ($this->user->hasRole('admin')) {
 
             return Project::where('business_id', $this->user->business_id)->count();
         }
@@ -163,11 +165,11 @@ class DashboardComponent extends Component
 
     public function getTaskCount()
     {
-        if($this->user->hasRole('client')) {
+        if ($this->user->hasRole('client')) {
 
             return Project::where('client_id', $this->user->client_id)
                 ->withCount('tasks')->get()->sum('tasks_count');
-        }elseif($this->user->hasRole('admin')) {
+        } elseif ($this->user->hasRole('admin')) {
 
             return Project::where('business_id', $this->user->business_id)
                 ->withCount('tasks')->get()->sum('tasks_count');
@@ -175,20 +177,20 @@ class DashboardComponent extends Component
     }
     public function getClientCount()
     {
-        if($this->user->hasRole('client')) {
+        if ($this->user->hasRole('client')) {
             return 0;
-        }elseif($this->user->hasRole('admin')) {
+        } elseif ($this->user->hasRole('admin')) {
 
-          return  Client::whereHas('business', function ($query) {
-                        $query->whereName(session('business'));
-                    })->count();
+            return Client::whereHas('business', function ($query) {
+                $query->whereName(session('business'));
+            })->count();
         }
     }
 
     public function getClientDetail()
     {
-        if($this->user->hasRole('client')) {
-           return Client::sessionBusiness()->whereId($this->user->client_id)
+        if ($this->user->hasRole('client')) {
+            return Client::sessionBusiness()->whereId($this->user->client_id)
                 ->with(['employees', 'business', 'country'])->firstOrFail();
         }
         return null;
@@ -233,17 +235,17 @@ class DashboardComponent extends Component
     public function getTasks()
     {
         $user = auth()->user();
-        if($user->hasRole('client')) {
+        if ($user->hasRole('client')) {
 
             return Task::whereHas('project', function ($query) use ($user) {
                 $query->where('business_id', $user->business_id)
                     ->where('client_id', $user->client_id);
             })->with(['project', 'comments'])
-            ->where('completed_at',null)
-            ->whereBetween('end_date', [now()->subDays(15)->format('Y-m-d'), now()->addDays(15)->format('Y-m-d')])
-            ->getList($this->taskSearch, $this->taskColumnName, $this->taskSortDirection)
-            ->latest()->take(4)->get();
-       }
+                ->where('completed_at', null)
+                ->whereBetween('end_date', [now()->subDays(15)->format('Y-m-d'), now()->addDays(15)->format('Y-m-d')])
+                ->getList($this->taskSearch, $this->taskColumnName, $this->taskSortDirection)
+                ->latest()->take(4)->get();
+        }
         return null;
     }
 
@@ -251,15 +253,15 @@ class DashboardComponent extends Component
     public function getProjects()
     {
         $user = auth()->user();
-        if($user->hasRole('client')) {
+        if ($user->hasRole('client')) {
             return Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
                 $query->whereHas('client', function ($query) use ($user) {
                     $query->where('id', $user->client_id);
                 });
-            })->with(['client', 'members', 'tasks'])->whereIn('status',['in-progress','pending'])
-            ->whereBetween('end_date', [now()->subDays(15)->format('Y-m-d'), now()->addDays(15)->format('Y-m-d')])
+            })->with(['client', 'members', 'tasks'])->whereIn('status', ['in-progress', 'pending'])
+                ->whereBetween('end_date', [now()->subDays(15)->format('Y-m-d'), now()->addDays(15)->format('Y-m-d')])
 
-            ->getList($this->search, $this->columnName, $this->sortDirection)->withCount(['members', 'tasks'])->take(6)->get();
+                ->getList($this->search, $this->columnName, $this->sortDirection)->withCount(['members', 'tasks'])->take(6)->get();
         }
         return null;
     }

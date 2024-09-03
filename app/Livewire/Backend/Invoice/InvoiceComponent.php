@@ -407,7 +407,7 @@ class InvoiceComponent extends Component
                 $query->where('id', $user->client_id);
             });
         })->count();
-        
+
         $this->dispatch('reinitialize-icons');
         return view('livewire.backend.invoice.invoice-component', compact('invoices', 'totalInvoices', 'activeInvoices', 'archivedInvoices'));
     }
