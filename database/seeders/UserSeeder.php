@@ -69,7 +69,7 @@ class UserSeeder extends Seeder
             ]);
 
             // Create Project Managers
-            User::factory()->count(10)->create()->each(function ($user) use ( $business) {
+            User::factory()->count(1)->create()->each(function ($user) use ( $business) {
                 $pmRole = Role::where('business_id', $business->id)->where('name', 'project-manager')->first();
                     DB::table('model_has_roles')->insert([
                         'role_id' => $pmRole->id,
@@ -79,7 +79,7 @@ class UserSeeder extends Seeder
             });
 
             // Create Team Leads
-            User::factory()->count(10)->create()->each(function ($user) use ( $business) {
+            User::factory()->count(1)->create()->each(function ($user) use ( $business) {
                 $teamLeadRole = Role::where('business_id', $business->id)->where('name', 'team-lead')->first();
                     DB::table('model_has_roles')->insert([
                         'role_id' => $teamLeadRole->id,
@@ -89,7 +89,7 @@ class UserSeeder extends Seeder
             });
 
             // Create Developers
-            User::factory()->count(10)->create()->each(function ($user) use ( $business) {
+            User::factory()->count(5)->create()->each(function ($user) use ( $business) {
                 $developerRole = Role::where('business_id', $business->id)->where('name', 'developer')->first();
                     DB::table('model_has_roles')->insert([
                         'role_id' => $developerRole->id,
@@ -99,7 +99,7 @@ class UserSeeder extends Seeder
             });
 
             // Create Clients
-            User::factory()->count(10)->create()->each(function ($user) use ( $business) {
+            User::factory()->count(1)->create()->each(function ($user) use ( $business) {
                 $clientRole = Role::where('business_id', $business->id)->where('name', 'client')->first();
                     DB::table('model_has_roles')->insert([
                         'role_id' => $clientRole->id,
@@ -109,7 +109,7 @@ class UserSeeder extends Seeder
             });
 
             // Create Quality Assurance
-            User::factory()->count(10)->create()->each(function ($user) use ( $business) {
+            User::factory()->count(1)->create()->each(function ($user) use ( $business) {
                 $qualityRole = Role::where('business_id', $business->id)->where('name', 'quality-insurance')->first();
                     DB::table('model_has_roles')->insert([
                         'role_id' => $qualityRole->id,

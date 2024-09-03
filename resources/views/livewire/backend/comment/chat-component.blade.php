@@ -124,7 +124,7 @@
                                             <div class="chat-avatar">
                                                 <span class="avatar box-shadow-1 cursor-pointer">
                                                     @if ($comment->fromUser && $comment->fromUser->avatar)
-                                                    <img src="{{ getUserAvatar($comment->fromUser->avatar) }}" alt="avatar"
+                                                    <img src="{{ getUserAvatar($comment->fromUser) }}" alt="avatar"
                                                         height="36" width="36" />
                                                     @else
                                                     <div class="avatar-content">{{ $comment->fromUser ?

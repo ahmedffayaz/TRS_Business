@@ -16,7 +16,7 @@
         }
 
         body {
-            margin-top: 2cm;
+            margin-top: 2.7cm;
             margin-left: 0.7cm;
             margin-right: 0.7cm;
             margin-bottom: .7cm;
@@ -95,16 +95,15 @@
         style="width: 100%; max-width: 100%; display: flex; justify-content: center; align-items: center;">
         @php
             $business_details = session('business_details');
-            $src = 'storage/' . $business_details['logo'];
+            $src = ($business_details['logo'] != null && Storage::disk('public')->exists($business_details['logo'])) ?  'storage/' . $business_details['logo'] : cmsLogo();
         @endphp
 
         <table
             style="width: 91%; border-collapse: collapse; margin-top: 12px; position: absolute;margin-left: 0.7cm;margin-right: 1cm;">
             <tr>
-                <td style="width: 33%; vertical-align: middle; text-align: left">
-                    @if (!empty($src))
-                        <img class="logo" src="{{ $src }}" alt=""
-                            style="max-width: 200px; height: 50px;" />
+                <td style="width: 33%; vertical-align: middle; text-align: left;">
+                    @if($src)
+                        <img class="logo" src="{{ $src }}" alt="Business Logo" style="max-width: 170px; height: 40px;" width="170" height="45" />
                     @endif
                 </td>
                 <td style="text-align: center; vertical-align: middle; width: 33%;">

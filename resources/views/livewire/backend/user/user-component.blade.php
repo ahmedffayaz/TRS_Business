@@ -21,145 +21,151 @@
         <div class="row mb-2 d-flex justify-content-between align-items-center">
             <div class="col-md-6 d-flex align-items-center">
                 <div class="">
-                    <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore> <i data-feather="filter"></i> Filter</button>
-                </div>
-            </div>
-            <div class="col-md-4 col-sm-12">
-                <div class="input-group input-group-merge">
-                    <span class="input-group-text" wire:ignore id="basic-addon-search2">
-                        <i data-feather="search"></i>
-                    </span>
-                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
-                        aria-describedby="basic-addon-search2" />
-                </div>
-            </div>
-        </div>
-
-        <div id="filter-area" class="d-none mb-2" wire:ignore>
-            <div class="row">
-                <div class="col-md-3 col-sm-12">
-                    <x-select-input placeholder="Filter by role" wire:model.defer="roleId" id="roleId" class="select2" name="roleId">
-                        <option value="">Select role</option>
-                        @isset($roles)
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->id }}" class="text-capitalize">{{ ucwords($role->name) }}</option>
-                            @endforeach
-                        @endisset
-                    </x-select-input>
-                </div>
-                <div class="col-md-3 col-sm-12">
-                    <x-select-input placeholder="Filter by status" wire:model.defer="filterStatus" id="filterStatus" class="select2" name="filterStatus">
-                        <option value="">Select status</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </x-select-input>
+                    @role('admin')
+                        <div class="ms-1">
+                            <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore> <i data-feather="filter"></i> Filter</button>
+                        </div>
+                    @endrole
                 </div>
                 <div class="col-md-4 col-sm-12">
-                    <x-input type="text" class="flatpickr-range" name="joinedFrom" id="joinedFrom" placeholder="YYYY-MM-DD to YYYY-MM-DD" wire:model.defer="joinedFrom" />
-                </div>
-                <div class="col-md-2 col-sm-12 ">
-                    <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter"
-                        wire:click="applyFilter($('#roleId').val(),$('#filterStatus').val(),$('#joinedFrom').val())" disabled>Apply</button>
+                    <div class="input-group input-group-merge">
+                        <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                            <i data-feather="search"></i>
+                        </span>
+                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
+                            aria-describedby="basic-addon-search2" />
+                    </div>
                 </div>
             </div>
 
-        </div>
+            <div id="filter-area" class="d-none mb-2" wire:ignore>
+                <div class="row">
+                    <div class="col-md-3 col-sm-12">
+                        <x-select-input placeholder="Filter by role" wire:model.defer="roleId" id="roleId" class="select2" name="roleId">
+                            <option value="">Select role</option>
+                            @isset($roles)
+                                @foreach ($roles as $role)
+                                    <option value="{{ $role->id }}" class="text-capitalize">{{ ucwords($role->name) }}</option>
+                                @endforeach
+                            @endisset
+                        </x-select-input>
+                    </div>
+                    <div class="col-md-3 col-sm-12">
+                        <x-select-input placeholder="Filter by status" wire:model.defer="filterStatus" id="filterStatus" class="select2" name="filterStatus">
+                            <option value="">Select status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </x-select-input>
+                    </div>
+                    <div class="col-md-4 col-sm-12">
+                        <x-input type="text" class="flatpickr-range" name="joinedFrom" id="joinedFrom" placeholder="YYYY-MM-DD to YYYY-MM-DD"
+                            wire:model.defer="joinedFrom" />
+                    </div>
+                    <div class="col-md-2 col-sm-12 ">
+                        <button class="btn btn-outline-primary" wire:ignore title="Apply filter" id="apply-filter"
+                            wire:click="applyFilter($('#roleId').val(),$('#filterStatus').val(),$('#joinedFrom').val())" disabled>Apply</button>
+                    </div>
+                </div>
 
-        <div class="table-responsive">
-            <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>Users</th>
-                        <th>Status</th>
-                        <th>Role</th>
-                        <th>Joined at</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @isset($users)
-                        @foreach ($users as $user)
-                            <tr>
-                                <td class="sorting_1">
-                                    <div class="d-flex justify-content-left align-items-center">
-                                        <div class="avatar-wrapper">
-                                            <div class="avatar  me-1"><img src="{{ $user?->avatar }}" alt="Avatar" height="32" width="32"></div>
-                                        </div>
-                                        <div class="d-flex flex-column">
-                                            <x-anchor-tag href="{{ route('dashboard.users.profile', $user->id) }}" class="user_name text-truncate text-body">
-                                                <span class="fw-bolder">{{ $user?->fullName }}</span>
-                                            </x-anchor-tag>
-                                            <small class="emp_post text-muted">{{ $user?->email }}</small>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    @if ($user?->is_active)
-                                        <span class="badge rounded-pill badge-light-success">Active</span>
-                                    @else
-                                        <span class="badge rounded-pill badge-light-danger">Inactive</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if (count($user->roles) > 0)
-                                        @foreach ($user->roles as $role)
-                                            <span class="badge rounded-pill bg-secondary">{{ $role->title }}</span>
-                                        @endforeach
-                                    @endif
-                                </td>
-                                <td>{{ formatDate($user->created_at) }}</td>
-                                <td>
-                                    <div class="dropdown position-static">
-                                        @can('edit_users', 'delete_users')
-                                            <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
-                                                <span wire:ignore><i data-feather="more-vertical">open</i></span>
-                                            </button>
-                                            <div class="dropdown-menu dropdown-menu-end">
-                                                @can('edit_users')
-                                                    <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $user?->id }}')">
-                                                        <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
-                                                        <span>Edit</span>
-                                                    </x-anchor-tag>
-                                                    @if ($user->is_active)
-                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deactivateUserConfirmation('{{ $user?->id }}')">
-                                                            <span><i data-feather="arrow-down" class="me-50"></i></span>
-                                                            <span>Deactivate</span>
-                                                        </x-anchor-tag>
-                                                    @else
-                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="activateUserConfirmation('{{ $user?->id }}')">
-                                                            <span><i data-feather="arrow-up" class="me-50"></i></span>
-                                                            <span>Activate</span>
-                                                        </x-anchor-tag>
-                                                    @endif
-                                                @endcan
-                                                @can('delete_users')
-                                                    @if (empty($user->deleted_at))
-                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
-                                                            <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
-                                                            <span>Delete</span>
-                                                        </x-anchor-tag>
-                                                    @endif
-                                                @endcan
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Users</th>
+                            <th>Status</th>
+                            <th>Role</th>
+                            <th>Joined at</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @isset($users)
+                            @foreach ($users as $user)
+                                <tr>
+                                    <td class="sorting_1">
+                                        <div class="d-flex justify-content-left align-items-center">
+                                            <div class="avatar-wrapper">
+                                                <div class="avatar  me-1"><img src="{{ getUserAvatar($user) }}" alt="Avatar" height="32" width="32" class="avatar-img">
+                                                </div>
                                             </div>
-                                        @endcan
-                                    </div>
-                                </td>
-                            </tr>
-                        @endforeach
-                    @endisset
-                </tbody>
-            </table>
-            <div class="pagination-container d-flex justify-content-between align-items-center">
-                <x-table-pagination limitPerPage="limitPerPage"></x-table-pagination>
-                <div>
-                    {{ $users->links('components.pagination') }}
+                                            <div class="d-flex flex-column">
+                                                <x-anchor-tag href="{{ route('dashboard.users.profile', $user->id) }}" class="user_name text-truncate text-body">
+                                                    <span class="fw-bolder">{{ $user?->fullName }}</span>
+                                                </x-anchor-tag>
+                                                <small class="emp_post text-muted">{{ $user?->email }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if ($user?->is_active)
+                                            <span class="badge rounded-pill badge-light-success">Active</span>
+                                        @else
+                                            <span class="badge rounded-pill badge-light-danger">Inactive</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if (count($user->roles) > 0)
+                                            @foreach ($user->roles as $role)
+                                                <span class="badge rounded-pill bg-secondary">{{ $role->title }}</span>
+                                            @endforeach
+                                        @endif
+                                    </td>
+                                    <td>{{ formatDate($user->created_at) }}</td>
+                                    <td>
+                                        <div class="dropdown position-static">
+                                            @can('edit_users', 'delete_users')
+                                                <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0" data-bs-toggle="dropdown">
+                                                    <span wire:ignore><i data-feather="more-vertical">open</i></span>
+                                                </button>
+                                                <div class="dropdown-menu dropdown-menu-end">
+                                                    @can('edit_users')
+                                                        <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="edit('{{ $user?->id }}')">
+                                                            <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
+                                                            <span>Edit</span>
+                                                        </x-anchor-tag>
+                                                        @if ($user->is_active)
+                                                            <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deactivateUserConfirmation('{{ $user?->id }}')">
+                                                                <span><i data-feather="arrow-down" class="me-50"></i></span>
+                                                                <span>Deactivate</span>
+                                                            </x-anchor-tag>
+                                                        @else
+                                                            <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="activateUserConfirmation('{{ $user?->id }}')">
+                                                                <span><i data-feather="arrow-up" class="me-50"></i></span>
+                                                                <span>Activate</span>
+                                                            </x-anchor-tag>
+                                                        @endif
+                                                    @endcan
+                                                    @can('delete_users')
+                                                        @if (empty($user->deleted_at))
+                                                            <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation('{{ $user?->id }}')">
+                                                                <span wire:ignore><i data-feather="trash" class="me-50"></i></span>
+                                                                <span>Delete</span>
+                                                            </x-anchor-tag>
+                                                        @endif
+                                                    @endcan
+                                                </div>
+                                            @endcan
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @endisset
+                    </tbody>
+                </table>
+                <div class="pagination-container d-flex justify-content-between align-items-center">
+                    <x-table-pagination limitPerPage="limitPerPage"></x-table-pagination>
+                    <div>
+                        {{ $users->links('components.pagination') }}
+                    </div>
                 </div>
-            </div>
 
+            </div>
         </div>
-    </div>
-    @can('add_users')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} User" buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonStatus="true">
+        @can('add_users')
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} User"
+                buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonStatus="true">
                 <div class="row">
                     <div class="col-md-6 mb-1">
                         <x-input-label for="first_name" class="required" value="First Name" />
@@ -295,117 +301,117 @@
                         @enderror
                     </div>
                 </div>
-        </x-main-modal>
-    @endcan
-</div>
+            </x-main-modal>
+        @endcan
+    </div>
 
-@script
-    <script type="module">
-        $(document).ready(function() {
-            // Reinitialize icons
-            Livewire.on('reinitialize-icons', () => {
-                $(document).ready(function() {
-                    Livewire.dispatch('feather-icons');
+    @script
+        <script type="module">
+            $(document).ready(function() {
+                // Reinitialize icons
+                Livewire.on('reinitialize-icons', () => {
+                    $(document).ready(function() {
+                        Livewire.dispatch('feather-icons');
+                    });
                 });
-            });
 
-            // Initialize select2
-            Livewire.dispatch('select-container');
-            Livewire.on('select-client', (data) => {
-                var $select = $('#client');
-                // Clear existing selections
-                $select.val(null).trigger('change');
-                // Set the new selections
-                $select.val(data[0].formClient).trigger('change');
-            });
+                // Initialize select2
+                Livewire.dispatch('select-container');
+                Livewire.on('select-client', (data) => {
+                    var $select = $('#client');
+                    // Clear existing selections
+                    $select.val(null).trigger('change');
+                    // Set the new selections
+                    $select.val(data[0].formClient).trigger('change');
+                });
 
-            Livewire.on('select-currency', (data) => {
-                var $select = $('#currency');
-                // Clear existing selections
-                $select.val(null).trigger('change');
-                // Set the new selections
-                $select.val(data[0].formCurrency).trigger('change');
-            });
+                Livewire.on('select-currency', (data) => {
+                    var $select = $('#currency');
+                    // Clear existing selections
+                    $select.val(null).trigger('change');
+                    // Set the new selections
+                    $select.val(data[0].formCurrency).trigger('change');
+                });
 
-            Livewire.on('select-status', (data) => {
-                var $select = $('#status');
-                // Clear existing selections
-                $select.val(null).trigger('change');
-                // Set the new selections
-                $select.val(data[0].formStatus).trigger('change');
-            });
+                Livewire.on('select-status', (data) => {
+                    var $select = $('#status');
+                    // Clear existing selections
+                    $select.val(null).trigger('change');
+                    // Set the new selections
+                    $select.val(data[0].formStatus).trigger('change');
+                });
 
-            Livewire.on('select-roles', (data) => {
-                var $select = $('#roles');
-                // Clear existing selections
-                $select.val(null).trigger('change');
-                // Set the new selections
-                $select.val(data[0].formRoles).trigger('change');
-            });
+                Livewire.on('select-roles', (data) => {
+                    var $select = $('#roles');
+                    // Clear existing selections
+                    $select.val(null).trigger('change');
+                    // Set the new selections
+                    $select.val(data[0].formRoles).trigger('change');
+                });
 
-            $('#client').on('change', function(e) {
-                @this.set('form.client_id', $(this).val());
-            });
+                $('#client').on('change', function(e) {
+                    @this.set('form.client_id', $(this).val());
+                });
 
-            $('#currency').on('change', function(e) {
-                @this.set('form.currency', $(this).val());
-            });
+                $('#currency').on('change', function(e) {
+                    @this.set('form.currency', $(this).val());
+                });
 
-            $('#status').on('change', function(e) {
-                @this.set('form.is_active', $(this).val());
-            });
+                $('#status').on('change', function(e) {
+                    @this.set('form.is_active', $(this).val());
+                });
 
-            $('#roles').on('change', function(e) {
-                @this.set('form.roles', $(this).val());
-            });
+                $('#roles').on('change', function(e) {
+                    @this.set('form.roles', $(this).val());
+                });
 
-            // Reinitialize flatpickr
-            Livewire.dispatch('flatpickr');
-            Livewire.on('reinitialize-dispatcher', () => {
-                $(document).ready(function() {
-                    Livewire.dispatch('flatpickr');
+                // Reinitialize flatpickr
+                Livewire.dispatch('flatpickr');
+                Livewire.on('reinitialize-dispatcher', () => {
+                    $(document).ready(function() {
+                        Livewire.dispatch('flatpickr');
+                    })
                 })
-            })
 
-            $('#filter-toggle').on('click', function() {
-                $('#filter-area').toggleClass('d-none d-block');
-                if ($(this).attr('data-filter') === 'open') {
-                    $(this).attr('data-filter', 'close')
-                        .html('<i data-feather="filter"></i> Filter');
-                    Livewire.dispatch('reset-user-filter');
+                $('#filter-toggle').on('click', function() {
+                    $('#filter-area').toggleClass('d-none d-block');
+                    if ($(this).attr('data-filter') === 'open') {
+                        $(this).attr('data-filter', 'close')
+                            .html('<i data-feather="filter"></i> Filter');
+                        Livewire.dispatch('reset-user-filter');
+                    }
+                });
+
+
+                $(document).on('click', '#apply-filter', function() {
+                    $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
+                });
+
+                document.addEventListener('reset-filters', function() {
+                    $('#roleId').val('').trigger('change');
+                    $('#filterStatus').val('').trigger('change');
+                    $('#joinedFrom').val('');
+                });
+
+                function checkFilters() {
+                    let roleSelected = $('#roleId').val() !== '';
+                    let statusSelected = $('#filterStatus').val() !== '';
+                    let dateRangeEntered = $('#joinedFrom').val() !== '';
+
+                    if (roleSelected || statusSelected || dateRangeEntered) {
+                        $('#apply-filter').prop('disabled', false);
+                    } else {
+                        $('#apply-filter').prop('disabled', true);
+                    }
                 }
-            });
 
+                // Monitor changes in the dropdowns and date range input
+                $('#roleId, #filterStatus, #joinedFrom').on('change keyup', function() {
+                    checkFilters();
+                });
 
-            $(document).on('click', '#apply-filter', function() {
-                $('#filter-toggle').attr('data-filter', 'open').html('<i data-feather="x"></i> Remove filter');
-            });
-
-            document.addEventListener('reset-filters', function() {
-                $('#roleId').val('').trigger('change');
-                $('#filterStatus').val('').trigger('change');
-                $('#joinedFrom').val('');
-            });
-
-            function checkFilters() {
-                let roleSelected = $('#roleId').val() !== '';
-                let statusSelected = $('#filterStatus').val() !== '';
-                let dateRangeEntered = $('#joinedFrom').val() !== '';
-
-                if (roleSelected || statusSelected || dateRangeEntered) {
-                    $('#apply-filter').prop('disabled', false);
-                } else {
-                    $('#apply-filter').prop('disabled', true);
-                }
-            }
-
-            // Monitor changes in the dropdowns and date range input
-            $('#roleId, #filterStatus, #joinedFrom').on('change keyup', function() {
+                // Initial check
                 checkFilters();
-            });
-
-            // Initial check
-            checkFilters();
-        })
-    </script>
-@endscript
+            })
+        </script>
+    @endscript

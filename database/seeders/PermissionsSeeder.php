@@ -64,6 +64,7 @@ class PermissionsSeeder extends Seeder
 		Permission::create(['group' => 'project', 'name' => 'view_archived', 'title' => 'View archived']);
         Permission::create(['group' => 'project', 'name' => 'restore_projects', 'title' => 'Restore Project']);
 		Permission::create(['group' => 'project', 'name' => 'view_associated_projects', 'title' => 'View Associated Projects']);
+		Permission::create(['group' => 'project', 'name' => 'allow_invitation', 'title' => 'Allow Invitation']);
 
 	    // Tasks
 	    Permission::create(['group' => 'task', 'name' => 'add_tasks', 'title' => 'Add tasks']);
@@ -123,6 +124,8 @@ class PermissionsSeeder extends Seeder
         // Email permissions
         Permission::create(['group' => 'email', 'name' => 'view_emails', 'title' => 'Email Reports']);
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
+        // calendar permissions
+        Permission::create(['group' => 'Calendar', 'name' => 'view_tasks_in_calendar', 'title' => 'View Tasks in Calendar']);
 
         $superAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
 		$superAdminRole->permissions()->sync(Permission::pluck('id')->all());

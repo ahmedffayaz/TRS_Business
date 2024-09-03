@@ -178,11 +178,11 @@ function getGroupPermissions()
 function priorityToIcon($priority)
 {
     if ($priority == 'high') {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="1" data-feather="arrow-up" class="text-success"></i>';
+        return "<span class='badge badge-light-danger text-capitalize'>{$priority}</span>";
     } else if ($priority === 'medium') {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="2" data-feather="arrow-up" class="text-warning"></i>';
+        return "<span class='badge badge-light-primary text-capitalize'>{$priority}</span>";
     } else {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="3" data-feather="arrow-down" class="text-danger"></i>';
+        return "<span class='badge badge-light-warning text-capitalize'>{$priority}</span>";
     }
 }
 
@@ -343,4 +343,30 @@ function leaveStatus($status)
 function getFullName($user)
 {
     return ucwords("{$user->first_name} {$user->last_name}");
+}
+
+function getInitials($input)
+{
+    if (is_object($input) && isset($input->first_name) && isset($input->last_name)) {
+        // Assume input is a user object
+        $firstName = $input->first_name;
+        $lastName = $input->last_name;
+
+        $initials = ($firstName ? $firstName[0] : '') . ($lastName ? $lastName[0] : '');
+    } elseif (is_string($input)) {
+        // Assume input is a project name string
+        $words = explode(' ', $input);
+        $initials = '';
+
+        if (count($words) > 1) {
+            $initials = $words[0][0] . $words[count($words) - 1][0];
+        } elseif (count($words) === 1) {
+            $initials = $words[0][0];
+        }
+    } else {
+        // Handle unexpected input
+        $initials = '';
+    }
+
+    return strtoupper($initials);
 }

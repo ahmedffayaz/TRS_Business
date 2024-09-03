@@ -93,6 +93,7 @@ class ProjectComponent extends Component
 
     public function render()
     {
+        $user = auth()->user();
         $projects = $this->getProjects();
         $totalProjects =  $this->getTotalProjects()->count();
         $activeProjects = $this->getActiveProjects()->count();
