@@ -3,18 +3,24 @@
     <div class="card">
         <div class="card-body  py-1 my-25">
             <div class="row mb-2">
-                <div class="col-md-4 col-sm-6">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text" wire:ignore id="basic-addon-search2"><i data-feather="search"></i></span>
-                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..." aria-label="Search..."
-                            aria-describedby="basic-addon-search2" />
-                    </div>
-                </div>
-                <div class="col-md-8 col-sm-6 text-end">
+                <div class="col-md-12 col-sm-6 text-end">
                     @can('add_terms_conditions')
                         <x-anchor-tag href="javascript:void(0);" class="btn btn-primary" tabindex="0" aria-controls="table-hover"
                             type="button" wire:click="openMainModal">Add Terms & Conditions</x-anchor-tag>
                     @endcan
+                </div>
+            </div>
+            <div class="container-fluid ms-1">
+                <div class="row mb-2 d-flex justify-content-end align-items-center">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                                <i data-feather="search"></i>
+                            </span>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                                placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -90,12 +96,11 @@
             </div>
         </div>
     </div>
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Terms & Conditions">
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Terms & Conditions" buttonLabel="{{ $form->isUpdate ? __('Update') : __('Add') }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonStatus="true">
         <div class="row">
-            <div class="col-md-6">
-                <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
+            <div class="col-md-12">
                     <div class="row mb-2">
-                        <div class="col-md-12 mb-2">
+                        <div class="col-md-6 mb-2">
                             <x-input-label for="title" class="required" :value="__('Title')" />
                             <x-input type="text" :class="$errors->has('form.title') ? 'form-control error' : 'form-control'" placeholder="Title"
                                 data-msg="Please enter title" autofocus wire:model="form.title" />
@@ -103,7 +108,7 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-md-12 mb-2">
+                        <div class="col-md-6 mb-2">
                             <x-input-label for="version" class="required" :value="__('Version')" />
                             <x-input type="number" :class="$errors->has('form.version') ? 'form-control error' : 'form-control'" placeholder="Version"
                                 data-msg="Please enter version" min="1" step="0.1" autofocus wire:model="form.version" />
@@ -111,7 +116,7 @@
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-md-12 mb-2">
+                        <div class="col-md-12 mb-1">
                             <span wire:ignore.>
                                 <x-input-label for="roles" class="required" value="Roles" />
                                 <x-select-input name="roles" id="role-select" multiple
@@ -129,30 +134,47 @@
                                 <x-input-error :message="$message" />
                             @enderror
                         </div>
-                        <div class="col-md-12 mb-2">
+                        <div class="col-md-12 mb-5">
                             <span wire:ignore.>
-                                <x-input-label for="description" class="required" :value="__('Description')" />
-                                <x-textarea name="description" id="count_text" rows="4" wire:model="form.description"
-                                :class="$errors->has('form.description') ? 'error' : ''" />
+                                    <span wire:ignore.>
+                                        <x-input-label for="description" :value="__('Description')" />
+                                        <div x-data
+                                            x-ref="quillEditor"
+                                            x-init="
+                                                toolbarOptions = [
+                                                    [
+                                                        'bold', 'italic',
+                                                        'underline',
+                                                        'blockquote',
+                                                        'code-block',
+                                                        { 'header': 1 },
+                                                        { 'header': 2 },
+                                                        { 'list': 'ordered'},
+                                                        { 'list': 'bullet' },
+                                                        { 'align': [] },
+                                                        'link'
+                                                    ],
+                                                ];
+                                                quill = new Quill($refs.quillEditor, {modules: {
+                                                    toolbar: toolbarOptions
+                                                },theme: 'snow'});
+                                                quill.on('text-change', function () {
+                                                    data = quill.root.innerHTML;
+                                                    @this.set('form.description', data)
+                                                });
+                                            "
+                                            wire:model.debounce.2000ms="form.description"
+                                        >{!! $form->description !!}</div>
+                                    </span>
+                                    @error('form.description')
+                                        <x-input-error :message="$message" />
+                                    @enderror
                             </span>
                             @error('form.description')
                                 <small class="text-danger">{{ $message }}</small>
                             @enderror
                         </div>
-                        <div class="col-12 text-start">
-                            <button class="btn btn-primary me-1 waves-effect waves-float waves-light" tabindex="4" wire:loading.attr="disabled">
-                                <span wire:loading.remove>{{ $form->isUpdate ? __('Update') : __('Add') }}</span>
-                                <span wire:loading>
-                                    <i class="fa fa-spinner fa-spin " wire:ignore></i> {{ __('Loading...') }}
-                                </span>
-                            </button>
-                        </div>
                     </div>
-                </form>
-            </div>
-            <div class="col-md-6">
-                <x-input-label for="answer" value="Preview" />
-                <div class="form-group markup-preview"></div>
             </div>
         </div>
     </x-main-modal>

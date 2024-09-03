@@ -11,7 +11,20 @@
                         </div>
                         @endcan
                     </div>
-                    <x-table-search :dataCounter="[]" />
+                    <div class="container-fluid ms-2">
+                        <div class="row mb-2 d-flex justify-content-end align-items-center">
+                            <div class="col-md-4 col-sm-12">
+                                <div class="input-group input-group-merge">
+                                    <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                                        <i data-feather="search"></i>
+                                    </span>
+                                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                                        placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="card-table table-responsive card-min-height">
                         <table class="table table-hover">
                             <thead>
@@ -138,7 +151,12 @@
                                 @endisset
                             </tbody>
                         </table>
-                        {{ $leaves->links('components.pagination') }}
+                    </div>
+                    <div class="pagination-container d-flex justify-content-between align-items-center mt-2">
+                        <x-table-pagination limitPerPage="limitPerPage"></x-table-pagination>
+                        <div>
+                            {{ $leaves->links('components.pagination') }}
+                        </div>
                     </div>
                 </div>
             </div>
@@ -156,7 +174,7 @@
         </x-main-modal>
         @else
         @can('view_leaves')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Leave">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Leave" buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'createLeave' }}" buttonStatus="true">
             @include('livewire.backend.leaves.form')
         </x-main-modal>
         @endcan

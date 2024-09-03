@@ -1,5 +1,5 @@
 .dropzone {
-    min-height: 200px;
+    min-height: 180px;
     border: 2px dashed #7367f0;
     background: #f8f8f8;
     position: relative;
@@ -32,8 +32,8 @@
     font-size: 80px;
     position: absolute;
     top: 10rem;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     display: inline-block;
     line-height: 1;
     z-index: 2;

@@ -1,4 +1,3 @@
-<form wire:submit.prevent="{{ $categoryForm->isUpdate ? 'update(' . $categoryForm->id . ')' : 'store' }}">
     <div class="row mb-2">
         <div class="col-md-12">
             <x-input-label for="name" class="required" value="Name" />
@@ -31,20 +30,6 @@
             @enderror
         </div>
     </div>
-
-    <div class="row">
-        <div class="col-md-12 text-center">
-            <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                wire:loading.attr="disabled">
-                <span wire:loading.remove>{{ $categoryForm->isUpdate ? 'Update' : 'Add' }}</span>
-                <span wire:loading>
-                    <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
-                </span>
-            </x-button>
-        </div>
-    </div>
-</form>
-
 @script
     <script>
         $(document).ready(function () {

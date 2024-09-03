@@ -1,6 +1,5 @@
-<form wire:submit.prevent="{{ $questionForm->isUpdate ? 'updateKnowledgeBase(' . $questionForm->id . ')' : 'storeKnowledgeBase' }}">
     <div class="row">
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="row mb-2">
                 <div class="col-md-12">
                     <span wire:ignore.>
@@ -34,21 +33,46 @@
                 </div>
             </div>
 
-            <div class="row mb-2">
+            <div class="row mb-5">
                 <div class="col-md-12">
                     <span wire:ignore.>
-                        <x-input-label for="answer" class="required" value="Answer" />
-                        <x-textarea name="answer" id="count_text" rows="4" wire:model="questionForm.answer"
-                        :class="$errors->has('questionForm.question') ? 'error' : ''" />
-                    </span>
-                    @error('questionForm.answer')
+                        <x-input-label for="answer" :value="__('answer')" />
+                        <div x-data
+                            x-ref="quillEditor"
+                            x-init="
+                                toolbarOptions = [
+                                    [
+                                        'bold', 'italic',
+                                        'underline',
+                                        'blockquote',
+                                        'code-block',
+                                        { 'header': 1 },
+                                        { 'header': 2 },
+                                        { 'list': 'ordered'},
+                                        { 'list': 'bullet' },
+                                        { 'align': [] },
+                                        'link'
+                                    ],
+                                ];
+                                quill = new Quill($refs.quillEditor, {modules: {
+                                    toolbar: toolbarOptions
+                                },theme: 'snow'});
+                                quill.on('text-change', function () {
+                                    data = quill.root.innerHTML;
+                                    @this.set('questionForm.answer', data)
+                                });
+                            "
+                            wire:model.debounce.2000ms="questionForm.answer"
+                        >{!! $questionForm->answer !!}</div>
+                        @error('questionForm.answer')
                         <x-input-error :message="$message" />
-                    @enderror
+                          @enderror
+                    </span>
                 </div>
             </div>
 
-            <div class="row mb-2">
-                <div class="col-md-12">
+            <div class="row mb-2 mt-5">
+                <div class="col-md-12 mt-2">
                     <x-input-label for="keyword" class="required" value="Keywords (separated by , )" />
                     <x-input type="text" name="keywords" id="keywords"
                         :class="$errors->has('questionForm.keywords') ? 'error' : ''"
@@ -58,25 +82,8 @@
                     @enderror
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove>{{ $questionForm->isUpdate ? 'Update' : 'Add' }}</span>
-                        <span wire:loading>
-                            <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
-                        </span>
-                    </x-button>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <x-input-label for="answer" value="Answer Preview" />
-            <div class="form-group answer-preview">
         </div>
     </div>
-</form>
 
 @script
     <script>

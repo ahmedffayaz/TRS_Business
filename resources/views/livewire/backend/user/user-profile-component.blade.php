@@ -17,9 +17,13 @@
                                         : (isset($profileLogo) && $profileLogo
                                             ? asset('storage/' . $profileLogo)
                                             : asset($defaultImage)) }}"
-                                        id="account-upload-img" class="uploadedAvatar rounded me-50"
-                                        alt="profile image" height="100" width="100">
+                                        id="account-upload-img"
+                                        class="uploadedAvatar rounded me-50 object-fit-cover overflow-hidden"
+                                        alt="profile image"
+                                        height="100" width="100"
+                                        style="object-fit: cover; overflow: hidden;" >
                                 </a>
+
                                 <div class="d-flex align-items-end mt-75 ms-1">
                                     <div>
                                         <label for="account-upload"

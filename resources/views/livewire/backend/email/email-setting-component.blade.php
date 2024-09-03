@@ -114,7 +114,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row mt-2">
+                        <div class="row mt-2 text-end">
                             <div class="col-12">
                                 <button type="submit" class="btn btn-primary">Save</button>
                             </div>

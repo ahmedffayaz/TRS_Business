@@ -20,13 +20,13 @@
                             <div class="role-heading">
                                 <h4 class="fw-bolder">{{ ucwords($role->name) }}</h4>
                                 @if ((auth()->user()->can('edit_roles') && $isAdminRoleEditAble && $role->name != 'admin') || auth()->user()->hasRole('super-admin'))
-                                    <a href="javascript:;" class="role-edit-modal" wire:click="edit('{{ $role->id }}')">
-                                        <small class="fw-bolder">Edit Role</small>
+                                    <a href="javascript:;" class="role-edit-modal me-2" wire:click="edit('{{ $role->id }}')">
+                                        <small class="fw-bolder fs-6">Edit Role</small>
                                     </a>
                                 @endif
                                 @can('view_roles')
-                                <a href="javascript:;" class="role-edit-modal ms-2" wire:click="viewPermission('{{ $role->id }}')">
-                                    <small class="fw-bolder">View Role</small>
+                                <a href="javascript:;" class="role-edit-modal" wire:click="viewPermission('{{ $role->id }}')">
+                                    <small class="fw-bolder fs-6">View Role</small>
                                 </a>
                                 @endcan
                             </div>
@@ -62,8 +62,7 @@
     @include('livewire.backend.show-role-Permission', compact('permissionList','roleName' ))
     </x-main-modal>
     @else
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Update' : 'Add' }} Role Permissions">
-        <form class="row" wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Update' : 'Add' }} Role Permissions" buttonLabel="{{ $form->isUpdate ? __('Update Changes') : __('Save Changes') }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" buttonStatus="true">
             <div class="col-12">
                 <label class="form-label">Role Name</label>
                 <input type="text" class="form-control  @error('form.title') is-invalid @enderror" wire:model="form.title" placeholder="Role Name" autofocus
@@ -100,15 +99,6 @@
                 </div>
                 <!-- Permission table -->
             </div>
-            <div class="col-12 text-end mt-75">
-                <button class="btn btn-primary me-1 waves-effect waves-float waves-light" tabindex="4" wire:loading.attr="disabled">
-                    <span wire:loading.remove>{{ $form->isUpdate ? __('Update Changes') : __('Save Changes') }}</span>
-                    <span wire:loading>
-                        <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
-                    </span>
-                </button>
-            </div>
-        </form>
     </x-main-modal>
     @endif
 </div>

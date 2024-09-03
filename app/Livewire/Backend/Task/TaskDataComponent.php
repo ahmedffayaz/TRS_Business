@@ -45,7 +45,7 @@ class TaskDataComponent extends Component
     public string $sortDirection = 'desc';
     public string $dataCountType = 'total'; // Default user type
 
-    public int $limitPerPage = 20;
+    public int $limitPerPage = 10;
 
     public ?int $projectId;
     public ?string $projectSlug;

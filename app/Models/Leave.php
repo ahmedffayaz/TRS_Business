@@ -22,7 +22,7 @@ class Leave extends Model
     ];
 
     protected $casts = [
-        'is_working' => LeaveType::class,
+
         'status' => LeaveStatus::class
     ];
 

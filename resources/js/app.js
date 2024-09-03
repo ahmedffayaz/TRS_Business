@@ -16,9 +16,8 @@ import '../assets/vendors/editors/markdown-text-editor-master/js/editor.min'
 import MTE from '../assets/vendors/editors/markdown-text-editor-master/js/mte'
 import flatpickr from 'flatpickr'
 import '../assets/js/app-chat'
-// import '../assets/js/chart-apex.js'
 import '../assets/js/script'
-
+import '../assets/js/custom'
 document.addEventListener('DOMContentLoaded', () => {
     if (feather) {
         feather.replace({
@@ -84,3 +83,16 @@ window.Quill = Quill;
 window.Showdown = Showdown;
 window.MTE = MTE;
 window.ApexCharts = ApexCharts;
+
+import { Calendar } from '@fullcalendar/core';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import interactionPlugin from '@fullcalendar/interaction';
+
+window.Calendar = Calendar;
+window.dayGridPlugin = dayGridPlugin;
+window.timeGridPlugin = timeGridPlugin;
+window.listPlugin = listPlugin;
+window.interactionPlugin = interactionPlugin;
+

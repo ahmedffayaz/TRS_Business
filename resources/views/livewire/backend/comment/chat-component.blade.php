@@ -45,20 +45,22 @@
                                     <div class="d-flex align-items-center">
                                         <div class="design-group">
                                             @foreach ($members as $member)
-                                                @if ($loop->iteration <= 5)
-                                                    <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
-                                                        title="{{ $member?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
-                                                        @if ($member?->avatar)
-                                                            <img src="{{ getUserAvatar($member) }}" alt="Avatar" width="36" height="36" />
-                                                        @else
-                                                            <div class="avatar-content">{{ $member?->avatarName }}</div>
-                                                        @endif
-                                                    </div>
-                                                @endif
-                                                @if (count($members) > 5)
-                                                    <span>+ {{ count($members) - 5 }}</span>
-                                                @endif
-                                            @endforeach
+                                            @if ($loop->iteration <= 5)
+                                                <div data-bs-toggle="tooltip" data-popup="tooltip-custom" data-bs-placement="bottom"
+                                                    title="{{ $member?->fullName }}" class="avatar bg-light-{{ randomColors() }} pull-up">
+                                                    @if ($member?->avatar)
+                                                        <img src="{{ getUserAvatar($member) }}" alt="Avatar" width="36" height="36" />
+                                                    @else
+                                                        <div class="avatar-content">{{ $member?->avatarName }}</div>
+                                                    @endif
+                                                </div>
+                                            @endif
+                                        @endforeach
+
+                                        @if (count($members) > 5)
+                                            <span>+ {{ count($members) - 5 }}</span>
+                                        @endif
+
                                         </div>
                                     </div>
                                     <div class="dropdown my-2">
@@ -122,7 +124,7 @@
                                             <div class="chat-avatar">
                                                 <span class="avatar box-shadow-1 cursor-pointer">
                                                     @if ($comment->fromUser && $comment->fromUser->avatar)
-                                                    <img src="{{ getUserAvatar($comment->fromUser->avatar) }}" alt="avatar"
+                                                    <img src="{{ getUserAvatar($comment->fromUser) }}" alt="avatar"
                                                         height="36" width="36" />
                                                     @else
                                                     <div class="avatar-content">{{ $comment->fromUser ?
