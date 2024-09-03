@@ -414,7 +414,6 @@
         </section>
     </div>
 
-    {{-- client eidt modal  --}}
     @role('client')
     <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeMainModal" modalTitle="Edit company details">
         <form wire:submit.prevent="updateClientDetail">
@@ -483,7 +482,7 @@
         </form>
     </x-main-modal>
 @endcan
-</div>
+
 @if ($show_swl)
     <script type="module">
         window.Swal.fire({
@@ -504,6 +503,9 @@
         });
     </script>
 @endif
+
+</div>
+
 @script
     <script type="module">
         $(document).ready(function () {
