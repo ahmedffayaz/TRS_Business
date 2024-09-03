@@ -10,21 +10,25 @@ use App\Models\Project;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Database\Eloquent\Builder;
+use App\Enums\Comment\CommentType;
+use App\Enums\Leave\LeaveType;
 
 class EventController extends Controller
 {
     public function events()
     {
         $user = Auth::user();
-        $start = Carbon::parse(request()->get('start'))->format('Y-m-d');
-        $end = Carbon::parse(request()->get('end'))->format('Y-m-d');
+        $start =formatDate(request()->input('start'),'Y-m-d');
+        $end = formatDate(request()->input('end'),'Y-m-d');
+        // $start = Carbon::parse(request()->get('start'))->format('Y-m-d');
+        // $end = Carbon::parse(request()->get('end'))->format('Y-m-d');
         $events = [];
         $types = explode(',', request('types'));
 
         if ($user->hasRole('admin')) {
             $projects = Project::whereBetween('start_date', [$start, $end])->get();
             $comments = Comment::with('to_user', 'fromUser', 'task')
-                ->whereIn('type', ['assigned', 'removed', 'time'])
+                ->whereIn('type', [CommentType::ASSIGNED,  CommentType::REMOVED,CommentType::TIME])
                 ->whereBetween('dated', [$start, $end])->get();
         } else {
             $projects = Project::whereHas('members', function (Builder $query) use ($user) {
@@ -100,19 +104,24 @@ class EventController extends Controller
                 if ($days > 0) {
                     $end_date = date('Y-m-d', strtotime($record->end_date . ' +1 day'));
                 }
-                $working_label = $record->is_working == '1' ? 'Work from home' : ($record->is_working == '2' ? 'Half Leave' : 'Leave ');
+                $working_label = match ($record->is_working) {
+                    '1' => ucwords(LeaveType::WORK_FROM_HOME->value),
+                    '2' => ucwords(LeaveType::HALF_LEAV->value),
+                    default => ucwords(LeaveType::LEAVE->value),
+                };
+
                 $events[] = [
                     'title' => $working_label . '<br/>' . $record->user->name . '<br>Status : ' . $record->status->value . '<br/>Days: ' . (($days === 0) ? 1 : $days),
                     'start' => $record->start_date,
                     'end' => $end_date,
-                    'can_edit' => $this->auth_user->hasPermissionTo('edit_leaves'),
+                    'can_edit' => $user->hasPermissionTo('edit_leaves'),
                     'user_id' => $record->user->id,
                     'auth_user_id' => $user->id,
                     'textColor' => $record->is_working == '1' ? '#FF9F43' : '#EA5455',
                     'borderColor' => $record->is_working == '1' ? 'rgba(255, 159, 67, .12)' : 'rgba(234, 84, 85, .12)',
                     'backgroundColor' => $record->is_working == '1' ? 'rgba(255, 159, 67, .12)' : 'rgba(234, 84, 85, .12)',
                     'evt' => $record,
-                    'can_delete' => $this->auth_user->hasPermissionTo('delete_leaves'),
+                    'can_delete' => $user->hasPermissionTo('delete_leaves'),
                 ];
             }
         }
@@ -122,12 +131,12 @@ class EventController extends Controller
 
     private function generateEventTitle($comment)
     {
-        if ($comment->type === 'assigned') {
+        if ($comment->type === CommentType::ASSIGNED->value) {
             return '<div class="d-flex justify-content-between align-items-center">
                         <div class="calendar-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->to_user->name . '">' . getInitials($comment->to_user) . '</div>
                         <span class="badge bg-success">assigned</span>
                     </div><br/>' . optional($comment->task)->name;
-        } else if ($comment->type === 'removed') {
+        } else if ($comment->type === CommentType::REMOVED->value) {
             return '<div class="d-flex justify-content-between align-items-center">
                         <div class="calendar-avatar" data-bs-toggle="tooltip" data-bs-placement="top" title="' . $comment->to_user->name . '">' . getInitials($comment->to_user) . '</div>
                         <span class="badge bg-danger">removed</span>
