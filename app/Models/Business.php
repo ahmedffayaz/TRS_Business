@@ -49,4 +49,9 @@ class Business extends Model
     {
         return $this->belongsToMany(Role::class, 'business_role', 'business_id', 'role_id');
     }
+
+    public function country()
+    {
+        return $this->belongsTo(Country::class);
+    }
 }

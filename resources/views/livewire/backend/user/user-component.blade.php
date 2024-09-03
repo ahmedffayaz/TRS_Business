@@ -32,9 +32,11 @@
                     </select>
                     <span class="">entries</span>
                 </div>
+                @role('admin')
                 <div class="ms-1">
                     <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore> <i data-feather="filter"></i> Filter</button>
                 </div>
+                @endrole
             </div>
             <div class="col-md-4 col-sm-12">
                 <div class="input-group input-group-merge">
@@ -96,7 +98,7 @@
                                 <td class="sorting_1">
                                     <div class="d-flex justify-content-left align-items-center">
                                         <div class="avatar-wrapper">
-                                            <div class="avatar  me-1"><img src="{{ $user?->avatar }}" alt="Avatar" height="32" width="32"></div>
+                                            <div class="avatar  me-1"><img src="{{ getUserAvatar($user) }}" alt="Avatar" height="32" width="32" class="avatar-img"></div>
                                         </div>
                                         <div class="d-flex flex-column">
                                             <x-anchor-tag href="{{ route('dashboard.users.profile', $user->id) }}" class="user_name text-truncate text-body">
@@ -166,10 +168,7 @@
         </div>
     </div>
     @can('add_users')
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal">
-            <div class="text-center mb-2">
-                <h1 class="mb-1">{{ $form->isUpdate ? 'Edit' : 'Add' }} User</h1>
-            </div>
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} User">
             <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
                 <div class="row">
                     <div class="col-md-6 mb-1">

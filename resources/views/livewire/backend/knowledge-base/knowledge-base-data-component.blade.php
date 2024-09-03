@@ -159,7 +159,7 @@
     </div>
 
     @if($isQuestionModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeQuestionModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeQuestionModal" modalTitle="{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Question">
             @include('livewire.backend.knowledge-base.question-form')
         </x-main-modal>
     @elseif($isShowKnowledgeBase)
@@ -167,7 +167,7 @@
             @include('livewire.backend.knowledge-base.knowledge-base-detail')
         </x-main-modal>
     @else
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeCategoryModal">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeCategoryModal" modalTitle="{{ $categoryForm->isUpdate ? 'Edit' : 'Add' }} Knowledge Base Category">
             @include('livewire.backend.knowledge-base.category-form')
         </x-main-modal>
     @endif

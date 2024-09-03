@@ -1,6 +1,3 @@
-<div class="text-center mb-2">
-    <h1 class="mb-1">{{ $categoryForm->isUpdate ? 'Edit' : 'Add' }} Knowledge Base Category</h1>
-</div>
 <form wire:submit.prevent="{{ $categoryForm->isUpdate ? 'update(' . $categoryForm->id . ')' : 'store' }}">
     <div class="row mb-2">
         <div class="col-md-12">

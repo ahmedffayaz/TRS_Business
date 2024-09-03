@@ -93,10 +93,23 @@ class ProjectComponent extends Component
 
     public function render()
     {
+        $user = auth()->user();
         $projects = $this->getProjects();
-        $totalProjects = Project::sessionBusiness()->withTrashed()->count();
-        $activeProjects = Project::sessionBusiness()->count();
-        $archivedProjects = Project::sessionBusiness()->onlyTrashed()->count();
+        $totalProjects = Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->withTrashed()->count();
+        $activeProjects = Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->count();
+        $archivedProjects = Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->onlyTrashed()->count();
         $clients = Client::select('id', 'business_id', 'name')->sessionBusiness()->get();
         $members = User::sessionBusiness()->get();
         $this->dispatch('reinitialize-icons');

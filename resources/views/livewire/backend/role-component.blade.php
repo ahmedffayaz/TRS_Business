@@ -62,11 +62,7 @@
     @include('livewire.backend.show-role-Permission', compact('permissionList','roleName' ))
     </x-main-modal>
     @else
-    <x-main-modal wireIgnoreSelf="wire:ignore.self">
-        <div class="text-center mb-2">
-            <h1 class="mb-1">{{ $form->isUpdate ? 'Update' : 'Add' }} Role</h1>
-            <p>Set role permissions.</p>
-        </div>
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" modalTitle="{{ $form->isUpdate ? 'Update' : 'Add' }} Role Permissions">
         <form class="row" wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
             <div class="col-12">
                 <label class="form-label">Role Name</label>

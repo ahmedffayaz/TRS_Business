@@ -157,11 +157,11 @@ function getGroupPermissions()
 function priorityToIcon($priority)
 {
     if ($priority == 'high') {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="1" data-feather="arrow-up" class="text-success"></i>';
+        return "<span class='badge badge-light-danger text-capitalize'>{$priority}</span>";
     } else if ($priority === 'medium') {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="2" data-feather="arrow-up" class="text-warning"></i>';
+        return "<span class='badge badge-light-primary text-capitalize'>{$priority}</span>";
     } else {
-        return '<i data-toggle="tooltip" title="' . $priority . '" data-priority="3" data-feather="arrow-down" class="text-danger"></i>';
+        return "<span class='badge badge-light-warning text-capitalize'>{$priority}</span>";
     }
 }
 

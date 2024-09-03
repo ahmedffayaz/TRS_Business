@@ -19,7 +19,7 @@
         <div class="col-md-6 float-end">
             <div class="view-options float-end d-flex">
 
-                @can('assign_member')
+                @can('allow_invitation')
                 <x-button class="btn btn-primary me-1" type="button" wire:click="openInviteClientModal">
                     Invite Client
                 </x-button>
@@ -30,16 +30,16 @@
                     Project Statistics
                 </x-button>
                 @endcan
-                <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Revenue')"
+                @can('view_revenue')
+                    <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Revenue')"
                     tabindex="0" aria-controls="table-hover" type="button" wire:click="showRevenueModal" wire:ignore. />
+                @endcan
 
                 @if ($project->tasks_count == 0 && $project->status->value !== 'delivered' &&
                 is_null($project->deleted_at))
                 <x-anchor-tag class="btn btn-primary me-1" href="javascript:void(0);" :value="__('Deliver Project')"
                     tabindex="0" aria-controls="table-hover" type="button" wire:ignore. />
                 @endif
-
-                <x-anchor-tag href="{{ route('dashboard.projects.index') }}" class="btn btn-primary" value="Back" />
             </div>
         </div>
     </section>

@@ -45,46 +45,63 @@ class UserComponent extends Component
         $this->getTotalUsers();
     }
 
-    private function getUserQuery()
+    public function getUserQuery()
     {
+        $user = auth()->user();
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
-        return User::sessionBusiness()->where(function($query){
-            $query->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
-            });
-        })->when($this->roleId, function ($query) {
-            $query->whereHas('roles', function ($query) {
-                $query->where('id', $this->roleId);
-            });
-        })
-        ->when($this->filterStatus, function ($query) {
-            $isActive = $this->filterStatus === 'active'  ? 1 : 0;
+
+        return User::sessionBusiness()
+            ->when($user->hasRole('client'), function ($query) use ($user) {
+                // For clients: Show only their own data
+                $query->whereHas('roles', function ($query) {
+                    $query->where('name', 'client');
+                })
+                    ->where('client_id', $user->client_id)
+                    ->where('is_active', 1);
+            }, function ($query) {
+                // For admins and others: Show all users except those with the 'client' role
+                $query->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'client');
+                });
+            })
+            ->when($this->roleId, function ($query) {
+                // Filter by role ID if provided
+                $query->whereHas('roles', function ($query) {
+                    $query->where('id', $this->roleId);
+                });
+            })
+            ->when($this->filterStatus, function ($query) {
+                // Filter by active status
+                $isActive = $this->filterStatus === 'active' ? 1 : 0;
                 $query->where('is_active', $isActive);
-        })
-        ->when($this->joinedFrom, function ($query) {
-            $query->whereDate('created_at', '>=', $this->joinedFrom);
-        })
-        ->when($this->joinedFrom, function ($query) {
-            $dateRange = $this->joinedFrom;
-            [$joinedFrom, $joinedTo] = explode(' to ', $dateRange);
-            $joinedFrom = Carbon::createFromFormat('Y-m-d', $joinedFrom)->startOfDay();
-            $joinedTo = Carbon::createFromFormat('Y-m-d', $joinedTo)->endOfDay();
-            $query->whereBetween('created_at', [$joinedFrom, $joinedTo]);
-        })
-        ->getList($this->search, $this->columnName, $this->sortDirection);
+            })
+            ->when($this->joinedFrom, function ($query) {
+                // Filter by join date
+                $dateRange = $this->joinedFrom;
+                if (strpos($dateRange, ' to ') !== false) {
+                    [$joinedFrom, $joinedTo] = explode(' to ', $dateRange);
+                    $joinedFrom = Carbon::createFromFormat('Y-m-d', $joinedFrom)->startOfDay();
+                    $joinedTo = Carbon::createFromFormat('Y-m-d', $joinedTo)->endOfDay();
+                    $query->whereBetween('created_at', [$joinedFrom, $joinedTo]);
+                } else {
+                    $query->whereDate('created_at', '>=', $dateRange);
+                }
+            })
+            ->getList($this->search, $this->columnName, $this->sortDirection);
     }
+
 
     private function getTotalUsers(): LengthAwarePaginator
     {
         return $this->getUserQuery()->paginate($this->limitPerPage);
     }
 
-    private function getActiveUsers() : LengthAwarePaginator
+    private function getActiveUsers(): LengthAwarePaginator
     {
         return $this->getUserQuery()->where('is_active', 1)->paginate($this->limitPerPage);
     }
 
-    private function getArchivedUsers() : LengthAwarePaginator
+    private function getArchivedUsers(): LengthAwarePaginator
     {
         return $this->getUserQuery()->where('is_active', 0)->paginate($this->limitPerPage);
     }
@@ -101,19 +118,19 @@ class UserComponent extends Component
         $clients = Client::sessionBusiness()->get();
         $roles = Role::where('name', '!=', 'client')->where('business_id', $this->business_id)->get();
         $users = $this->getUsers();
-        $totalUsers = User::sessionBusiness()->where(function($query){
+        $totalUsers = User::sessionBusiness()->where(function ($query) {
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->count();
 
-        $activeUsers = User::sessionBusiness()->where(function($query){
+        $activeUsers = User::sessionBusiness()->where(function ($query) {
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
         })->where('is_active', 1)->count();
 
-        $archivedUsers = User::sessionBusiness()->where(function($query){
+        $archivedUsers = User::sessionBusiness()->where(function ($query) {
             $query->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client')->where('business_id', $this->business_id);
             });
@@ -237,7 +254,8 @@ class UserComponent extends Component
             Log::error('Get error while update user: ' . $exception->getMessage());
             $this->dispatch('alert', [
                 'type' => 'error',
-                'message' => 'Sorry, the user could not be found in our database.']);
+                'message' => 'Sorry, the user could not be found in our database.'
+            ]);
         } catch (Exception $exception) {
             DB::rollBack();
             Log::error('Get error while update user: ' . $exception->getMessage());
@@ -248,7 +266,7 @@ class UserComponent extends Component
     public function deactivateUserConfirmation($id)
     {
         $this->dispatch('swal-alert', [
-            'id' =>  $id,
+            'id' => $id,
             'type' => 'deactivate',
             'iconType' => 'warning',
             'title' => 'Are you sure?',
@@ -265,7 +283,7 @@ class UserComponent extends Component
             $user->update(['is_active' => false]);
             DB::commit();
             $this->dispatch('reinitialize-icons');
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'User deactivated successfully.']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'User deactivated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error on deactivate user: ' . $exception->getMessage());
@@ -280,7 +298,7 @@ class UserComponent extends Component
     public function activateUserConfirmation($id)
     {
         $this->dispatch('swal-alert', [
-            'id' =>  $id,
+            'id' => $id,
             'type' => 'activate',
             'iconType' => 'warning',
             'title' => 'Are you sure?',
@@ -297,7 +315,7 @@ class UserComponent extends Component
             $user->update(['is_active' => true]);
             DB::commit();
             $this->dispatch('reinitialize-icons');
-            $this->dispatch('alert', ['type' => 'success',  'message' => 'User activated successfully.']);
+            $this->dispatch('alert', ['type' => 'success', 'message' => 'User activated successfully.']);
         } catch (ModelNotFoundException $exception) {
             DB::rollBack();
             Log::error('Get error on deactivate user: ' . $exception->getMessage());
@@ -339,7 +357,7 @@ class UserComponent extends Component
             $this->dispatch('alert', ['type' => 'error', 'message' => 'Something went wrong.']);
         }
     }
-    public function applyFilter($roleId,$status,$joinedFrom)
+    public function applyFilter($roleId, $status, $joinedFrom)
     {
         $this->roleId = $roleId;
         $this->filterStatus = $status;
@@ -349,6 +367,6 @@ class UserComponent extends Component
     public function resetFilters()
     {
         $this->dispatch('reset-filters');
-        $this->reset(['roleId','filterStatus','joinedFrom','search']);
+        $this->reset(['roleId', 'filterStatus', 'joinedFrom', 'search']);
     }
 }

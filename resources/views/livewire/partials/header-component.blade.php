@@ -1,4 +1,13 @@
 <div>
+    <style>
+                .avatar-img {
+        width: 33px;
+        height: 33px;
+        object-fit: cover;
+        border-radius: 50%;
+        overflow: hidden;
+    }
+    </style>
     <nav class="header-navbar navbar navbar-expand-lg align-items-center floating-nav navbar-light navbar-shadow container-xxl">
         <div class="navbar-container d-flex content">
             <div class="bookmark-wrapper d-flex align-items-center">
@@ -97,7 +106,7 @@
                             $avatar = auth()->user()->avatar ? asset('storage/' . auth()->user()->avatar) : '/assets/images/avatar.png';
                         @endphp
                         <div class="user-nav d-sm-flex d-none"><span class="user-name fw-bolder">{{ ucfirst(auth()->user()->first_name) }}
-                                {{ ucfirst(auth()->user()->last_name) }}</span><span class="user-status">{{ ucwords(getAuthRoles($business->id)) }}</span></div><span class="avatar"><img
+                                {{ ucfirst(auth()->user()->last_name) }}</span><span class="user-status">{{ ucwords(getAuthRoles($business->id)) }}</span></div><span class="avatar"><img class="avatar-img"
                                 class="round" src="{{ url($avatar) }}" alt="avatar" height="40" width="40"><span class="avatar-status-online"></span></span>
                     </a>
                     <div class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown-user" style="width : 15rem;">
