@@ -125,15 +125,16 @@
             <div style="margin-bottom: 10px; color:#03096D;  margin-top: 30px;">
                 <h5 style="">{{ ucwords($categoryName) ?? 'null' }}</h5>
             </div>
-            <div style="overflow: hidden; margin-bottom: 20px;">
+            <div style="overflow: hidden; margin-bottom: 20px; border: .2px solid #dcdcdc;border-radius: 3px;">
                 @foreach ($knowledgeBase as $questionAnswer)
-                    <div style="padding: 10px; font-size: 12px; border: .2px solid #dcdcdc;border-radius: 3px; margin-bottom: 10px;">
-                       <div style="margin-bottom: 10px;"> {{ $questionAnswer->question }} </div>
+                    <div style="padding: 10px; font-size: 12px; border-bottom: .2px solid #dcdcdc">
+                       <div style="margin-bottom: 7px;"> {{ $questionAnswer->question }} </div>
                     <dive
                         style="font-size: 11px; color: #7F7F7F;">
                         {{ $questionAnswer->answer }}
                     </dive>
                     </div>
+
                 @endforeach
             </div>
             @if (!$loop->last)
