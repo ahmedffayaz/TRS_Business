@@ -125,9 +125,9 @@
             <div style="margin-bottom: 10px; color:#03096D;  margin-top: 30px;">
                 <h5 style="">{{ ucwords($categoryName) ?? 'null' }}</h5>
             </div>
-            <div style="border-radius: 3px; overflow: hidden; border: .5px solid #cecece; margin-bottom: 20px;">
+            <div style="overflow: hidden; margin-bottom: 20px;">
                 @foreach ($knowledgeBase as $questionAnswer)
-                    <div style="padding: 10px; font-size: 12px;">
+                    <div style="padding: 10px; font-size: 12px; border: .2px solid #dcdcdc;border-radius: 3px; margin-bottom: 10px;">
                        <div style="margin-bottom: 10px;"> {{ $questionAnswer->question }} </div>
                     <dive
                         style="font-size: 11px; color: #7F7F7F;">

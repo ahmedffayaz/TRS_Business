@@ -93,6 +93,7 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'knowledgeBase', 'name' => 'edit_knowledgeBase', 'title' => 'Edit knowledge base']);
         Permission::create(['group' => 'knowledgeBase', 'name' => 'view_knowledgeBase', 'title' => 'View knowledge base']);
         Permission::create(['group' => 'knowledgeBase', 'name' => 'delete_knowledgeBase', 'title' => 'Delete knowledge base']);
+        Permission::create(['group' => 'knowledgeBase', 'name' => 'download_knowledgeBase', 'title' => 'Download knowledge base']);
         // Attachments
         Permission::create(['group' => 'attachment', 'name' => 'add_attachments', 'title' => 'Add attachment']);
         Permission::create(['group' => 'attachment', 'name' => 'view_attachments', 'title' => 'View attachments']);

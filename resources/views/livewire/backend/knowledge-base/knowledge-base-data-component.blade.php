@@ -64,7 +64,7 @@
                                                 <span>Delete</span>
                                             </x-anchor-tag>
                                         @endcan
-                                        @can('delete_knowledgeBase')
+                                        @can('download_knowledgeBase')
                                             <x-anchor-tag class="dropdown-item delete" href="javascript:void(0)"
                                                 wire:click="downloadKnowledgeBasePdf({{ $category->id }})">
                                                 <span wire:ignore.>
