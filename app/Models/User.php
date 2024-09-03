@@ -177,8 +177,8 @@ class User extends Authenticatable
             return $query->orWhere('is_active', 0);
         }
     }
-
-    public function scopeStatusActive($query)
+  
+     public function scopeStatusActive($query)
     {
         return $query->orWhere('is_active', 1);
     }

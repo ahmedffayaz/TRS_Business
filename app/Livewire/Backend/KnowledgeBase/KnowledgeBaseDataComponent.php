@@ -11,6 +11,7 @@ use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use App\Models\KnowledgeBase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Models\KnowledgeBaseCategory;
 use App\Livewire\Forms\KnowledgeBaseForm;
@@ -418,5 +419,29 @@ class KnowledgeBaseDataComponent extends Component
                 'message' => 'Something went wrong.'
             ]);
         }
+    }
+
+    public function downloadKnowledgeBasePdf($categoryId)
+    {
+        $categoryBaseQuestionsAnswers = KnowledgeBase::where('knowledge_base_category_id', $categoryId)
+        ->with('category')
+        ->get()
+        ->groupBy('category.name');
+
+        $pdf = App::make('dompdf.wrapper');
+        $pdf->setOption(['isPhpEnable' => true])->setPaper('a4', 'portrait');
+
+        $fileName = 'knowledge_base_' . uniqid() . '.pdf';
+
+        $tempDirectory = storage_path('app/public/temp/');
+        if (!is_dir($tempDirectory)) {
+            mkdir($tempDirectory, 0755, true);
+        }
+
+        $filePath = $tempDirectory . $fileName;
+        $view = 'livewire.backend.knowledge-base.knowledge-base-pdf';
+
+        $pdf->loadView($view, compact('categoryBaseQuestionsAnswers'))->save($filePath);
+        return response()->download($filePath)->deleteFileAfterSend(true);
     }
 }
