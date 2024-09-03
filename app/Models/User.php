@@ -178,6 +178,11 @@ class User extends Authenticatable
         }
     }
 
+    public function scopeStatusActive($query)
+    {
+        return $query->orWhere('is_active', 1);
+    }
+
     public function getStatusAttribute()
     {
         return $this->is_active ? 'Active' : 'Inactive';

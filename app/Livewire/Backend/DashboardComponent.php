@@ -138,13 +138,13 @@ class DashboardComponent extends Component
 
         if ($this->user->hasRole('client')) {
 
-            return User::where('client_id', $this->user->client_id)->status('Active')->whereHas('roles', function ($query) {
+            return User::where('client_id', $this->user->client_id)->StatusActive()->whereHas('roles', function ($query) {
                 $query->where('name', '=', 'client');
             })->count();
 
         } elseif ($this->user->hasRole('admin')) {
 
-            return User::where('business_id', $this->user->business_id)->status('Active')->whereHas('roles', function ($query) {
+            return User::where('business_id', $this->user->business_id)->StatusActive()->whereHas('roles', function ($query) {
                 $query->where('name', '!=', 'client');
             })->count();
         }
