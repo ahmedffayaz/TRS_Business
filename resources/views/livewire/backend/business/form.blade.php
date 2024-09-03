@@ -1,6 +1,4 @@
-<div class="text-center mb-2">
-    <h1 class="mb-1">Add Business</h1>
-</div>
+
 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
     <div class="row mb-1">
         <div class="col-md-12">
@@ -14,27 +12,6 @@
     </div>
 
     <div class="row mb-1">
-        <div class="col-md-12">
-            <x-input-label class="required" for="address" value="Address" />
-            <x-textarea name="address" id="address"
-                :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'"
-                placeholder="Enter address" wire:model="form.address"
-                data-length="200" length="200" rows="3" />
-            @error('form.address')
-                <x-input-error :message="$message" />
-            @enderror
-        </div>
-    </div>
-
-    <div class="row mb-1">
-        <div class="col-md-6 pe-md-1">
-            <x-input-label for="city" class="required" value="City" />
-            <x-input type="text" name="city" id="city" :class="$errors->has('form.city') ? 'error' : ''"
-                placeholder="Enter city" wire:model="form.city" />
-            @error('form.city')
-                <x-input-error :message="$message" />
-            @enderror
-        </div>
         <div class="col-md-6 ps-md-1">
             <span wire:ignore.>
             <x-input-label for="country" class="required" value="Country" />
@@ -50,6 +27,14 @@
             </x-select-input>
             </span>
             @error('form.country_id')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+        <div class="col-md-6 pe-md-1">
+            <x-input-label for="city" class="required" value="City" />
+            <x-input type="text" name="city" id="city" :class="$errors->has('form.city') ? 'error' : ''"
+                placeholder="Enter city" wire:model="form.city" />
+            @error('form.city')
                 <x-input-error :message="$message" />
             @enderror
         </div>
@@ -103,7 +88,18 @@
             @enderror
         </div>
     </div>
-
+    <div class="row">
+        <div class="col-md-12">
+            <x-input-label class="required" for="address" value="Address" />
+            <x-textarea name="address" id="address"
+                :class="$errors->has('form.address') ? 'error char-textarea' : 'char-textarea'"
+                placeholder="Enter address" wire:model="form.address"
+                data-length="200" length="200" rows="3" />
+            @error('form.address')
+                <x-input-error :message="$message" />
+            @enderror
+        </div>
+    </div>
     <div class="row mb-1">
         <div class="col-md-6 mb-1">
             <label class="col-form-label" for="Company favicon">Favicon</label>

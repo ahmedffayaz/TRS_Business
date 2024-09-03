@@ -1,6 +1,13 @@
 <div>
-    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" enctype="multipart/form-data">
         <div class="row mb-1">
+            <div class="col-md-{{ $projectId ? '12' : '6' }}">
+                <x-input-label for="name" class="required" value="Name" />
+                <x-input type="text" name="name" id="name" :class="$errors->has('form.name') ? 'error' : ''"
+                    placeholder="Enter project name" wire:model="form.name" />
+                @error('form.name')
+                    <x-input-error :message="$message" />
+                @enderror
+            </div>
             @if (!$projectId)
                 <div class="col-md-6">
                     <span wire:ignore.>
@@ -20,51 +27,6 @@
                     @enderror
                 </div>
             @endif
-            <div class="col-md-{{ $projectId ? '12' : '6' }}">
-                <x-input-label for="name" class="required" value="Name" />
-                <x-input type="text" name="name" id="name" :class="$errors->has('form.name') ? 'error' : ''"
-                    placeholder="Enter project name" wire:model="form.name" />
-                @error('form.name')
-                    <x-input-error :message="$message" />
-                @enderror
-            </div>
-        </div>
-        <div class="row mb-5">
-            <div class="col-md-12 mb-2">
-                <span wire:ignore.>
-                    <x-input-label for="description" :value="__('Description')" />
-                    <div x-data
-                        x-ref="quillEditor"
-                        x-init="
-                            toolbarOptions = [
-                                [
-                                    'bold', 'italic',
-                                    'underline',
-                                    'blockquote',
-                                    'code-block',
-                                    { 'header': 1 },
-                                    { 'header': 2 },
-                                    { 'list': 'ordered'},
-                                    { 'list': 'bullet' },
-                                    { 'align': [] },
-                                    'link'
-                                ],
-                            ];
-                            quill = new Quill($refs.quillEditor, {modules: {
-                                toolbar: toolbarOptions
-                            },theme: 'snow'});
-                            quill.on('text-change', function () {
-                                data = quill.root.innerHTML;
-                                @this.set('form.description', data)
-                            });
-                        "
-                        wire:model.debounce.2000ms="form.description"
-                    >{!! $form->description !!}</div>
-                </span>
-                @error('form.description')
-                    <x-input-error :message="$message" />
-                @enderror
-            </div>
         </div>
         <div class="row mb-1">
             @php
@@ -132,8 +94,45 @@
                 @enderror
             </div>
         </div>
-        <div class="row mb-1">
-            <div class="col-md-12">
+        <div class="row mb-5">
+            <div class="col-md-12 mb-3">
+                <span wire:ignore.>
+                    <x-input-label for="description" :value="__('Description')" />
+                    <div x-data
+                        x-ref="quillEditor"
+                        x-init="
+                            toolbarOptions = [
+                                [
+                                    'bold', 'italic',
+                                    'underline',
+                                    'blockquote',
+                                    'code-block',
+                                    { 'header': 1 },
+                                    { 'header': 2 },
+                                    { 'list': 'ordered'},
+                                    { 'list': 'bullet' },
+                                    { 'align': [] },
+                                    'link'
+                                ],
+                            ];
+                            quill = new Quill($refs.quillEditor, {modules: {
+                                toolbar: toolbarOptions
+                            },theme: 'snow'});
+                            quill.on('text-change', function () {
+                                data = quill.root.innerHTML;
+                                @this.set('form.description', data)
+                            });
+                        "
+                        wire:model.debounce.2000ms="form.description"
+                    >{!! $form->description !!}</div>
+                </span>
+                @error('form.description')
+                    <x-input-error :message="$message" />
+                @enderror
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12 h-25">
                 <livewire:dropzone
                 wire:model="form.attachments"
                 :rules="['mimes:png,jpeg,jpeg,pdf,doc,docx','max:10420']"
@@ -171,16 +170,6 @@
             @endforeach
         </div>
     @endif
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                    wire:loading.attr="disabled">
-                    <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
-                <x-button-loader />
-            </x-button>
-            </div>
-        </div>
-    </form>
 </div>
 
 @script

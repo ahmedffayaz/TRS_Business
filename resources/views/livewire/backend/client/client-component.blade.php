@@ -7,37 +7,26 @@
             @can('add_clients')
                 <div>
                     <x-anchor-tag href="{{ route('dashboard.clients.create') }}" class="btn btn-primary" tabindex="0"
-                        aria-controls="table-hover" type="button">Add Client</x-anchor-tag>
+                        aria-controls="table-hover" type="button">Add New Client</x-anchor-tag>
                 </div>
             @endcan
             </div>
         </div>
         <div class="card-body">
-            <div class="row mb-2 d-flex justify-content-between align-items-center">
-                <div class="col-md-6 d-flex align-items-center">
-                    <div class="col-md-2 col-sm-6 d-flex align-items-center">
-                        <span class="">Show</span>
-                        <select class="form-select  w-auto" wire:model.live.debounce.500ms="limitPerPage" style="margin:0 4px;">
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="25">25</option>
-                            <option value="30">30</option>
-                            <option value="35">35</option>
-                        </select>
-                        <span class="">entries</span>
-                    </div>
-                </div>
-                <div class="col-md-4 col-sm-12">
-                    <div class="input-group input-group-merge">
-                        <span class="input-group-text" wire:ignore id="basic-addon-search2">
-                            <i data-feather="search"></i>
-                        </span>
-                        <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
-                            placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+            <div class="container-fluid ms-1">
+                <div class="row mb-2 d-flex justify-content-end align-items-center">
+                    <div class="col-md-4 col-sm-12">
+                        <div class="input-group input-group-merge">
+                            <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                                <i data-feather="search"></i>
+                            </span>
+                            <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                                placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                        </div>
                     </div>
                 </div>
             </div>
+
 
 
 
@@ -122,7 +111,12 @@
                         @endisset
                     </tbody>
                 </table>
-                {{ $clients->links('components.pagination') }}
+            </div>
+            <div class="pagination-container d-flex justify-content-between align-items-center mt-2">
+                    <x-table-pagination limitPerPage="limitPerPage"></x-table-pagination>
+                <div>
+                    {{ $clients->links('components.pagination') }}
+                </div>
             </div>
         </div>
     </div>

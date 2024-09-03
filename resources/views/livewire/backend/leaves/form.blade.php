@@ -4,7 +4,6 @@
         $halfLeave = \App\Enums\Leave\LeaveType::HALF_LEAV->value;
         $workFromHome = \App\Enums\Leave\LeaveType::WORK_FROM_HOME->value;
     @endphp
-    <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'createLeave' }}">
         <div class="row mb-1">
             <div class="col-md-4">
                 <x-input-label for="start-date" class="required" value="Start Date" />
@@ -51,17 +50,6 @@
             @enderror
         </div>
     </div>
-
-        <div class="row">
-            <div class="col-md-12 text-center">
-                <x-button class="btn-primary me-1" type="submit" tabindex="4"
-                    wire:loading.attr="disabled">
-                        <span wire:loading.remove>{{ $form->isUpdate ? 'Update' : 'Add' }}</span>
-                    <x-button-loader />
-                </x-button>
-            </div>
-        </div>
-    </form>
 </div>
 
 

@@ -3,7 +3,7 @@
         @can('add_knowledgeBase')
             <div class="d-flex">
                 <div class="col-md-7">
-                    <x-anchor-tag class="btn btn-primary" href="javascript:void(0);"
+                    <x-anchor-tag class="btn btn-primary ms-5" href="javascript:void(0);"
                         :value="__('Add Question')" tabindex="0" aria-controls="table-hover"
                         type="button" wire:click="openCreateKnowledgeBaseModal" wire:ignore />
                 </div>
@@ -15,15 +15,20 @@
         @endcan
     @endsection
 
-    <div class="row mb-2">
-        <div class="col-md-4 col-sm-12">
-            <div class="input-group input-group-merge">
-                <span class="input-group-text" id="basic-addon-search2" wire:ignore><i data-feather="search"></i></span>
-                <input type="text" class="form-control" wire:model.live.debounce.500ms="search" placeholder="Search..."
-                    aria-label="Search..." aria-describedby="basic-addon-search2" />
+    <div class="container-fluid mt-1 ms-1">
+        <div class="row mb-2 d-flex justify-content-end align-items-center">
+            <div class="col-md-4 col-sm-12">
+                <div class="input-group input-group-merge">
+                    <span class="input-group-text" wire:ignore id="basic-addon-search2">
+                        <i data-feather="search"></i>
+                    </span>
+                    <input type="text" class="form-control" wire:model.live.debounce.500ms="search"
+                        placeholder="Search..." aria-label="Search..." aria-describedby="basic-addon-search2" />
+                </div>
             </div>
         </div>
     </div>
+
     <div class="row kb-search-content-info match-height">
         @forelse ($knowledgeBaseCategories as $category)
             @can('view_knowledgeBase')
@@ -31,20 +36,21 @@
                     <!-- account setting card -->
                     <div class="card">
                         <div class="card-header">
-                            <span wire:ignore.>
-                                <i data-feather="settings" class="font-medium-4 me-50 text-primary"></i>
-                            </span>
-                            <h4 class="card-title">{{ strlen($category->name) > 30
-                                ? substr($category->name, 0, 30) . '...'
-                                : $category->name }}</h4>
+
                             @can('edit_knowledgeBase', 'delete_knowledgeBase')
-                                <div class="dropdown">
+                            <div class="dropdown">
+                                    <span wire:ignore.>
+                                        <i data-feather="settings" class="font-medium-4 me-50 text-primary"></i>
+                                    </span>
                                     <button type="button" class="btn btn-sm dropdown-toggle hide-arrow py-0"
                                         data-bs-toggle="dropdown">
                                         <span wire:ignore.>
                                             <i data-feather="more-vertical"></i>
                                         </span>
                                     </button>
+                                    <h4 class="card-title mt-2 mb-0">{{ strlen($category->name) > 35
+                                        ? substr($category->name, 0, 35) . '...'
+                                        : $category->name }}</h4>
                                     <div class="dropdown-menu dropdown-menu-end">
                                         @can('edit_knowledgeBase')
                                             <x-anchor-tag class="dropdown-item" href="javascript:void(0);"
@@ -78,7 +84,7 @@
                             @endcan
                         </div>
                         <div class="card-body">
-                            <div class="list-group list-group-circle mt-2">
+                            <div class="list-group list-group-circle">
                                 @forelse ($category->questions as $question)
                                     <div class="row">
                                         <div class="col-md-10">
@@ -159,7 +165,7 @@
     </div>
 
     @if($isQuestionModalOpen)
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeQuestionModal" modalTitle="{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Question">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeQuestionModal" modalTitle="{{ $questionForm->isUpdate ? 'Edit' : 'Add' }} Question" buttonLabel="{{ $questionForm->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $questionForm->isUpdate ? 'updateKnowledgeBase(' . $questionForm->id . ')' : 'storeKnowledgeBase' }}" buttonStatus="true">
             @include('livewire.backend.knowledge-base.question-form')
         </x-main-modal>
     @elseif($isShowKnowledgeBase)
@@ -167,7 +173,7 @@
             @include('livewire.backend.knowledge-base.knowledge-base-detail')
         </x-main-modal>
     @else
-        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeCategoryModal" modalTitle="{{ $categoryForm->isUpdate ? 'Edit' : 'Add' }} Knowledge Base Category">
+        <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeCategoryModal" modalTitle="{{ $categoryForm->isUpdate ? 'Edit' : 'Add' }} Knowledge Base Category" buttonLabel="{{ $categoryForm->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $categoryForm->isUpdate ? 'update(' . $categoryForm->id . ')' : 'store' }}" buttonStatus="true">
             @include('livewire.backend.knowledge-base.category-form')
         </x-main-modal>
     @endif

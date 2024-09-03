@@ -38,19 +38,8 @@
 
             <div class="row mb-2 d-flex justify-content-between align-items-center">
                 <div class="col-md-6 d-flex align-items-center">
+                    <div>
                     <!-- Adjust column sizes and spacing -->
-                    <div class="d-flex align-items-center">
-                        <span class="">Show</span>
-                        <select class="form-select w-auto" wire:model.live.debounce.500ms="limitPerPage">
-                            <option value="10">10</option>
-                            <option value="15">15</option>
-                            <option value="20">20</option>
-                            <option value="25">25</option>
-                            <option value="30">30</option>
-                            <option value="35">35</option>
-                        </select>
-                        <span class="">entries</span>
-                    </div>
                     <div class="ms-1">
                         @role('admin')
                             <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore>
@@ -309,14 +298,19 @@
                         @endforelse
                     </tbody>
                 </table>
-                {{ $tasks->links('components.pagination') }}
+            </div>
+            <div class="pagination-container d-flex justify-content-between align-items-center mt-2">
+                <x-table-pagination limitPerPage="limitPerPage"></x-table-pagination>
+                <div>
+                    {{ $tasks->links('components.pagination') }}
+                </div>
             </div>
         </div>
     </div>
 
     @if ($isTaskModalOpen)
         @can('add_tasks')
-            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task">
+            <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeModal" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} Task" modalTitle="{{ $form->isUpdate ? 'Edit' : 'Add' }} User" buttonLabel="{{ $form->isUpdate ? 'Update' : 'Add' }}" formSubmit="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}" multipart="multipart/form-data" buttonStatus="true">
                 @include('livewire.backend.task.form')
             </x-main-modal>
         @endcan
