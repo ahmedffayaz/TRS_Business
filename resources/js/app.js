@@ -16,9 +16,8 @@ import '../assets/vendors/editors/markdown-text-editor-master/js/editor.min'
 import MTE from '../assets/vendors/editors/markdown-text-editor-master/js/mte'
 import flatpickr from 'flatpickr'
 import '../assets/js/app-chat'
-// import '../assets/js/chart-apex.js'
 import '../assets/js/script'
-
+import '../assets/js/custom'
 document.addEventListener('DOMContentLoaded', () => {
     if (feather) {
         feather.replace({
