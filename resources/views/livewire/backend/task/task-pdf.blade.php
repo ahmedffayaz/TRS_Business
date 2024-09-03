@@ -95,7 +95,7 @@
         style="width: 100%; max-width: 100%; display: flex; justify-content: center; align-items: center;">
         @php
             $business_details = session('business_details');
-            $src = ($business_details['logo'] != null && Storage::disk('public')->exists($business_details['logo'])) ?  'storage/' . $business_details['logo'] : null;
+            $src = ($business_details['logo'] != null && Storage::disk('public')->exists($business_details['logo'])) ?  'storage/' . $business_details['logo'] : cmsLogo();
         @endphp
 
         <table

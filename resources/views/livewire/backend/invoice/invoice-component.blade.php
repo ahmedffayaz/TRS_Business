@@ -24,7 +24,9 @@
                 <table class="table table-hover">
                     <thead>
                         <tr>
+                            @role('admin')
                             <th>Client</th>
+                            @endrole
                             <th>Project</th>
                             <th>Invoice Number</th>
                             <th>Total Amount</th>
@@ -46,9 +48,12 @@
                         @endphp
                             @forelse ($invoices as $invoice)
                                 <tr>
+                                    @role('admin')
                                     <td class="sorting_1">
                                         <x-anchor-tag href="#">{{ $invoice?->project?->client?->name }}</x-anchor-tag>
                                     </td>
+                                    @endrole
+
                                     <td>
                                         <x-anchor-tag
                                             href="{{ route('dashboard.projects.detail', $invoice?->project?->slug) }}">{{ $invoice?->project?->name }}</x-anchor-tag>
@@ -77,17 +82,21 @@
                                                         <span>View Invoice</span>
                                                     </x-anchor-tag>
                                                     @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus || $invoice?->status?->value === $approvedStatus)
+                                                        @role('admin')
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="resendEmail({{ $invoice?->id }})">
                                                             <span wire:ignore><i data-feather="mail" class="me-50"></i></span>
                                                             <span>Resend Email</span>
                                                         </x-anchor-tag>
+                                                        @endrole
                                                     @endif
 
                                                     @if ($invoice?->status?->value === $processedStatus || $invoice?->status?->value === $partiallyPaidStatus  && auth()->user()->hasPermissionTo('bill_invoices') && is_null($invoice?->billed_at))
+                                                    @role('admin')
                                                     <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="openAddPaymentModal({{ $invoice?->id }})">
                                                         <span wire:ignore><i data-feather="edit-2" class="me-50"></i></span>
                                                         <span>Add Payment</span>
                                                     </x-anchor-tag>
+                                                    @endrole
                                                     @endif
 
                                                     @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('add_invoices'))
@@ -96,16 +105,19 @@
                                                             <span>Referesh Invoice</span>
                                                         </x-anchor-tag>
                                                     @endif
-
+                                                    @role('admin')
                                                     <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="showPayments({{ $invoice?->id }})">
                                                         <span wire:ignore><i data-feather="dollar-sign" class="me-50"></i></span>
                                                         <span>Payments</span>
                                                     </x-anchor-tag>
+                                                    @endrole
                                                     @else
+                                                    @role('admin')
                                                     <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="show_draft({{ $invoice?->id }})">
                                                         <span wire:ignore><i data-feather="edit" class="me-50"></i></span>
                                                         <span>Edit</span>
                                                     </x-anchor-tag>
+                                                    @endrole
                                                     @endif
                                                     @if ($invoice?->status?->value === $processedStatus && auth()->user()->hasPermissionTo('bill_invoices'))
                                                         <x-anchor-tag class="dropdown-item" href="javascript:void(0);" wire:click="deleteConfirmation({{ $invoice?->id }})">
