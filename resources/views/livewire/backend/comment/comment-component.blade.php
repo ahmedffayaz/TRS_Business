@@ -6,7 +6,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center mb-1">
                         <h5 class="mb-0">Billable</h5>
-                        @can('add_task')
+                        @can('add_tasks')
                             <div>
                                 <x-anchor-tag href="#" class="btn btn-primary float-end" tabindex="0" aria-controls="table-hover"
                                     type="button" wire:click="openModal" value="Add Time" />

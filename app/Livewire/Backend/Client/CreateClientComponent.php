@@ -43,12 +43,15 @@ class CreateClientComponent extends Component
         $this->i = $i + 1;
         array_push($this->inputs, 1);
         $this->dispatch('reinitialize-icons');
+        $this->dispatch('reinitialize-feather-icons');
 
     }
 
     public function removeUserFields($key)
     {
         unset($this->inputs[$key]);
+        $this->dispatch('reinitialize-icons');
+        $this->dispatch('reinitialize-feather-icons');
     }
 
     public function render()

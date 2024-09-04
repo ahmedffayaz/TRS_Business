@@ -1,3 +1,8 @@
+<style>
+    .btn-icon{
+        width: 90px;
+    }
+</style>
 <form wire:submit.prevent="{{ $form->isUpdate ? 'update(' . $form->id . ')' : 'store' }}">
     <x-input type="hidden" wire:model="form.business_id" />
     <div class="row mb-1">
@@ -137,7 +142,7 @@
                                 name="send_email[0]" value="true" wire:model="form.send_email.0" />
                         </div>
                 </div>
-                <div class="col-md-1 ps-md-1">
+                <div class="col-md-1">
                     <div class="row">
                         <div class="col-md-12">
                             <x-input-label for="action" value="Action" />
@@ -146,8 +151,8 @@
                     <div class="row">
                         <div class="col-md-12">
                             <x-anchor-tag class="btn btn-icon btn-outline-primary"
-                                href="javascript:void(0);" wire:click="addUserFields({{ $i }})" wire:ignore.>
-                                    <i data-feather="plus"></i>
+                                href="javascript:void(0);" wire:click="addUserFields({{ $i }})">
+                                    <span><i data-feather="plus"></i>Add</span>
                             </x-anchor-tag>
                         </div>
                     </div>
@@ -184,20 +189,15 @@
                     <div class="form-check form-switch form-check-success">
                         <input type="hidden" name="send_email[{{ $key + 1 }}]" value="false">
                         <x-input type="checkbox" class="form-check-input" id="send_email_{{ $key + 1 }}"
-                            name="send_email[{{ $key + 1 }}]" value="true" wire:model="form.send_email.{{ $key + 1 }}" />
+                            name="send_email[{{ $key + 1 }}]" value="true" wire:model="form.send_email.{{ $key + 1 }}"/>
                     </div>
                 </div>
-                <div class="col-md-1 ps-md-1">
-                    <div class="row">
+                <div class="col-md-1">
+                    <div class="row mt-2">
                         <div class="col-md-12">
-                            <x-input-label for="action" value="Action" />
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12">
-                            <x-anchor-tag class="btn btn-icon btn-outline-danger"
-                                href="javascript:void(0);" wire:click="removeUserFields({{ $key }})" wire:ignore.>
-                                    <i data-feather="trash-2"></i>
+                            <x-anchor-tag class="btn btn-icon btn-outline-danger fs-10"
+                                href="javascript:void(0);" wire:click="removeUserFields({{ $key }})">
+                                    <span>Delete</span>
                             </x-anchor-tag>
                         </div>
                     </div>
