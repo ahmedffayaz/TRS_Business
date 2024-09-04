@@ -470,8 +470,8 @@
                                 <x-input-error :message="$message" />
                             @enderror
                         </div>
-                        <div class="col-md-12 text-center">
-                            <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
+                        <div class="col-md-12 text-center d-flex justify-content-end">
+                            <x-button class="btn btn-primary waves-effect waves-float waves-light" type="submit" tabindex="4"
                                 wire:loading.attr="disabled">
                                 <span wire:loading.remove>Update</span>
                                 <span wire:loading>
