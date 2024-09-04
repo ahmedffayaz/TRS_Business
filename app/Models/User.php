@@ -178,9 +178,9 @@ class User extends Authenticatable
         }
     }
 
-    public function scopeStatusActive($query)
+     public function scopeStatusActive($query)
     {
-        return $query->orWhere('is_active', 1);
+        return $query->whereIsActive(true);
     }
 
     public function getStatusAttribute()

@@ -58,7 +58,7 @@ class ProjectComponent extends Component
         $this->dispatch('reinitialize-icons');
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
         $this->dispatch('reinitialize-chart');
-        return Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
+        return Project::sessionBusiness()->when(!$user->can('view_total_projects'), function ($query) use ($user) {
                 $query->whereHas('members', function ($query) use ($user) {
                     $query->where('user_id', $user->id);
                 });

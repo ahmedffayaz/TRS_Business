@@ -46,14 +46,17 @@
                         <span class="badge badge-light-warning rounded-pill ms-auto me-1">2</span>
                     </a>
                     <ul class="menu-content">
-                        <li>
-                            <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.home') ? 'active' : '' }}" href="{{ url('dashboard') }}">
+                        @can('view_analytics')
+                        <li class="{{ request()->routeIs('dashboard.home') ? 'active' : '' }} nav-item">
+                            <x-anchor-tag class="d-flex align-items-center" href="{{ url('dashboard') }}">
                                  <i data-feather="circle"></i>
                                 <span class="menu-item text-truncate" data-i18n="Analytics">Analytics</span>
                             </x-anchor-tag>
                         </li>
-                        <li>
-                            <x-anchor-tag class="d-flex align-items-center {{ request()->routeIs('dashboard.home.calendar') ? 'active' : '' }}" href="{{ route('dashboard.home.calendar') }}">
+                        @endcan
+
+                        <li class="{{ request()->routeIs('dashboard.home.calendar') ? 'active' : '' }} nav-item">
+                            <x-anchor-tag class="d-flex align-items-center" href="{{ route('dashboard.home.calendar') }}">
                                 <i data-feather="circle"></i>
                                 <span class="menu-item text-truncate" data-i18n="eCommerce">Calendar</span>
                             </x-anchor-tag>

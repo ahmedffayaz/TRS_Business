@@ -93,6 +93,7 @@ class PermissionsSeeder extends Seeder
         Permission::create(['group' => 'knowledgeBase', 'name' => 'edit_knowledgeBase', 'title' => 'Edit knowledge base']);
         Permission::create(['group' => 'knowledgeBase', 'name' => 'view_knowledgeBase', 'title' => 'View knowledge base']);
         Permission::create(['group' => 'knowledgeBase', 'name' => 'delete_knowledgeBase', 'title' => 'Delete knowledge base']);
+        Permission::create(['group' => 'knowledgeBase', 'name' => 'download_knowledgeBase', 'title' => 'Download knowledge base']);
         // Attachments
         Permission::create(['group' => 'attachment', 'name' => 'add_attachments', 'title' => 'Add attachment']);
         Permission::create(['group' => 'attachment', 'name' => 'view_attachments', 'title' => 'View attachments']);
@@ -124,8 +125,15 @@ class PermissionsSeeder extends Seeder
         // Email permissions
         Permission::create(['group' => 'email', 'name' => 'view_emails', 'title' => 'Email Reports']);
         Permission::create(['group' => 'email', 'name' => 'email_reports', 'title' => 'Email Reports']);
-        // calendar permissions
-        Permission::create(['group' => 'Calendar', 'name' => 'view_tasks_in_calendar', 'title' => 'View Tasks in Calendar']);
+
+        // dashboard permissions
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_tasks_in_calendar', 'title' => 'View Tasks in Calendar']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_analytics', 'title' => 'View Analytics']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_total_users', 'title' => 'View Total Users']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_total_projects', 'title' => 'View Total Projects']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_total_tasks', 'title' => 'View Total Tasks']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_client_details', 'title' => 'View Client Details']);
+        Permission::create(['group' => 'Dashboard', 'name' => 'view_client_dashboard', 'title' => 'View Client Dashboard']);
 
         $superAdminRole = Role::updateOrCreate(['name' => 'super-admin'], ['title' => 'Super Admin']);
 		$superAdminRole->permissions()->sync(Permission::pluck('id')->all());

@@ -71,9 +71,7 @@ class Task extends Model
             });
         })->whereHas('project', function ($query) {
             if (!auth()->user()->hasRole('super-admin')) {
-                $query->sessionBusiness()->whereHas('members', function ($query) {
-                    $query->where('user_id', auth()->user()->id);
-                });
+                $query->sessionBusiness();
             } else {
                 $query->sessionBusiness();
             }
