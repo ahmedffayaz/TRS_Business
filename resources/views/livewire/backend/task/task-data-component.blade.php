@@ -36,11 +36,9 @@
             @endphp
 
 
-            <div class="row mb-2 d-flex justify-content-between align-items-center">
-                <div class="col-md-6 d-flex align-items-center">
-                    <div>
-                    <!-- Adjust column sizes and spacing -->
-                    <div class="ms-1">
+            <div class="row d-flex justify-content-between align-items-center  mb-2">
+                <div class="col-md-2 col-sm-12">
+                    <div class="">
                         @role('admin')
                             <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore>
                                 <i data-feather="filter"></i> Filter

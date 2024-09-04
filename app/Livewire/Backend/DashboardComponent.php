@@ -134,44 +134,42 @@ class DashboardComponent extends Component
 
     public function getUserCount()
     {
+        $user = auth()->user();
 
-
-        if ($this->user->hasRole('client')) {
-
-            return User::where('client_id', $this->user->client_id)->statusActive()->whereHas('roles', function ($query) {
-                $query->where('name', '=', 'client');
+           return User::sessionBusiness()
+            ->when($user->hasRole('client'), function ($query) use ($user) {
+                $query->whereHas('roles', function ($query) {
+                    $query->where('name', 'client');
+                })
+                    ->where('client_id', $user->client_id)
+                    ->where('is_active', 1);
+            }, function ($query) {
+                $query->whereDoesntHave('roles', function ($query) {
+                    $query->where('name', 'client');
+                });
             })->count();
 
-        } elseif ($this->user->hasRole('admin')) {
-
-            return User::where('business_id', $this->user->business_id)->statusActive()->whereHas('roles', function ($query) {
-                $query->where('name', '!=', 'client');
-            })->count();
-        }
-
-        return 0;
     }
 
     public function getProjectCount()
     {
-        if ($this->user->hasRole('client')) {
-
-            return Project::where('client_id', $this->user->client_id)->where('business_id', $this->user->business_id)->count();
-        } elseif ($this->user->hasRole('admin')) {
-
-            return Project::where('business_id', $this->user->business_id)->count();
-        }
+        $user = auth()->user();
+        return Project::sessionBusiness()->when($user->hasRole('client'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->count();
     }
 
     public function getTaskCount()
     {
         if ($this->user->hasRole('client')) {
 
-            return Project::where('client_id', $this->user->client_id)
+            return Project::sessionBusiness()->where('client_id', $this->user->client_id)
                 ->withCount('tasks')->get()->sum('tasks_count');
         } elseif ($this->user->hasRole('admin')) {
 
-            return Project::where('business_id', $this->user->business_id)
+            return Project::sessionBusiness()
                 ->withCount('tasks')->get()->sum('tasks_count');
         }
     }

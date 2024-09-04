@@ -65,7 +65,6 @@ class UserComponent extends Component
                 });
             })
             ->when($this->roleId, function ($query) {
-                // Filter by role ID if provided
                 $query->whereHas('roles', function ($query) {
                     $query->where('id', $this->roleId);
                 });

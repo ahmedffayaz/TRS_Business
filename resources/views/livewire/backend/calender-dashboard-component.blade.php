@@ -720,10 +720,32 @@
                             } else if (result.dismiss === Swal.DismissReason.cancel) {
 
                                 if (can_delete) {
-                                    Livewire.dispatch('destroy-leave', [calEvent.extendedProps
+                                    Swal.fire({
+                                    text: "Are you sure to delete ?",
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#3085d6',
+                                    cancelButtonColor: '#d33',
+                                    confirmButtonText: 'Yes, delete it!',
+                                    cancelButtonText: 'No, keep it',
+                                    focusConfirm: true
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        Livewire.dispatch('destroy-leave', [calEvent.extendedProps
                                         .evt.id
                                     ]);
+                                    }
+
+                                });
+
+                                }else{
+                                    Swal.fire({
+                                    text: "You have no permission to delete",
+                                    icon: 'warning',
+                                    cancelButtonText: 'OK',
+                                });
                                 }
+
                             }
                         });
                     }
