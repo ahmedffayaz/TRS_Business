@@ -20,10 +20,10 @@
                 <li class="nav-item me-auto">
                     <a class="navbar-brand" href="{{ route('dashboard.home') }}">
                         <span class="brand-logo">
-                            <img class="logo-light" src="{{ cmsLogo() }}" alt="Light Mode Logo" height="40">
-                            <img class="logo-dark" src="{{ darkModeCMSLogo() }}" alt="Dark Mode Logo" height="40">
-                            <img class="light-short-logo" src="{{ shortCMSLogo() }}" alt="Short CMS Logo" height="40">
-                            <img class="dark-short-logo" src="{{ darkShortCMSLogo() }}" alt="Short CMS Logo" height="40">
+                            <img class="logo-light" src="{{ cmsLogo() }}" alt="Light Mode Logo" height="40" >
+                            <img class="logo-dark" src="{{ darkModeCMSLogo() }}" alt="Dark Mode Logo" height="40" style="display: none">
+                            <img class="light-short-logo" src="{{ shortCMSLogo() }}" alt="Short CMS Logo" height="40" style="display: none">
+                            <img class="dark-short-logo" src="{{ darkShortCMSLogo() }}" alt="Short CMS Logo" height="40" style="display: none">
                         </span>
                     </a>
                 </li>
