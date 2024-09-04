@@ -146,15 +146,17 @@ class DashboardComponent extends Component
     public function getProjectCount()
     {
         $user = auth()->user();
-        return Project::select('id', 'business_id', 'client_id', 'created_at')->sessionBusiness()->when(!$user->can('view_total_tasks'), function ($query) use ($user) {
-            $query->where('client_id', $user->client_id);
-        })->withCount('tasks')->get()->sum('tasks_count');
+        return Project::sessionBusiness()->when(!$user->can('view_total_projects'), function ($query) use ($user) {
+            $query->whereHas('members', function ($query) use ($user) {
+                $query->where('user_id', $user->id);
+            });
+        })->count();
     }
 
     public function getTaskCount()
     {
         $user = auth()->user();
-        return Project::sessionBusiness()->when(!$user->can('view_total_tasks'), function ($query) use ($user) {
+        return Project::select('id', 'business_id', 'client_id', 'created_at')->sessionBusiness()->when(!$user->can('view_total_tasks'), function ($query) use ($user) {
             $query->where('client_id', $user->client_id);
         })->withCount('tasks')->get()->sum('tasks_count');
 
