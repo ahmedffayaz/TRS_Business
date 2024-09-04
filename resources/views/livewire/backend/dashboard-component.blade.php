@@ -45,7 +45,8 @@
                 </div>
             @endif
             <div class="row match-height">
-                @role('client')
+                @can('view_client_dashboard')
+                @if(!auth()->user()->hasRole('admin'))
                 <div class="col-xl-6 col-md-6 col-12">
                     <div class="card card-congratulation-medal">
                         <div class="card-body">
@@ -67,12 +68,13 @@
                         </div>
                     </div>
                 </div>
-                @endrole
+                @endif
+                @endcan
                 <!-- Statistics Card -->
                 <div
                     class="col-md-6 col-12 {{ auth()->user()->hasRole('admin') ? 'col-lg-12' :  'col-lg-6' }}">
                     <div class="row">
-                        @role('admin|client')
+                        @can('view_client_dashboard')
                             <div
                                 class="col-md-4 col-sm-6 {{ auth()->user()->hasRole('client') ? 'col-xl-4' : 'col-xl-3' }}">
                                 <div class="card text-center">
@@ -90,7 +92,7 @@
                                     </div>
                                 </div>
                             </div>
-                        @endrole
+                        @endcan
                         @role('admin')
                             <div class="col-xl-3 col-md-4 col-sm-6">
                                 <div class="card text-center">
@@ -109,7 +111,7 @@
                                 </div>
                             </div>
                         @endrole
-                        @role('admin|client')
+                        @can('view_client_dashboard')
                             <div
                                 class="col-md-4 col-sm-6 {{ auth()->user()->hasRole('client') ? 'col-xl-4' : 'col-xl-3' }}">
                                 <div class="card text-center">
@@ -127,8 +129,8 @@
                                     </div>
                                 </div>
                             </div>
-                        @endrole
-                        @role('admin|client')
+                        @endcan
+                        @can('view_client_dashboard')
                             <div
                                 class="col-md-4 col-sm-6 {{ auth()->user()->hasRole('client') ? 'col-xl-4' : 'col-xl-3' }}">
                                 <div class="card text-center">
@@ -146,13 +148,14 @@
                                     </div>
                                 </div>
                             </div>
-                        @endrole
+                        @endcan
                     </div>
                 </div>
             </div>
 
 
-            @role('client')
+            @can('view_client_dashboard')
+            @if(!auth()->user()->hasRole('admin'))
             <div class="row match-height">
                 <!-- task Table Card -->
                 <div class="col-lg-8 col-12">
@@ -410,78 +413,81 @@
                     </div>
                 </div>
             </div>
-            @endrole
+
+
+            {{-- eide modal --}}
+            <x-main-modal wireIgnoreSelf="wire:ignore.self"  modalTitle="Edit company details" formSubmit="updateClientDetail">
+                {{-- <form wire:submit="updateClientDetail"> --}}
+                    <div class="row">
+                        <div class="col-md-6 mb-1">
+                            <x-input-label for="clientName" class="required" value="Company name" />
+                            <x-input type="text" id="clientName" :class="$errors->has('form.clientName') ? 'error' : ''" placeholder="Enter company name" wire:model="form.clientName"
+                                value="{{ $clientDetail?->name }}" />
+                            @error('form.clientName')
+                                <x-input-error :message="$message" />
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <span>
+                                <x-input-label for="clientContryId" class="required" value="Country" />
+                                <x-select-input id="clientContryId"
+                                    :class="$errors->has('form.clientContryId') ? 'error select-two select2' : 'select-two select2'"
+                                    wire:model="form.clientContryId">
+                                    <option>Select country</option>
+                                    @isset($this->countries)
+                                        @foreach ($this->countries as $country)
+                                            <option value="{{ $country->id }}" @selected($country->id == $form['clientContryId'])>{{ $country->name }}</option>
+                                        @endforeach
+                                    @endisset
+                                </x-select-input>
+                            </span>
+                            @error('form.clientContryId')
+                                <x-input-error :message="$message" />
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <x-input-label for="clientCity" class="required" value="City" />
+                            <x-input type="text"  id="clientCity" :class="$errors->has('form.clientCity') ? 'error' : ''" placeholder="Enter city" wire:model="form.clientCity"
+                                value="{{ $clientDetail?->city }}" />
+                            @error('form.clientCity')
+                                <x-input-error :message="$message" />
+                            @enderror
+                        </div>
+                        <div class="col-md-6">
+                            <x-input-label for="clientPostalCode" value="Postal Code" />
+                            <x-input type="number" id="clientPostalCode"
+                                :class="$errors->has('form.clientPostalCode') ? 'error' : ''"
+                                placeholder="Enter postal code" wire:model="form.clientPostalCode"  value="{{ $clientDetail?->postal_code }}"/>
+                            @error('form.clientPostalCode')
+                                <x-input-error :message="$message" />
+                            @enderror
+                        </div>
+                        <div class="col-md-12 mb-1">
+                            <x-input-label for="address" class="required" value="Address" />
+                            <x-textarea type="text" id="address" :class="$errors->has('form.clientAddress') ? 'error' : ''" placeholder="Enter address" wire:model="form.clientAddress"
+                                value="{{ $clientDetail?->address }}" />
+                            @error('form.clientAddress')
+                                <x-input-error :message="$message" />
+                            @enderror
+                        </div>
+                        <div class="col-md-12 text-center">
+                            <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
+                                wire:loading.attr="disabled">
+                                <span wire:loading.remove>Update</span>
+                                <span wire:loading>
+                                    <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
+                                </span>
+                            </x-button>
+                        </div>
+                    </div>
+                {{-- </form> --}}
+            </x-main-modal>
+            @endif
+            @endcan
         </section>
     </div>
 
-    @role('client')
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeMainModal" modalTitle="Edit company details">
-        <form wire:submit.prevent="updateClientDetail">
-            <div class="row">
-                <div class="col-md-6 mb-1">
-                    <x-input-label for="clientName" class="required" value="Company name" />
-                    <x-input type="text" id="clientName" :class="$errors->has('form.clientName') ? 'error' : ''" placeholder="Enter company name" wire:model="form.clientName"
-                        value="{{ $clientDetail?->name }}" />
-                    @error('form.clientName')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6">
-                    <span>
-                        <x-input-label for="clientContryId" class="required" value="Country" />
-                        <x-select-input id="clientContryId"
-                            :class="$errors->has('form.clientContryId') ? 'error select-two select2' : 'select-two select2'"
-                            wire:model="form.clientContryId">
-                            <option>Select country</option>
-                            @isset($this->countries)
-                                @foreach ($this->countries as $country)
-                                    <option value="{{ $country->id }}" @selected($country->id == $form['clientContryId'])>{{ $country->name }}</option>
-                                @endforeach
-                            @endisset
-                        </x-select-input>
-                    </span>
-                    @error('form.clientContryId')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6">
-                    <x-input-label for="clientCity" class="required" value="City" />
-                    <x-input type="text"  id="clientCity" :class="$errors->has('form.clientCity') ? 'error' : ''" placeholder="Enter city" wire:model="form.clientCity"
-                        value="{{ $clientDetail?->city }}" />
-                    @error('form.clientCity')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-6">
-                    <x-input-label for="clientPostalCode" value="Postal Code" />
-                    <x-input type="number" id="clientPostalCode"
-                        :class="$errors->has('form.clientPostalCode') ? 'error' : ''"
-                        placeholder="Enter postal code" wire:model="form.clientPostalCode"  value="{{ $clientDetail?->postal_code }}"/>
-                    @error('form.clientPostalCode')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-12 mb-1">
-                    <x-input-label for="address" class="required" value="Address" />
-                    <x-textarea type="text" id="address" :class="$errors->has('form.clientAddress') ? 'error' : ''" placeholder="Enter address" wire:model="form.clientAddress"
-                        value="{{ $clientDetail?->address }}" />
-                    @error('form.clientAddress')
-                        <x-input-error :message="$message" />
-                    @enderror
-                </div>
-                <div class="col-md-12 text-center">
-                    <x-button class="btn btn-primary me-1 waves-effect waves-float waves-light" type="submit" tabindex="4"
-                        wire:loading.attr="disabled">
-                        <span wire:loading.remove>Update</span>
-                        <span wire:loading>
-                            <i class="fa fa-spinner fa-spin"></i> {{ __('Loading...') }}
-                        </span>
-                    </x-button>
-                </div>
-            </div>
-        </form>
-    </x-main-modal>
-@endcan
+
 
 @if ($show_swl)
     <script type="module">
@@ -506,23 +512,24 @@
 
 </div>
 
-@script
-    <script type="module">
-        $(document).ready(function () {
-            // Reinitialize icons
-            Livewire.on('reinitialize-icons', () => {
-                $(document).ready(function () {
-                    Livewire.dispatch('feather-icons');
-                    Livewire.dispatch('select-container');
-                    $('[data-bs-toggle="tooltip"]').tooltip({
-                        container: 'body'
-                    })
-                });
+@push('scripts')
+<script type="module">
+    $(document).ready(function () {
+        // Reinitialize icons
+        Livewire.on('reinitialize-icons', () => {
+            $(document).ready(function () {
+                Livewire.dispatch('feather-icons');
+                Livewire.dispatch('select-container');
+                // $('[data-bs-toggle="tooltip"]').tooltip({
+                //     container: 'body'
+                // });
             });
+        });
 
-            $(document).on('change','#clientContryId', function(e) {
-                @this.set('form.clientContryId', e.target.value);
-            });
-        })
-    </script>
-@endscript
+        $(document).on('change','#clientContryId', function(e) {
+            @this.set('form.clientContryId', e.target.value);
+        });
+    });
+</script>
+@endpush
+

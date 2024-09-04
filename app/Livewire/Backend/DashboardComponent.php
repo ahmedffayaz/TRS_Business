@@ -135,26 +135,18 @@ class DashboardComponent extends Component
     public function getUserCount()
     {
         $user = auth()->user();
-
-           return User::sessionBusiness()
-            ->when($user->hasRole('client'), function ($query) use ($user) {
-                $query->whereHas('roles', function ($query) {
-                    $query->where('name', 'client');
-                })
-                    ->where('client_id', $user->client_id)
-                    ->where('is_active', 1);
-            }, function ($query) {
-                $query->whereDoesntHave('roles', function ($query) {
-                    $query->where('name', 'client');
-                });
-            })->count();
-
+        return User::sessionBusiness()
+            ->when(!$user->can('view_total_users'), function ($query) use ($user) {
+                  $query->where('client_id', $user->client_id)->where('account_type', 'client');
+            })
+            ->statusActive()
+            ->count();
     }
 
     public function getProjectCount()
     {
         $user = auth()->user();
-        return Project::sessionBusiness()->when($user->hasRole('client'), function ($query) use ($user) {
+        return Project::sessionBusiness()->when(!$user->can('view_total_projects'), function ($query) use ($user) {
             $query->whereHas('members', function ($query) use ($user) {
                 $query->where('user_id', $user->id);
             });
@@ -163,22 +155,15 @@ class DashboardComponent extends Component
 
     public function getTaskCount()
     {
-        if ($this->user->hasRole('client')) {
+        $user = auth()->user();
+        return Project::sessionBusiness()->when(!$user->can('view_total_tasks'), function ($query) use ($user) {
+            $query->where('client_id', $user->client_id);
+        })->withCount('tasks')->get()->sum('tasks_count');
 
-            return Project::sessionBusiness()->where('client_id', $this->user->client_id)
-                ->withCount('tasks')->get()->sum('tasks_count');
-        } elseif ($this->user->hasRole('admin')) {
-
-            return Project::sessionBusiness()
-                ->withCount('tasks')->get()->sum('tasks_count');
-        }
     }
     public function getClientCount()
     {
-        if ($this->user->hasRole('client')) {
-            return 0;
-        } elseif ($this->user->hasRole('admin')) {
-
+        if ($this->user->hasRole('admin')) {
             return Client::whereHas('business', function ($query) {
                 $query->whereName(session('business'));
             })->count();
@@ -187,7 +172,7 @@ class DashboardComponent extends Component
 
     public function getClientDetail()
     {
-        if ($this->user->hasRole('client')) {
+        if ($this->user->can('view_client_details')) {
             return Client::sessionBusiness()->whereId($this->user->client_id)
                 ->with(['employees', 'business', 'country'])->firstOrFail();
         }
@@ -233,7 +218,7 @@ class DashboardComponent extends Component
     public function getTasks()
     {
         $user = auth()->user();
-        if ($user->hasRole('client')) {
+        if ($user->can('view_client_dashboard')) {
 
             return Task::whereHas('project', function ($query) use ($user) {
                 $query->where('business_id', $user->business_id)
@@ -251,7 +236,7 @@ class DashboardComponent extends Component
     public function getProjects()
     {
         $user = auth()->user();
-        if ($user->hasRole('client')) {
+        if ($user->can('view_client_dashboard')) {
             return Project::sessionBusiness()->when(!$user->hasRole('super-admin'), function ($query) use ($user) {
                 $query->whereHas('client', function ($query) use ($user) {
                     $query->where('id', $user->client_id);

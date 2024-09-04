@@ -87,9 +87,15 @@ class TaskDataComponent extends Component
 
     private function getTasksQuery()
     {
+        $user = auth()->user();
         $this->dispatch('reinitialize-icons');
         $projectId = isset($this->projectId) ? $this->projectId : null;
         return Task::hasProject($projectId)->with(['project', 'comments'])
+        ->when(!$user->can('view_total_tasks'), function ($query) use ($user) {
+            $query->whereHas('project', function ($query) use ($user) {
+                $query->where('client_id', $user->client_id);
+            });
+        })
         ->when($this->developerId, function ($query) {
             $query->whereHas('user', function ($query) {
                 $query->where('id', $this->developerId);

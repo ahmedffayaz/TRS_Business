@@ -51,19 +51,9 @@ class UserComponent extends Component
         $this->search ? $this->resetPage() : ''; // reset pagination while searching
 
         return User::sessionBusiness()
-            ->when($user->hasRole('client'), function ($query) use ($user) {
-                // For clients: Show only their own data
-                $query->whereHas('roles', function ($query) {
-                    $query->where('name', 'client');
-                })
-                    ->where('client_id', $user->client_id)
-                    ->where('is_active', 1);
-            }, function ($query) {
-                // For admins and others: Show all users except those with the 'client' role
-                $query->whereDoesntHave('roles', function ($query) {
-                    $query->where('name', 'client');
-                });
-            })
+            ->when(!$user->can('view_total_users'), function ($query) use ($user) {
+                $query->where('client_id', $user->client_id)->where('account_type', 'client');
+          })->statusActive()
             ->when($this->roleId, function ($query) {
                 $query->whereHas('roles', function ($query) {
                     $query->where('id', $this->roleId);
