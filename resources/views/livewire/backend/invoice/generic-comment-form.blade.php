@@ -47,7 +47,7 @@
         <x-anchor-tag class="btn btn-icon btn-outline-danger delete-user-fields delete-comment" href="javascript:void(0);"
             wire:click="removeGenericCommentsFields({{ $key }})">
             <span wire.ignore>
-                <i data-feather="trash-2"></i>
+                <span>Delete</span>
             </span>
         </x-anchor-tag>
     </div>
