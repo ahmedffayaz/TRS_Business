@@ -525,8 +525,7 @@
         </div>
     </div>
 
-    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeLeaveModal" modalTitle="Request Leaves">
-        <form wire:submit.prevent="submitLeaveRequest">
+    <x-main-modal wireIgnoreSelf="wire:ignore.self" closeModal="closeLeaveModal" modalTitle="Request Leaves" formSubmit="submitLeaveRequest">
             <div class="row">
                 <div class="col-md-6 mb-1">
                     <x-input-label for="start_date" class="required" value="Start Date" />
@@ -571,7 +570,7 @@
                     @enderror
                 </div>
 
-                <div class="col-md-12 text-center">
+                <div class="col-md-12 text-center d-flex justify-content-end">
                     <x-button class="btn btn-primary" type="submit" wire:loading.attr="disabled">
                         <span wire:loading.remove>Save</span>
                         <span wire:loading>
@@ -580,7 +579,6 @@
                     </x-button>
                 </div>
             </div>
-        </form>
     </x-main-modal>
 </div>
 
