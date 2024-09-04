@@ -18,11 +18,11 @@
             ];
         @endphp
 
-        <div class="row mb-2 d-flex justify-content-between align-items-center">
-            <div class="col-md-6 d-flex align-items-center">
-                <div class="">
+        <div class="row mb-2">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="col-md-6 col-sm-12">
                     @role('admin')
-                        <div class="ms-1">
+                        <div>
                             <button class="btn btn-outline-primary" data-filter="close" id="filter-toggle" wire:ignore> <i data-feather="filter"></i> Filter</button>
                         </div>
                     @endrole
